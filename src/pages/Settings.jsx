@@ -4,7 +4,7 @@ import Icon from "../components/Icon.jsx";
 import { AppBar, Card, BottomSheet } from "../components/index.js";
 import { useApp } from "../store/AppStore.jsx";
 import { LANGUAGES } from "../constants/languages.js";
-import { storage } from "../utils/storage.js";
+import { notificationService } from "../services/notifications/notificationService.js";
 
 function Row({ icon, label, children, onClick, last }) {
   return (
@@ -33,11 +33,22 @@ function Toggle({ on, onChange }) {
 export default function Settings() {
   const { t, pop, lang, setLang, toast } = useApp();
   const { mode, setTheme } = useTheme();
-  const [notif, setNotif] = useState(() => storage.get("notif", true));
+  const [notif, setNotif] = useState(() => notificationService.isEnabled());
   const [langSheet, setLangSheet] = useState(false);
   const current = LANGUAGES.find((l) => l.code === lang);
 
-  const setNotifP = (v) => { setNotif(v); storage.set("notif", v); toast(v ? "Notifications on" : "Notifications off", "success"); };
+  const setNotifP = async (v) => {
+    if (v && notificationService.getPermission() !== "granted") {
+      const result = await notificationService.requestPermission();
+      const granted = result === "granted";
+      setNotif(granted);
+      toast(granted ? "Notifications enabled" : "Blocked — enable in browser settings", granted ? "success" : "info");
+      return;
+    }
+    notificationService.setEnabled(v);
+    setNotif(v);
+    toast(v ? "Notifications on" : "Notifications off", "success");
+  };
 
   const themeOpts = [
     { k: "light", label: t("light"), icon: "Sun" },
@@ -81,8 +92,8 @@ export default function Settings() {
         </Card>
 
         <Card pad={6}>
-          <Row icon="Info" label={t("about")} onClick={() => toast("AgriOS India · Phase 1")} last>
-            <span style={{ fontSize: 13, color: T.inkFaint }}>v0.3.0</span>
+          <Row icon="Info" label={t("about")} onClick={() => toast("AgriOS India · Phase 4C")} last>
+            <span style={{ fontSize: 13, color: T.inkFaint }}>v0.4.0</span>
           </Row>
         </Card>
       </div>

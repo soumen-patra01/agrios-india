@@ -20,6 +20,7 @@ import FarmLocations from "../pages/FarmLocations.jsx";
 import NearbyServices from "../pages/NearbyServices.jsx";
 import MandiPrices from "../pages/MandiPrices.jsx";
 import SchemeExplorer from "../pages/SchemeExplorer.jsx";
+import FarmLedger from "../pages/FarmLedger.jsx";
 
 const TAB_SCREENS = { home: Home, ai: AIHub, market: Market, services: Services, profile: Profile };
 
@@ -33,6 +34,7 @@ function StackScreen({ item }) {
   if (item.kind === "nearby") return <NearbyServices />;
   if (item.kind === "mandiPrices") return <MandiPrices />;
   if (item.kind === "schemeExplorer") return <SchemeExplorer />;
+  if (item.kind === "farmLedger") return <FarmLedger />;
   return null;
 }
 

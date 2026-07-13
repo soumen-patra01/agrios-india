@@ -6,6 +6,8 @@ import { useApp } from "../store/AppStore.jsx";
 import { greetingKey, longDate, initials, rupee, compact } from "../utils/format.js";
 import { weatherService } from "../services/weather/weatherService.js";
 import { locationService } from "../services/location/locationService.js";
+import { ledgerService } from "../services/ledger/ledgerService.js";
+import { notificationService } from "../services/notifications/notificationService.js";
 import {
   QUICK_ACTIONS, TASKS, SCHEMES, PRICES, NEWS, CALCULATORS, CATEGORIES, FEATURED, AI_TOOLS,
 } from "../constants/content.js";
@@ -24,7 +26,23 @@ export default function Home() {
     push({ kind: "chat", props: { agentId: x?.agentId ?? null } });
   };
 
-  const monthNet = 70100, monthIn = 108600, monthOut = 38500;
+  const { net: monthNet, income: monthIn, expense: monthOut } = ledgerService.currentMonthSummary();
+
+  const [showNotifBanner, setShowNotifBanner] = useState(
+    () => notificationService.isSupported() && !notificationService.hasPrompted()
+  );
+
+  const handleNotifAllow = async () => {
+    const result = await notificationService.requestPermission();
+    setShowNotifBanner(false);
+    if (result === "granted") toast("Weather alerts enabled", "success");
+    else toast("Notifications blocked — enable in browser settings", "info");
+  };
+
+  const handleNotifDismiss = () => {
+    notificationService.markPrompted();
+    setShowNotifBanner(false);
+  };
 
   return (
     <div style={{ paddingBottom: 24, animation: "ag-fade .25s var(--ag-ease)" }}>
@@ -49,9 +67,32 @@ export default function Home() {
         <WeatherCard t={t} onOpen={() => push({ kind: "weather" })} />
       </div>
 
+      {/* notification opt-in banner — shown once */}
+      {showNotifBanner && (
+        <div style={{ padding: `10px ${H_PAD}px 0` }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 14px",
+            borderRadius: T.rLg, background: T.primarySoft, border: `1px solid ${T.primary}22` }}>
+            <Icon name="BellRing" size={20} style={{ color: T.primary, flexShrink: 0 }} />
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: T.primary }}>Enable weather alerts?</div>
+              <div style={{ fontSize: 12, color: T.inkSoft }}>Get notified of storms and spray windows.</div>
+            </div>
+            <button onClick={handleNotifAllow}
+              style={{ background: T.primary, color: "#fff", border: "none", borderRadius: 10,
+                padding: "7px 12px", cursor: "pointer", fontFamily: T.body, fontSize: 12.5, fontWeight: 600, flexShrink: 0 }}>
+              Allow
+            </button>
+            <button onClick={handleNotifDismiss}
+              style={{ background: "none", border: "none", cursor: "pointer", color: T.inkFaint, display: "flex", padding: 4, flexShrink: 0 }}>
+              <Icon name="X" size={16} />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* farm summary */}
       <div style={{ padding: `18px ${H_PAD}px 0` }}>
-        <SectionHeader title={t("farmSummary")} action={t("seeAll")} onAction={() => openFeature("Farm summary", "Your income, expenses and profit.", "Wallet", "primary")} />
+        <SectionHeader title={t("farmSummary")} action={t("seeAll")} onAction={() => push({ kind: "farmLedger" })} />
         <div style={{ display: "flex", gap: 10 }}>
           <StatTile label={t("net")} value={compact(monthNet)} accentColor={T.primary} icon="TrendingUp" bg={T.primarySoft} />
           <StatTile label={t("income")} value={compact(monthIn)} accentColor={T.blue} icon="ArrowDownLeft" bg={T.blueSoft} />

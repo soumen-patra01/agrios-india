@@ -16,6 +16,7 @@ import {
   Thermometer, Gauge, MapPin, Navigation, Compass, LocateFixed, Plus, RefreshCw,
   Clock, SprayCan,
   BookmarkPlus, BookmarkCheck, ExternalLink, BadgeCheck, BadgeAlert, Lightbulb,
+  Receipt, PlusCircle, ArrowDownCircle, ArrowUpCircle, BellRing, BellOff,
 } from "lucide-react";
 
 const REGISTRY = {
@@ -33,6 +34,7 @@ const REGISTRY = {
   Thermometer, Gauge, MapPin, Navigation, Compass, LocateFixed, Plus, RefreshCw,
   Clock, SprayCan,
   BookmarkPlus, BookmarkCheck, ExternalLink, BadgeCheck, BadgeAlert, Lightbulb,
+  Receipt, PlusCircle, ArrowDownCircle, ArrowUpCircle, BellRing, BellOff,
 };
 
 export default function Icon({ name, size = 20, color = "currentColor", strokeWidth = 2, style }) {

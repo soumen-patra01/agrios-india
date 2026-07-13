@@ -1,0 +1,15 @@
+{
+  "name": "AgriOS India",
+  "short_name": "AgriOS",
+  "description": "The AI Operating System for Every Indian Farmer",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F4F7F1",
+  "theme_color": "#12894E",
+  "orientation": "portrait",
+  "lang": "en-IN",
+  "categories": ["agriculture", "productivity"],
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
