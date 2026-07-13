@@ -1,0 +1,70 @@
+version: "3.9"
+
+# MLOps extended stack — includes annotation service, model serving stubs,
+# and monitoring. Extend with real services as they are built.
+# Usage: docker compose -f docker-compose.yml -f docker-compose.mlops.yml up
+
+services:
+  app:
+    environment:
+      - MLOPS_API_URL=http://mlops-api:4000
+      - ANNOTATION_SERVICE_URL=http://annotation-service:4001
+      - MODEL_REGISTRY_URL=http://model-registry:4002
+
+  # MLOps API — future FastAPI / Node service for server-side MLOps operations
+  mlops-api:
+    image: node:20-alpine
+    container_name: agrios-mlops-api
+    working_dir: /app
+    volumes:
+      - ./mlops-api:/app
+    ports:
+      - "4000:4000"
+    command: sh -c "echo 'MLOps API placeholder — replace with real service' && sleep infinity"
+    healthcheck:
+      test: ["CMD", "echo", "ok"]
+      interval: 30s
+    profiles: ["mlops"]
+
+  # Annotation service — future label-studio or custom annotation backend
+  annotation-service:
+    image: node:20-alpine
+    container_name: agrios-annotation-service
+    ports:
+      - "4001:4001"
+    command: sh -c "echo 'Annotation service placeholder — replace with real service' && sleep infinity"
+    profiles: ["mlops"]
+
+  # Model registry API — future MLflow or custom model registry
+  model-registry:
+    image: node:20-alpine
+    container_name: agrios-model-registry
+    ports:
+      - "4002:4002"
+    command: sh -c "echo 'Model registry placeholder — replace with real service' && sleep infinity"
+    profiles: ["mlops"]
+
+  # Object storage — MinIO (S3-compatible) for artifact storage
+  minio:
+    image: minio/minio:latest
+    container_name: agrios-minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      - MINIO_ROOT_USER=agrios
+      - MINIO_ROOT_PASSWORD=agrios-secret-change-in-prod
+    volumes:
+      - minio-data:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+    profiles: ["mlops"]
+
+volumes:
+  minio-data:
+
+networks:
+  default:
+    name: agrios-network

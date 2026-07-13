@@ -1,0 +1,81 @@
+replicaCount: 2
+
+image:
+  repository: agrios-india
+  tag: latest
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 3000
+
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: agrios.in
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: agrios-tls
+      hosts:
+        - agrios.in
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+env:
+  NODE_ENV: production
+
+secrets:
+  # ANTHROPIC_API_KEY is injected via Vercel env vars or K8s Secret
+  # Never hardcode here — use: kubectl create secret generic agrios-secrets --from-literal=ANTHROPIC_API_KEY=...
+  existingSecret: ""
+  secretKeyName: ANTHROPIC_API_KEY
+
+nodeSelector: {}
+tolerations: []
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: agrios-india
+          topologyKey: kubernetes.io/hostname
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+serviceAccount:
+  create: true
+  automountServiceAccountToken: false
+
+mlops:
+  enabled: false
+  objectStorage:
+    provider: s3
+    bucket: agrios-mlops-artifacts
+    region: ap-south-1
+
+monitoring:
+  enabled: false
+  prometheus:
+    scrape: true
+    port: 9090

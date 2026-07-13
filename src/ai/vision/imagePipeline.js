@@ -52,3 +52,10 @@ export async function captureImageBlock({ capture = false } = {}) {
   const compressed = await compressImage(file);
   return { block: toImageBlock(compressed), meta: compressed };
 }
+
+/* Re-export new vision services so existing callers don't need path changes. */
+export { imageProcessor }    from "../../services/vision/imageProcessor.js";
+export { imageValidator }    from "../../services/vision/imageValidator.js";
+export { cameraService }     from "../../services/vision/cameraService.js";
+export { galleryService }    from "../../services/vision/galleryService.js";
+export { visionPipeline }    from "../../services/vision/pipeline.js";

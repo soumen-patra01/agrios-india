@@ -1,0 +1,15 @@
+apiVersion: v2
+name: agrios-india
+description: AI-powered farming assistant for Indian farmers with MLOps platform
+type: application
+version: 0.3.0
+appVersion: "0.2.0"
+keywords:
+  - agriculture
+  - ai
+  - mlops
+  - india
+  - farming
+maintainers:
+  - name: AgriOS India Team
+    email: dev@agrios.in

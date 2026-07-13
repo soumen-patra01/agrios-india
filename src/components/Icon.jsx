@@ -14,9 +14,16 @@ import {
   SlidersHorizontal, Wallet, Mic, Volume2, Star, Download, Trash2,
   Cloud, CloudFog, CloudDrizzle, CloudLightning, Snowflake, Umbrella,
   Thermometer, Gauge, MapPin, Navigation, Compass, LocateFixed, Plus, RefreshCw,
-  Clock, SprayCan, Timer,
+  Clock, SprayCan, Timer, CameraOff, ImagePlus, FlipHorizontal2, Aperture, Zap,
   BookmarkPlus, BookmarkCheck, ExternalLink, BadgeCheck, BadgeAlert, Lightbulb,
   Receipt, PlusCircle, ArrowDownCircle, ArrowUpCircle, BellRing, BellOff,
+  Microscope, HeartPulse, Scan, ClipboardList, FileDown, History, Share2, Printer, GitBranch,
+  Database, GitMerge, Activity, BarChart2, Layers, Package2, Cpu, Boxes,
+  PieChart, Target, Crosshair, Radio, Network, ShieldAlert,
+  XCircle, PlayCircle, PauseCircle, StopCircle, Hourglass,
+  ArrowRight, ArrowLeft, ChevronUp, Eye, EyeOff, Tag, FolderOpen,
+  Upload, Link, Unlink, Workflow, Server, HardDrive,
+  LayoutDashboard, ListFilter, SortAsc, SortDesc, Pencil, Copy, MoreHorizontal,
 } from "lucide-react";
 
 const REGISTRY = {
@@ -32,9 +39,16 @@ const REGISTRY = {
   SlidersHorizontal, Wallet, Mic, Volume2, Star, Download, Trash2,
   Cloud, CloudFog, CloudDrizzle, CloudLightning, Snowflake, Umbrella,
   Thermometer, Gauge, MapPin, Navigation, Compass, LocateFixed, Plus, RefreshCw,
-  Clock, SprayCan, Timer,
+  Clock, SprayCan, Timer, CameraOff, ImagePlus, FlipHorizontal2, Aperture, Zap,
   BookmarkPlus, BookmarkCheck, ExternalLink, BadgeCheck, BadgeAlert, Lightbulb,
   Receipt, PlusCircle, ArrowDownCircle, ArrowUpCircle, BellRing, BellOff,
+  Microscope, HeartPulse, Scan, ClipboardList, FileDown, History, Share2, Printer, GitBranch,
+  Database, GitMerge, Activity, BarChart2, Layers, Package2, Cpu, Boxes,
+  PieChart, Target, Crosshair, Radio, Network, ShieldAlert,
+  XCircle, PlayCircle, PauseCircle, StopCircle, Hourglass,
+  ArrowRight, ArrowLeft, ChevronUp, Eye, EyeOff, Tag, FolderOpen,
+  Upload, Link, Unlink, Workflow, Server, HardDrive,
+  LayoutDashboard, ListFilter, SortAsc, SortDesc, Pencil, Copy, MoreHorizontal,
 };
 
 export default function Icon({ name, size = 20, color = "currentColor", strokeWidth = 2, style }) {

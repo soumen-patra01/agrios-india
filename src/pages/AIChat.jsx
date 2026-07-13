@@ -4,8 +4,10 @@ import Icon from "../components/Icon.jsx";
 import Markdown from "../components/markdown.jsx";
 import { AppBar, IconTile, BottomSheet, Dialog, EmptyState, accent } from "../components/index.js";
 import { useApp } from "../store/AppStore.jsx";
-import { useAI, conversationStore, voice, captureImageBlock, getAgent } from "../ai/index.js";
+import { useAI, conversationStore, voice, getAgent } from "../ai/index.js";
 import { textOf } from "../ai/models/message.js";
+import CameraCapture from "../components/CameraCapture.jsx";
+import { compressImage, toImageBlock } from "../ai/vision/imagePipeline.js";
 
 export default function AIChat({ agentId = null, conversationId = null }) {
   const { t, lang, pop, toast } = useApp();
@@ -13,7 +15,8 @@ export default function AIChat({ agentId = null, conversationId = null }) {
   const [input, setInput] = useState("");
   const [listening, setListening] = useState(false);
   const [pendingImage, setPendingImage] = useState(null);
-  const [historyOpen, setHistoryOpen] = useState(false);
+  const [cameraOpen, setCameraOpen]     = useState(false);
+  const [historyOpen, setHistoryOpen]   = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(null);
   const endRef = useRef(null);
   const sttRef = useRef(null);
@@ -44,10 +47,14 @@ export default function AIChat({ agentId = null, conversationId = null }) {
     });
   };
 
-  const attach = async () => {
+  const attach = () => setCameraOpen(true);
+
+  const handleCapture = async (file) => {
+    setCameraOpen(false);
     try {
-      const img = await captureImageBlock({});
-      if (img) { setPendingImage(img); toast(t("imageAttached"), "success"); }
+      const compressed = await compressImage(file);
+      setPendingImage({ block: toImageBlock(compressed), meta: compressed });
+      toast(t("imageAttached"), "success");
     } catch { toast(t("imageFailed"), "error"); }
   };
 
@@ -175,6 +182,10 @@ export default function AIChat({ agentId = null, conversationId = null }) {
           }}
         />
       </BottomSheet>
+
+      {cameraOpen && (
+        <CameraCapture onCapture={handleCapture} onCancel={() => setCameraOpen(false)} />
+      )}
 
       <Dialog open={!!confirmDelete} onClose={() => setConfirmDelete(null)}
         title={t("deleteChat") + "?"} body={t("deleteChatBody")} icon="Trash2" danger

@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: agrios-india
+  labels:
+    app.kubernetes.io/name: agrios-india
+    app.kubernetes.io/managed-by: helm
+    environment: production

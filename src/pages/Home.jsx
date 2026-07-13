@@ -170,6 +170,48 @@ export default function Home() {
         )}
       </div>
 
+      {/* AI Diagnostics banner */}
+      <div style={{ padding: `20px ${H_PAD}px 0` }}>
+        <button onClick={() => push({ kind: "diagnosticsHome" })}
+          style={{ width: "100%", padding: "16px 18px", borderRadius: T.rLg, cursor: "pointer",
+            background: `linear-gradient(135deg, ${T.primary}, ${T.primaryDark})`,
+            border: "none", fontFamily: T.body, textAlign: "left",
+            display: "flex", alignItems: "center", gap: 14 }}>
+          <div style={{ width: 48, height: 48, borderRadius: 14, background: "rgba(255,255,255,.2)",
+            display: "grid", placeItems: "center", flexShrink: 0 }}>
+            <Icon name="Microscope" size={26} color="#fff" />
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 15, fontWeight: 700, color: "#fff" }}>AI Crop & Livestock Diagnostics</div>
+            <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.78)", marginTop: 3 }}>
+              Disease, pest & health analysis for crops and animals
+            </div>
+          </div>
+          <Icon name="ChevronRight" size={20} color="rgba(255,255,255,.7)" />
+        </button>
+      </div>
+
+      {/* MLOps Platform banner */}
+      <div style={{ padding: `10px ${H_PAD}px 0` }}>
+        <button onClick={() => push({ kind: "mlopsHub" })}
+          style={{ width: "100%", padding: "14px 18px", borderRadius: T.rLg, cursor: "pointer",
+            background: `linear-gradient(135deg, #1e3a5f, #0f2444)`,
+            border: "none", fontFamily: T.body, textAlign: "left",
+            display: "flex", alignItems: "center", gap: 14 }}>
+          <div style={{ width: 44, height: 44, borderRadius: 12, background: "rgba(255,255,255,.15)",
+            display: "grid", placeItems: "center", flexShrink: 0 }}>
+            <Icon name="Layers" size={22} color="#fff" />
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>MLOps Platform</div>
+            <div style={{ fontSize: 12, color: "rgba(255,255,255,.7)", marginTop: 2 }}>
+              Dataset · Annotation · Model Registry · Monitoring
+            </div>
+          </div>
+          <Icon name="ChevronRight" size={18} color="rgba(255,255,255,.6)" />
+        </button>
+      </div>
+
       {/* schemes — horizontal */}
       <div style={{ paddingTop: 20 }}>
         <div style={{ padding: `0 ${H_PAD}px` }}><SectionHeader title={t("schemes")} action={t("seeAll")} onAction={() => push({ kind: "schemeExplorer" })} /></div>

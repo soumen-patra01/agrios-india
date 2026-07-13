@@ -21,7 +21,19 @@ import NearbyServices from "../pages/NearbyServices.jsx";
 import MandiPrices from "../pages/MandiPrices.jsx";
 import SchemeExplorer from "../pages/SchemeExplorer.jsx";
 import FarmLedger from "../pages/FarmLedger.jsx";
-import CropCalendar from "../pages/CropCalendar.jsx";
+import CropCalendar        from "../pages/CropCalendar.jsx";
+import DiagnosticsHome     from "../pages/DiagnosticsHome.jsx";
+import DiagnosticFlow      from "../pages/DiagnosticFlow.jsx";
+import DiagnosticResult    from "../pages/DiagnosticResult.jsx";
+import DiagnosticHistory   from "../pages/DiagnosticHistory.jsx";
+import MLOpsHub            from "../pages/mlops/MLOpsHub.jsx";
+import DatasetBrowser      from "../pages/mlops/DatasetBrowser.jsx";
+import DatasetDetail       from "../pages/mlops/DatasetDetail.jsx";
+import AnnotationWorkspace from "../pages/mlops/AnnotationWorkspace.jsx";
+import ModelRegistryPage   from "../pages/mlops/ModelRegistryPage.jsx";
+import ExperimentList      from "../pages/mlops/ExperimentList.jsx";
+import TrainingDashboard   from "../pages/mlops/TrainingDashboard.jsx";
+import MonitoringDashboard from "../pages/mlops/MonitoringDashboard.jsx";
 
 const TAB_SCREENS = { home: Home, ai: AIHub, market: Market, services: Services, profile: Profile };
 
@@ -36,7 +48,20 @@ function StackScreen({ item }) {
   if (item.kind === "mandiPrices") return <MandiPrices />;
   if (item.kind === "schemeExplorer") return <SchemeExplorer />;
   if (item.kind === "farmLedger") return <FarmLedger />;
-  if (item.kind === "cropCalendar") return <CropCalendar />;
+  if (item.kind === "cropCalendar")      return <CropCalendar />;
+  if (item.kind === "diagnosticsHome")   return <DiagnosticsHome />;
+  if (item.kind === "diagnosticFlow")    return <DiagnosticFlow    {...(item.props || {})} />;
+  if (item.kind === "diagnosticResult")  return <DiagnosticResult  {...(item.props || {})} />;
+  if (item.kind === "diagnosticHistory") return <DiagnosticHistory />;
+  if (item.kind === "diagnosticConsent")    return <DiagnosticsHome />;
+  if (item.kind === "mlopsHub")             return <MLOpsHub />;
+  if (item.kind === "datasetBrowser")       return <DatasetBrowser />;
+  if (item.kind === "datasetDetail")        return <DatasetDetail       {...(item.props || {})} />;
+  if (item.kind === "annotationWorkspace")  return <AnnotationWorkspace {...(item.props || {})} />;
+  if (item.kind === "modelRegistryPage")    return <ModelRegistryPage />;
+  if (item.kind === "experimentList")       return <ExperimentList />;
+  if (item.kind === "trainingDashboard")    return <TrainingDashboard />;
+  if (item.kind === "monitoringDashboard")  return <MonitoringDashboard />;
   return null;
 }
 
