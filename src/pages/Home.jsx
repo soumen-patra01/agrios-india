@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { T } from "../theme/ThemeProvider.jsx";
 import Icon from "../components/Icon.jsx";
 import { Card, IconTile, SectionHeader, Chip } from "../components/index.js";
@@ -8,6 +8,7 @@ import { weatherService } from "../services/weather/weatherService.js";
 import { locationService } from "../services/location/locationService.js";
 import { ledgerService } from "../services/ledger/ledgerService.js";
 import { notificationService } from "../services/notifications/notificationService.js";
+import { cropCalendarService } from "../services/calendar/cropCalendarService.js";
 import {
   QUICK_ACTIONS, TASKS, SCHEMES, PRICES, NEWS, CALCULATORS, CATEGORIES, FEATURED, AI_TOOLS,
 } from "../constants/content.js";
@@ -18,6 +19,9 @@ const H_PAD = 16;
 export default function Home() {
   const { t, locale, user, push, switchTab } = useApp();
   const [tasks, setTasks] = useState(TASKS);
+  const [calTick, setCalTick] = useState(0);
+  const hasCrops  = useMemo(() => cropCalendarService.all().length > 0, [calTick]);
+  const calTasks  = useMemo(() => cropCalendarService.upcomingTasks(7), [calTick]);
   const name = (user?.name || "Farmer").split(" ")[0];
 
   const openFeature = (title, desc, icon, a) => push({ kind: "feature", props: { title, desc, icon, a } });
@@ -115,20 +119,55 @@ export default function Home() {
 
       {/* tasks */}
       <div style={{ padding: `20px ${H_PAD}px 0` }}>
-        <SectionHeader title={t("todayTasks")} />
-        <Card pad={6}>
-          {tasks.map((tk, i) => (
-            <div key={tk.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 12px", borderTop: i ? `1px solid ${T.lineSoft}` : "none" }}>
-              <button onClick={() => setTasks(tasks.map((x) => x.id === tk.id ? { ...x, done: !x.done } : x))} aria-label="toggle"
-                style={{ width: 22, height: 22, borderRadius: 7, flexShrink: 0, cursor: "pointer", display: "grid", placeItems: "center",
-                  border: `1.5px solid ${tk.done ? T.primary : T.line}`, background: tk.done ? T.primary : "transparent", transition: "all .15s" }}>
-                {tk.done && <Icon name="Check" size={14} color="#fff" strokeWidth={3} />}
+        <SectionHeader title={t("todayTasks")}
+          action={hasCrops ? t("seeAll") : undefined}
+          onAction={hasCrops ? () => push({ kind: "cropCalendar" }) : undefined} />
+        {hasCrops ? (
+          calTasks.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "20px 0", fontSize: 13.5, color: T.inkFaint }}>
+              No tasks due this week —{" "}
+              <button onClick={() => push({ kind: "cropCalendar" })}
+                style={{ background: "none", border: "none", cursor: "pointer",
+                  color: T.primary, fontFamily: T.body, fontSize: 13.5, fontWeight: 600, padding: 0 }}>
+                open calendar
               </button>
-              <span style={{ flex: 1, fontSize: 14, color: tk.done ? T.inkFaint : T.ink, textDecoration: tk.done ? "line-through" : "none" }}>{tk.text}</span>
-              <span style={{ fontSize: 11, fontWeight: 600, color: T.inkSoft, background: T.surface2, padding: "3px 9px", borderRadius: 8 }}>{tk.tag}</span>
             </div>
-          ))}
-        </Card>
+          ) : (
+            <Card pad={6}>
+              {calTasks.map((tk, i) => (
+                <div key={tk.taskKey} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 12px", borderTop: i ? `1px solid ${T.lineSoft}` : "none" }}>
+                  <button onClick={() => {
+                    if (tk.done) cropCalendarService.markUndone(tk.taskKey);
+                    else cropCalendarService.markDone(tk.taskKey);
+                    setCalTick((n) => n + 1);
+                  }} aria-label="toggle"
+                    style={{ width: 22, height: 22, borderRadius: 7, flexShrink: 0, cursor: "pointer", display: "grid", placeItems: "center",
+                      border: `1.5px solid ${tk.done ? T.primary : T.line}`, background: tk.done ? T.primary : "transparent", transition: "all .15s" }}>
+                    {tk.done && <Icon name="Check" size={14} color="#fff" strokeWidth={3} />}
+                  </button>
+                  <span style={{ flex: 1, fontSize: 14, color: tk.done ? T.inkFaint : T.ink, textDecoration: tk.done ? "line-through" : "none" }}>
+                    {tk.type.label}{tk.note ? ` — ${tk.note}` : ""}
+                  </span>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: T.inkSoft, background: T.surface2, padding: "3px 9px", borderRadius: 8 }}>{tk.cropName}</span>
+                </div>
+              ))}
+            </Card>
+          )
+        ) : (
+          <Card pad={6}>
+            {tasks.map((tk, i) => (
+              <div key={tk.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 12px", borderTop: i ? `1px solid ${T.lineSoft}` : "none" }}>
+                <button onClick={() => setTasks(tasks.map((x) => x.id === tk.id ? { ...x, done: !x.done } : x))} aria-label="toggle"
+                  style={{ width: 22, height: 22, borderRadius: 7, flexShrink: 0, cursor: "pointer", display: "grid", placeItems: "center",
+                    border: `1.5px solid ${tk.done ? T.primary : T.line}`, background: tk.done ? T.primary : "transparent", transition: "all .15s" }}>
+                  {tk.done && <Icon name="Check" size={14} color="#fff" strokeWidth={3} />}
+                </button>
+                <span style={{ flex: 1, fontSize: 14, color: tk.done ? T.inkFaint : T.ink, textDecoration: tk.done ? "line-through" : "none" }}>{tk.text}</span>
+                <span style={{ fontSize: 11, fontWeight: 600, color: T.inkSoft, background: T.surface2, padding: "3px 9px", borderRadius: 8 }}>{tk.tag}</span>
+              </div>
+            ))}
+          </Card>
+        )}
       </div>
 
       {/* schemes — horizontal */}

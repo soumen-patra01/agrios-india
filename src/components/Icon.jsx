@@ -14,7 +14,7 @@ import {
   SlidersHorizontal, Wallet, Mic, Volume2, Star, Download, Trash2,
   Cloud, CloudFog, CloudDrizzle, CloudLightning, Snowflake, Umbrella,
   Thermometer, Gauge, MapPin, Navigation, Compass, LocateFixed, Plus, RefreshCw,
-  Clock, SprayCan,
+  Clock, SprayCan, Timer,
   BookmarkPlus, BookmarkCheck, ExternalLink, BadgeCheck, BadgeAlert, Lightbulb,
   Receipt, PlusCircle, ArrowDownCircle, ArrowUpCircle, BellRing, BellOff,
 } from "lucide-react";
@@ -32,7 +32,7 @@ const REGISTRY = {
   SlidersHorizontal, Wallet, Mic, Volume2, Star, Download, Trash2,
   Cloud, CloudFog, CloudDrizzle, CloudLightning, Snowflake, Umbrella,
   Thermometer, Gauge, MapPin, Navigation, Compass, LocateFixed, Plus, RefreshCw,
-  Clock, SprayCan,
+  Clock, SprayCan, Timer,
   BookmarkPlus, BookmarkCheck, ExternalLink, BadgeCheck, BadgeAlert, Lightbulb,
   Receipt, PlusCircle, ArrowDownCircle, ArrowUpCircle, BellRing, BellOff,
 };
