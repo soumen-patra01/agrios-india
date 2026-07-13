@@ -1,9 +1,9 @@
 /* OTP sender — generates a 6-digit code, signs it in a JWT (no DB needed),
-   and sends it via Fast2SMS. Returns { token } to the client.
-   If FAST2SMS_API_KEY is not set, skips SMS and returns { token, demo: true }
-   so the app stays usable in dev/staging without credentials. */
+   then sends via 2Factor.in (preferred) or Fast2SMS (fallback).
+   If neither key is set, returns { token, demo: true } so the app still
+   works in dev/staging without credentials. */
 
-import { createHmac, timingSafeEqual, randomInt } from "crypto";
+import { createHmac, randomInt } from "crypto";
 
 /* ── JWT helpers (HS256, no external package) ────────────────────────────── */
 function b64url(buf) {
@@ -34,6 +34,29 @@ function isLimited(phone) {
   return false;
 }
 
+/* ── SMS providers ───────────────────────────────────────────────────────── */
+
+async function sendVia2Factor(apiKey, phone, otp) {
+  const url = `https://2factor.in/API/V1/${apiKey}/SMS/${phone}/${otp}/`;
+  const res  = await fetch(url);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || data.Status !== "Success") {
+    throw new Error(data.Details || "2Factor delivery failed");
+  }
+}
+
+async function sendViaFast2SMS(apiKey, phone, otp) {
+  const res  = await fetch("https://www.fast2sms.com/dev/bulkV2", {
+    method:  "POST",
+    headers: { authorization: apiKey, "Content-Type": "application/json" },
+    body:    JSON.stringify({ route: "otp", variables_values: otp, numbers: phone, flash: 0 }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || data.return === false) {
+    throw new Error(data.message || "Fast2SMS delivery failed");
+  }
+}
+
 /* ── Handler ─────────────────────────────────────────────────────────────── */
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -58,39 +81,24 @@ export default async function handler(req, res) {
   const exp   = Math.floor(Date.now() / 1000) + 600;   // 10 min
   const token = signJwt({ phone, otp, exp }, secret);
 
-  const apiKey = process.env.FAST2SMS_API_KEY;
+  const twoFactorKey = process.env.TWOFACTOR_API_KEY;
+  const fast2smsKey  = process.env.FAST2SMS_API_KEY;
 
   /* ── Demo mode: no SMS key configured ───────────────────────────────────── */
-  if (!apiKey) {
+  if (!twoFactorKey && !fast2smsKey) {
     return res.status(200).json({ token, demo: true });
   }
 
-  /* ── Send SMS via Fast2SMS ───────────────────────────────────────────────── */
+  /* ── Try 2Factor first, then Fast2SMS as fallback ────────────────────────── */
   try {
-    const smsRes = await fetch("https://www.fast2sms.com/dev/bulkV2", {
-      method: "POST",
-      headers: {
-        authorization: apiKey,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        route:            "otp",
-        variables_values: otp,
-        numbers:          phone,
-        flash:            0,
-      }),
-    });
-
-    const smsJson = await smsRes.json().catch(() => ({}));
-
-    if (!smsRes.ok || smsJson.return === false) {
-      console.error("Fast2SMS error:", smsJson);
-      return res.status(502).json({ error: "SMS delivery failed — try again" });
+    if (twoFactorKey) {
+      await sendVia2Factor(twoFactorKey, phone, otp);
+    } else {
+      await sendViaFast2SMS(fast2smsKey, phone, otp);
     }
-
     return res.status(200).json({ token });
   } catch (err) {
-    console.error("Fast2SMS fetch failed:", err);
-    return res.status(502).json({ error: "SMS service unreachable — try again" });
+    console.error("SMS error:", err.message);
+    return res.status(502).json({ error: "SMS delivery failed — " + err.message });
   }
 }
