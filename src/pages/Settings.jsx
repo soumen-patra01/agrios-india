@@ -1,0 +1,107 @@
+import { useState } from "react";
+import { T, useTheme } from "../theme/ThemeProvider.jsx";
+import Icon from "../components/Icon.jsx";
+import { AppBar, Card, BottomSheet } from "../components/index.js";
+import { useApp } from "../store/AppStore.jsx";
+import { LANGUAGES } from "../constants/languages.js";
+import { storage } from "../utils/storage.js";
+
+function Row({ icon, label, children, onClick, last }) {
+  return (
+    <div onClick={onClick} style={{ display: "flex", alignItems: "center", gap: 13, padding: "13px 12px",
+      borderTop: last ? "none" : `1px solid ${T.lineSoft}`, cursor: onClick ? "pointer" : "default" }}>
+      <div style={{ width: 34, height: 34, borderRadius: 10, background: T.surface2, color: T.inkSoft, display: "grid", placeItems: "center", flexShrink: 0 }}>
+        <Icon name={icon} size={17} />
+      </div>
+      <span style={{ flex: 1, fontSize: 14.5, fontWeight: 500 }}>{label}</span>
+      {children}
+    </div>
+  );
+}
+
+function Toggle({ on, onChange }) {
+  return (
+    <button onClick={() => onChange(!on)} aria-pressed={on}
+      style={{ width: 46, height: 28, borderRadius: 999, border: "none", cursor: "pointer", padding: 3, flexShrink: 0,
+        background: on ? T.primary : T.line, transition: "background .2s var(--ag-ease)" }}>
+      <div style={{ width: 22, height: 22, borderRadius: "50%", background: "#fff", transform: `translateX(${on ? 18 : 0}px)`,
+        transition: "transform .2s var(--ag-ease)", boxShadow: "0 1px 3px rgba(0,0,0,.2)" }} />
+    </button>
+  );
+}
+
+export default function Settings() {
+  const { t, pop, lang, setLang, toast } = useApp();
+  const { mode, setTheme } = useTheme();
+  const [notif, setNotif] = useState(() => storage.get("notif", true));
+  const [langSheet, setLangSheet] = useState(false);
+  const current = LANGUAGES.find((l) => l.code === lang);
+
+  const setNotifP = (v) => { setNotif(v); storage.set("notif", v); toast(v ? "Notifications on" : "Notifications off", "success"); };
+
+  const themeOpts = [
+    { k: "light", label: t("light"), icon: "Sun" },
+    { k: "dark", label: t("dark"), icon: "Moon" },
+    { k: "system", label: t("system"), icon: "SmartphoneNfc" },
+  ];
+
+  return (
+    <>
+      <AppBar title={t("settings")} onBack={pop} />
+      <div style={{ padding: "4px 16px 24px", display: "flex", flexDirection: "column", gap: 18, animation: "ag-fade .25s var(--ag-ease)" }}>
+        {/* theme */}
+        <div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: T.inkSoft, textTransform: "uppercase", letterSpacing: .4, marginBottom: 10, padding: "0 2px" }}>{t("theme")}</div>
+          <div style={{ display: "flex", gap: 10 }}>
+            {themeOpts.map((o) => {
+              const on = mode === o.k;
+              return (
+                <button key={o.k} onClick={() => setTheme(o.k)}
+                  style={{ flex: 1, display: "grid", justifyItems: "center", gap: 8, padding: "16px 8px", borderRadius: T.rLg, cursor: "pointer", fontFamily: T.body,
+                    background: on ? T.primarySoft : T.surface, border: `1.5px solid ${on ? T.primary : T.line}`, transition: "all .18s var(--ag-ease)" }}>
+                  <Icon name={o.icon} size={22} style={{ color: on ? T.primary : T.inkSoft }} />
+                  <span style={{ fontSize: 12.5, fontWeight: 600, color: on ? T.primary : T.inkSoft }}>{o.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <Card pad={6}>
+          <Row icon="Bell" label={t("notifications")}><Toggle on={notif} onChange={setNotifP} /></Row>
+          <Row icon="Languages" label={t("language")} onClick={() => setLangSheet(true)}>
+            <span style={{ fontSize: 13, color: T.inkSoft, fontWeight: 600 }}>{current?.native} <Icon name="ChevronRight" size={16} style={{ verticalAlign: -3, color: T.inkFaint }} /></span>
+          </Row>
+          <Row icon="ShieldCheck" label={t("security")} onClick={() => toast("Security settings — coming soon")}>
+            <Icon name="ChevronRight" size={18} style={{ color: T.inkFaint }} />
+          </Row>
+          <Row icon="SlidersHorizontal" label={t("permissions")} onClick={() => toast("Permissions — coming soon")} last>
+            <Icon name="ChevronRight" size={18} style={{ color: T.inkFaint }} />
+          </Row>
+        </Card>
+
+        <Card pad={6}>
+          <Row icon="Info" label={t("about")} onClick={() => toast("AgriOS India · Phase 1")} last>
+            <span style={{ fontSize: 13, color: T.inkFaint }}>v0.3.0</span>
+          </Row>
+        </Card>
+      </div>
+
+      <BottomSheet open={langSheet} onClose={() => setLangSheet(false)} title={t("language")}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+          {LANGUAGES.map((l) => {
+            const on = l.code === lang;
+            return (
+              <button key={l.code} onClick={() => { setLang(l.code); setLangSheet(false); toast("Language updated", "success"); }}
+                style={{ textAlign: "left", padding: "13px 15px", borderRadius: T.rLg, cursor: "pointer", fontFamily: T.body,
+                  border: `1.5px solid ${on ? T.primary : T.line}`, background: on ? T.primarySoft : T.surface }}>
+                <div style={{ fontFamily: T.display, fontSize: 16, fontWeight: 700, color: on ? T.primary : T.ink }}>{l.native}</div>
+                <div style={{ fontSize: 12, color: T.inkSoft }}>{l.label}</div>
+              </button>
+            );
+          })}
+        </div>
+      </BottomSheet>
+    </>
+  );
+}
