@@ -92,12 +92,12 @@ export default function Home() {
 
       {/* schemes — horizontal */}
       <div style={{ paddingTop: 20 }}>
-        <div style={{ padding: `0 ${H_PAD}px` }}><SectionHeader title={t("schemes")} action={t("seeAll")} onAction={() => openFeature("Government schemes", "Schemes you may be eligible for.", "Landmark", "primary")} /></div>
+        <div style={{ padding: `0 ${H_PAD}px` }}><SectionHeader title={t("schemes")} action={t("seeAll")} onAction={() => push({ kind: "schemeExplorer" })} /></div>
         <HScroll>
           {SCHEMES.map((s) => {
             const c = accent(s.accent);
             return (
-              <div key={s.id} onClick={() => openFeature(s.title, s.note, "Landmark", s.accent)}
+              <div key={s.id} onClick={() => push({ kind: "schemeExplorer" })}
                 style={{ minWidth: 210, background: T.surface, border: `1px solid ${T.line}`, borderRadius: T.rLg, padding: 15, cursor: "pointer" }}>
                 <div style={{ display: "inline-flex", fontSize: 11, fontWeight: 700, color: c.fg, background: c.bg, padding: "4px 9px", borderRadius: 7 }}>{s.tag}</div>
                 <div style={{ fontFamily: T.display, fontSize: 16, fontWeight: 700, marginTop: 10 }}>{s.title}</div>

@@ -1,0 +1,245 @@
+import { useState } from "react";
+import { T } from "../theme/ThemeProvider.jsx";
+import Icon from "../components/Icon.jsx";
+import { AppBar, Screen, Card, Chip, IconTile } from "../components/index.js";
+import { useApp } from "../store/AppStore.jsx";
+import { schemesService } from "../services/schemes/schemesService.js";
+import { ELIGIBILITY_LABELS, ELIGIBILITY_COLORS } from "../services/schemes/eligibilityEngine.js";
+import { profileMemory } from "../ai/memory/profileMemory.js";
+
+const CATEGORY_LABELS = {
+  income: "Income support", insurance: "Insurance", credit: "Credit",
+  subsidy: "Subsidy", advisory: "Advisory",
+};
+const CATEGORIES = ["all", "income", "insurance", "credit", "subsidy", "advisory"];
+
+export default function SchemeExplorer() {
+  const { pop, push, toast } = useApp();
+  const [query, setQuery] = useState("");
+  const [activeCategory, setActiveCategory] = useState("all");
+  const [bookmarks, setBookmarks] = useState(() => schemesService.bookmarks());
+  const [selected, setSelected] = useState(null);
+  const [showOnlyBookmarked, setShowOnlyBookmarked] = useState(false);
+
+  const profile = profileMemory.get();
+  const hasProfile = profile.landSize || (profile.farmType || []).length > 0;
+
+  const eligibilityResults = schemesService.findEligible();
+
+  const displayed = eligibilityResults.filter(({ scheme }) => {
+    if (query) return scheme.title.toLowerCase().includes(query.toLowerCase()) ||
+      scheme.fullName.toLowerCase().includes(query.toLowerCase()) ||
+      scheme.offer.toLowerCase().includes(query.toLowerCase());
+    if (showOnlyBookmarked) return bookmarks.includes(scheme.id);
+    if (activeCategory !== "all") return scheme.category === activeCategory;
+    return true;
+  });
+
+  const toggleBookmark = (id) => {
+    schemesService.toggleBookmark(id);
+    setBookmarks(schemesService.bookmarks());
+    toast(bookmarks.includes(id) ? "Removed from saved" : "Saved scheme", "success");
+  };
+
+  const eligColors = ELIGIBILITY_COLORS(T);
+
+  return (
+    <>
+      <AppBar title="Government schemes" onBack={pop} />
+      <Screen gap={14}>
+        {/* profile nudge */}
+        {!hasProfile && (
+          <button onClick={() => push({ kind: "chat", props: { agentId: "governmentAdvisor" } })}
+            style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 14px", borderRadius: T.rLg, background: T.primarySoft, border: `1px solid ${T.primary}20`, cursor: "pointer", textAlign: "left", width: "100%" }}>
+            <Icon name="Sparkles" size={20} style={{ color: T.primary, flexShrink: 0 }} />
+            <div>
+              <div style={{ fontSize: 13.5, fontWeight: 700, color: T.primary }}>Get personalised scheme matches</div>
+              <div style={{ fontSize: 12.5, color: T.ink, marginTop: 1 }}>Tell our AI your farm details and we'll check which schemes you qualify for.</div>
+            </div>
+            <Icon name="ChevronRight" size={16} style={{ color: T.primary, flexShrink: 0 }} />
+          </button>
+        )}
+
+        {/* search */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "0 12px", borderRadius: T.pill,
+          background: T.surface2, border: `1px solid ${query ? T.primary : "transparent"}`, transition: "border-color .18s" }}>
+          <Icon name="Search" size={18} style={{ color: T.inkFaint }} />
+          <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search schemes (PM-KISAN, insurance…)"
+            style={{ flex: 1, padding: "12px 0", border: "none", outline: "none", background: "transparent", fontFamily: T.body, fontSize: 14.5, color: T.ink }} />
+          {query && <button onClick={() => setQuery("")} style={{ background: "none", border: "none", cursor: "pointer", color: T.inkFaint, display: "flex" }}><Icon name="X" size={16} /></button>}
+        </div>
+
+        {/* filters */}
+        {!query && (
+          <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 2 }}>
+            {CATEGORIES.map((c) => (
+              <Chip key={c} active={activeCategory === c && !showOnlyBookmarked}
+                onClick={() => { setActiveCategory(c); setShowOnlyBookmarked(false); }}>
+                {c === "all" ? "All" : CATEGORY_LABELS[c]}
+              </Chip>
+            ))}
+            {bookmarks.length > 0 && (
+              <Chip active={showOnlyBookmarked} icon="BookmarkCheck"
+                onClick={() => setShowOnlyBookmarked((v) => !v)}>
+                Saved
+              </Chip>
+            )}
+          </div>
+        )}
+
+        {/* profile summary badge */}
+        {hasProfile && (
+          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", borderRadius: T.rMd, background: T.surface2, fontSize: 12.5, color: T.inkSoft }}>
+            <Icon name="User" size={14} />
+            Checking eligibility for:
+            {profile.landSize && <strong style={{ color: T.ink }}> {profile.landSize}</strong>}
+            {(profile.farmType || []).length > 0 && <strong style={{ color: T.ink }}> · {profile.farmType.join(", ")}</strong>}
+            {profile.location && <strong style={{ color: T.ink }}> · {profile.location}</strong>}
+          </div>
+        )}
+
+        {/* scheme list */}
+        {displayed.map(({ scheme, result }) => {
+          const ec = eligColors[result.status] || eligColors.unknown;
+          const isBookmarked = bookmarks.includes(scheme.id);
+          return (
+            <Card key={scheme.id} pad={14} onClick={() => setSelected({ scheme, result })}
+              style={{ cursor: "pointer", position: "relative" }}>
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+                <IconTile name={scheme.icon} a={scheme.accent} size={44} iconSize={21} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                    <div style={{ fontFamily: T.display, fontSize: 16, fontWeight: 700, color: T.ink }}>{scheme.title}</div>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: ec.fg, background: ec.bg, padding: "2px 8px", borderRadius: 6 }}>
+                      {ELIGIBILITY_LABELS[result.status]}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: 12, color: T.inkSoft, marginTop: 1 }}>{scheme.fullName}</div>
+                  <div style={{ fontSize: 13, color: T.ink, marginTop: 6, lineHeight: 1.45 }}>{scheme.offer}</div>
+                </div>
+                <button onClick={(e) => { e.stopPropagation(); toggleBookmark(scheme.id); }} aria-label="Save"
+                  style={{ background: "none", border: "none", cursor: "pointer", color: isBookmarked ? T.primary : T.inkFaint, display: "flex", flexShrink: 0, padding: 4 }}>
+                  <Icon name={isBookmarked ? "BookmarkCheck" : "BookmarkPlus"} size={18} />
+                </button>
+              </div>
+
+              {/* reasons/missing pill row */}
+              {result.missing?.length > 0 && (
+                <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
+                  <Icon name="AlertCircle" size={13} style={{ color: T.orange, flexShrink: 0 }} />
+                  <span style={{ fontSize: 12, color: T.inkSoft }}>{result.missing[0]}</span>
+                </div>
+              )}
+            </Card>
+          );
+        })}
+
+        {displayed.length === 0 && (
+          <div style={{ textAlign: "center", padding: "36px 0", color: T.inkSoft, fontSize: 13.5 }}>
+            No schemes found{query ? ` for "${query}"` : ""}.
+          </div>
+        )}
+
+        <div style={{ fontSize: 11.5, color: T.inkFaint, textAlign: "center", lineHeight: 1.6 }}>
+          Eligibility based on your saved profile · Rules as of 2024-25<br />
+          Always confirm at the official portal before applying
+        </div>
+      </Screen>
+
+      {selected && (
+        <SchemeSheet scheme={selected.scheme} result={selected.result}
+          isBookmarked={bookmarks.includes(selected.scheme.id)}
+          onBookmark={() => toggleBookmark(selected.scheme.id)}
+          onClose={() => setSelected(null)} />
+      )}
+    </>
+  );
+}
+
+function SchemeSheet({ scheme, result, isBookmarked, onBookmark, onClose }) {
+  const ec = ELIGIBILITY_COLORS(T)[result.status] || ELIGIBILITY_COLORS(T).unknown;
+
+  return (
+    <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 80, background: T.scrim, display: "flex", alignItems: "flex-end", justifyContent: "center", animation: "ag-fade .2s var(--ag-ease)" }}>
+      <div onClick={(e) => e.stopPropagation()} style={{ width: "100%", maxWidth: 460, background: T.surface, borderRadius: `${T.rXl} ${T.rXl} 0 0`, padding: "10px 20px 36px", maxHeight: "88vh", overflowY: "auto", animation: "ag-sheet .3s var(--ag-ease)" }}>
+        <div style={{ width: 40, height: 4, borderRadius: 2, background: T.line, margin: "6px auto 16px" }} />
+
+        <div style={{ display: "flex", alignItems: "flex-start", gap: 12, marginBottom: 14 }}>
+          <IconTile name={scheme.icon} a={scheme.accent} size={52} iconSize={26} />
+          <div style={{ flex: 1 }}>
+            <div style={{ fontFamily: T.display, fontSize: 20, fontWeight: 700 }}>{scheme.title}</div>
+            <div style={{ fontSize: 13, color: T.inkSoft }}>{scheme.fullName}</div>
+            <div style={{ fontSize: 12, color: T.inkSoft, marginTop: 2 }}>{scheme.ministry}</div>
+          </div>
+          <button onClick={onBookmark} style={{ background: isBookmarked ? T.primarySoft : T.surface2, border: "none", borderRadius: 12, padding: 10, cursor: "pointer", color: isBookmarked ? T.primary : T.inkFaint, display: "flex" }}>
+            <Icon name={isBookmarked ? "BookmarkCheck" : "BookmarkPlus"} size={20} />
+          </button>
+        </div>
+
+        {/* eligibility badge */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", borderRadius: T.rMd, background: ec.bg, marginBottom: 14 }}>
+          <Icon name={result.status === "eligible" ? "BadgeCheck" : result.status === "partial" ? "BadgeAlert" : "AlertCircle"} size={18} style={{ color: ec.fg }} />
+          <span style={{ fontSize: 13.5, fontWeight: 700, color: ec.fg }}>{ELIGIBILITY_LABELS[result.status]}</span>
+        </div>
+
+        <SheetSection title="What you get">{scheme.offer}</SheetSection>
+
+        {result.reasons?.length > 0 && (
+          <SheetSection title="Why you qualify">
+            {result.reasons.map((r, i) => (
+              <div key={i} style={{ display: "flex", gap: 8, marginTop: 6 }}>
+                <Icon name="Check" size={14} style={{ color: T.primary, flexShrink: 0, marginTop: 2 }} />
+                <span style={{ fontSize: 13, color: T.ink }}>{r}</span>
+              </div>
+            ))}
+          </SheetSection>
+        )}
+
+        {result.missing?.length > 0 && (
+          <SheetSection title="What's still needed">
+            {result.missing.map((m, i) => (
+              <div key={i} style={{ display: "flex", gap: 8, marginTop: 6 }}>
+                <Icon name="AlertCircle" size={14} style={{ color: T.orange, flexShrink: 0, marginTop: 2 }} />
+                <span style={{ fontSize: 13, color: T.ink }}>{m}</span>
+              </div>
+            ))}
+          </SheetSection>
+        )}
+
+        <SheetSection title="Documents needed">
+          {scheme.documents.map((d, i) => (
+            <div key={i} style={{ display: "flex", gap: 8, marginTop: 5 }}>
+              <Icon name="FileText" size={13} style={{ color: T.inkSoft, flexShrink: 0, marginTop: 2 }} />
+              <span style={{ fontSize: 13, color: T.ink }}>{d}</span>
+            </div>
+          ))}
+        </SheetSection>
+
+        <SheetSection title="How to apply">{scheme.applyHow}</SheetSection>
+
+        {scheme.excludes && <SheetSection title="Who does NOT qualify"><span style={{ color: T.inkSoft }}>{scheme.excludes}</span></SheetSection>}
+
+        <div style={{ marginTop: 18 }}>
+          <a href={scheme.applyUrl} target="_blank" rel="noreferrer"
+            style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "14px 0", borderRadius: T.pill,
+              background: T.primary, color: "#fff", fontWeight: 600, fontSize: 15, textDecoration: "none" }}>
+            <Icon name="ExternalLink" size={17} /> Apply at official portal
+          </a>
+        </div>
+
+        <div style={{ fontSize: 11.5, color: T.inkFaint, textAlign: "center", marginTop: 14, lineHeight: 1.6 }}>
+          Rules as of 2024-25 — confirm with your local agriculture officer or official portal before applying.
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SheetSection({ title, children }) {
+  return (
+    <div style={{ marginBottom: 14 }}>
+      <div style={{ fontSize: 12, fontWeight: 700, color: T.inkSoft, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6 }}>{title}</div>
+      <div style={{ fontSize: 13.5, color: T.ink, lineHeight: 1.55 }}>{children}</div>
+    </div>
+  );
+}

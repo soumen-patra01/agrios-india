@@ -18,6 +18,8 @@ import AIChat from "../pages/AIChat.jsx";
 import WeatherDashboard from "../pages/WeatherDashboard.jsx";
 import FarmLocations from "../pages/FarmLocations.jsx";
 import NearbyServices from "../pages/NearbyServices.jsx";
+import MandiPrices from "../pages/MandiPrices.jsx";
+import SchemeExplorer from "../pages/SchemeExplorer.jsx";
 
 const TAB_SCREENS = { home: Home, ai: AIHub, market: Market, services: Services, profile: Profile };
 
@@ -29,6 +31,8 @@ function StackScreen({ item }) {
   if (item.kind === "weather") return <WeatherDashboard />;
   if (item.kind === "farmLocations") return <FarmLocations />;
   if (item.kind === "nearby") return <NearbyServices />;
+  if (item.kind === "mandiPrices") return <MandiPrices />;
+  if (item.kind === "schemeExplorer") return <SchemeExplorer />;
   return null;
 }
 

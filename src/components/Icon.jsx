@@ -15,6 +15,7 @@ import {
   Cloud, CloudFog, CloudDrizzle, CloudLightning, Snowflake, Umbrella,
   Thermometer, Gauge, MapPin, Navigation, Compass, LocateFixed, Plus, RefreshCw,
   Clock, SprayCan,
+  BookmarkPlus, BookmarkCheck, ExternalLink, BadgeCheck, BadgeAlert, Lightbulb,
 } from "lucide-react";
 
 const REGISTRY = {
@@ -31,6 +32,7 @@ const REGISTRY = {
   Cloud, CloudFog, CloudDrizzle, CloudLightning, Snowflake, Umbrella,
   Thermometer, Gauge, MapPin, Navigation, Compass, LocateFixed, Plus, RefreshCw,
   Clock, SprayCan,
+  BookmarkPlus, BookmarkCheck, ExternalLink, BadgeCheck, BadgeAlert, Lightbulb,
 };
 
 export default function Icon({ name, size = 20, color = "currentColor", strokeWidth = 2, style }) {

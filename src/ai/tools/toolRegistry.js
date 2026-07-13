@@ -1,12 +1,14 @@
 /* Tool registry — Claude tool-calling schemas + the executor.
 
-   Live tools do real work (calculator, weather). Declared-but-unconnected tools
-   (market, schemes, pdf, imageAnalyzer) honestly report that their source is not
+   Live tools: calculator, weather (4A), market + schemes (4B).
+   Declared-but-unconnected tools (pdf, imageAnalyzer) honestly report that their source is not
    integrated yet, so agents answer from general knowledge and say so — no fake
    data, per project rules. Connecting them in a later phase is a one-file change. */
 
 import { calculatorTool } from "./calculator.js";
 import { weatherTool } from "./weatherTool.js";
+import { marketTool } from "./marketTool.js";
+import { schemesTool } from "./schemesTool.js";
 
 const notConnected = (name, hint) => ({
   name,
@@ -22,9 +24,9 @@ const notConnected = (name, hint) => ({
 const TOOLS = new Map(
   [
     calculatorTool,
-    weatherTool, // live as of Phase 4A
-    notConnected("market", "Get live mandi prices for a crop."),
-    notConnected("schemes", "Look up current government scheme details."),
+    weatherTool,   // live as of Phase 4A
+    marketTool,    // live as of Phase 4B (MSP + seasonal band)
+    schemesTool,   // live as of Phase 4B (eligibility engine)
     notConnected("pdf", "Generate a PDF document from content."),
     notConnected("imageAnalyzer", "Run specialised image analysis (disease models, OCR)."),
   ].map((t) => [t.name, t]),
