@@ -105,6 +105,7 @@ export const MARKET_SECTIONS = [
 ];
 
 export const SERVICES = [
+  { id: "marketplace", title: "Marketplace",      desc: "Buy & sell seeds, feed, equipment",   icon: "ShoppingBag", accent: "primary", kind: "marketplace" },
   { id: "erp",       title: "Farm ERP",           desc: "Complete farm management system",     icon: "Tractor",   accent: "primary", kind: "farmErp" },
   { id: "livestock", title: "Livestock Manager", desc: "Poultry, dairy, goat, pig, sheep, fish & bees", icon: "Rabbit", accent: "primary", kind: "livestockHub" },
   { id: "vax",       title: "Vaccination Calendar", desc: "Upcoming & missed vaccinations",   icon: "Syringe",   accent: "red",     kind: "vaccinationCalendar" },

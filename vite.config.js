@@ -7,4 +7,8 @@ export default defineConfig({
     port: process.env.PORT ? parseInt(process.env.PORT) : 5199,
     strictPort: false,
   },
+  test: {
+    environment: "node",
+    setupFiles: ["fake-indexeddb/auto"],
+  },
 });

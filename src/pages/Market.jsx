@@ -60,10 +60,20 @@ export default function Market() {
           <SectionHeader title={t("marketTitle")} />
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             {MARKET_SECTIONS.map((s) => {
-              const isPrices = s.id === "prices";
+              /* Tiles now route into the marketplace (with a category preset
+                 where one applies). "buyers" waits for the shared backend. */
+              const go = {
+                prices:      () => push({ kind: "mandiPrices" }),
+                marketplace: () => push({ kind: "marketplace" }),
+                sellers:     () => push({ kind: "marketplace" }),
+                equipment:   () => push({ kind: "marketplace", props: { category: "equipment" } }),
+                seeds:       () => push({ kind: "marketplace", props: { category: "seeds" } }),
+                feed:        () => push({ kind: "marketplace", props: { category: "feed" } }),
+                medicine:    () => push({ kind: "marketplace", props: { category: "medicine" } }),
+              }[s.id];
               return (
                 <Card key={s.id}
-                  onClick={() => isPrices ? push({ kind: "mandiPrices" }) : open(s.title, s.icon, s.accent)}
+                  onClick={() => go ? go() : open(s.title, s.icon, s.accent)}
                   pad={15} style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   <IconTile name={s.icon} a={s.accent} size={44} iconSize={21} />
                   <div style={{ fontFamily: T.display, fontSize: 14.5, fontWeight: 700, lineHeight: 1.2 }}>{s.title}</div>

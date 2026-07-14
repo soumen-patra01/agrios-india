@@ -26,7 +26,7 @@ import {
   LayoutDashboard, ListFilter, SortAsc, SortDesc, Pencil, Copy, MoreHorizontal,
   Syringe, Egg, BookOpen, ArrowLeftRight, Percent, Warehouse, Map, ClipboardCheck,
   ListChecks, CalendarClock, Banknote, Handshake, Contact, Factory, UserCheck,
-  Satellite, Beef,
+  Satellite, Beef, Heart, ShoppingCart, Minus,
 } from "lucide-react";
 
 const REGISTRY = {
@@ -54,7 +54,7 @@ const REGISTRY = {
   LayoutDashboard, ListFilter, SortAsc, SortDesc, Pencil, Copy, MoreHorizontal,
   Syringe, Egg, BookOpen, ArrowLeftRight, Percent, Warehouse, Map, ClipboardCheck,
   ListChecks, CalendarClock, Banknote, Handshake, Contact, Factory, UserCheck,
-  Satellite, Beef,
+  Satellite, Beef, Heart, ShoppingCart, Minus,
 };
 
 export default function Icon({ name, size = 20, color = "currentColor", strokeWidth = 2, style }) {
