@@ -105,6 +105,14 @@ export const MARKET_SECTIONS = [
 ];
 
 export const SERVICES = [
+  { id: "erp",       title: "Farm ERP",           desc: "Complete farm management system",     icon: "Tractor",   accent: "primary", kind: "farmErp" },
+  { id: "livestock", title: "Livestock Manager", desc: "Poultry, dairy, goat, pig, sheep, fish & bees", icon: "Rabbit", accent: "primary", kind: "livestockHub" },
+  { id: "vax",       title: "Vaccination Calendar", desc: "Upcoming & missed vaccinations",   icon: "Syringe",   accent: "red",     kind: "vaccinationCalendar" },
+  { id: "inventory", title: "Inventory",           desc: "Feed, medicine & stock alerts",     icon: "Warehouse", accent: "orange",  kind: "erpInventory" },
+  { id: "tasks",     title: "Task Manager",        desc: "Daily work & reminders",            icon: "ListChecks", accent: "blue",   kind: "erpTasks" },
+  { id: "business",  title: "Farm Business",     desc: "P&L, cash flow & profit analysis",  icon: "BarChart3", accent: "blue", kind: "businessDashboard" },
+  { id: "ledger",    title: "Farm Ledger",        desc: "Income & expense tracking",          icon: "BookOpen",  accent: "primary", kind: "farmLedger" },
+  { id: "calendar",  title: "Crop Calendar",      desc: "Season tasks & reminders",           icon: "CalendarDays", accent: "primary", kind: "cropCalendar" },
   { id: "vet", title: "Veterinary", desc: "Doctors & clinics near you", icon: "Stethoscope", accent: "red" },
   { id: "soil", title: "Soil testing", desc: "Labs & at-home kits", icon: "FlaskConical", accent: "orange" },
   { id: "drone", title: "Drone services", desc: "Spraying & mapping", icon: "Send", accent: "blue" },

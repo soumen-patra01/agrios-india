@@ -212,6 +212,27 @@ export default function Home() {
         </button>
       </div>
 
+      {/* Farm ERP banner — livestock, land, inventory, business, everything */}
+      <div style={{ padding: `10px ${H_PAD}px 0` }}>
+        <button onClick={() => push({ kind: "farmErp" })}
+          style={{ width: "100%", padding: "14px 18px", borderRadius: T.rLg, cursor: "pointer",
+            background: `linear-gradient(135deg, #065f46, #064e3b)`,
+            border: "none", fontFamily: T.body, textAlign: "left",
+            display: "flex", alignItems: "center", gap: 14 }}>
+          <div style={{ width: 44, height: 44, borderRadius: 12, background: "rgba(255,255,255,.15)",
+            display: "grid", placeItems: "center", flexShrink: 0 }}>
+            <Icon name="Tractor" size={22} color="#fff" />
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>Farm ERP</div>
+            <div style={{ fontSize: 12, color: "rgba(255,255,255,.7)", marginTop: 2 }}>
+              Livestock · Land · Inventory · Team · Business · Reports
+            </div>
+          </div>
+          <Icon name="ChevronRight" size={18} color="rgba(255,255,255,.6)" />
+        </button>
+      </div>
+
       {/* schemes — horizontal */}
       <div style={{ paddingTop: 20 }}>
         <div style={{ padding: `0 ${H_PAD}px` }}><SectionHeader title={t("schemes")} action={t("seeAll")} onAction={() => push({ kind: "schemeExplorer" })} /></div>

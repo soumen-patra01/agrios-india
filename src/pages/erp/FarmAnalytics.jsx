@@ -1,0 +1,137 @@
+import { useState, useEffect } from "react";
+import { T } from "../../theme/ThemeProvider.jsx";
+import Icon from "../../components/Icon.jsx";
+import { AppBar, Card, SectionHeader } from "../../components/index.js";
+import { useApp } from "../../store/AppStore.jsx";
+import { kpiService } from "../../services/business/kpiService.js";
+import { costAnalysis } from "../../services/finance/costAnalysis.js";
+import { inventoryService } from "../../services/inventory/inventoryService.js";
+import { assetService } from "../../services/assets/assetService.js";
+import { rupee, compact } from "../../utils/format.js";
+
+export default function FarmAnalytics() {
+  const { pop } = useApp();
+  const year = new Date().getFullYear();
+  const [kpi, setKpi]             = useState(null);
+  const [costs, setCosts]         = useState([]);
+  const [breakEven, setBreakEven] = useState([]);
+  const [forecast, setForecast]   = useState([]);
+  const [stockValue, setStockValue] = useState(0);
+  const [assetValue, setAssetValue] = useState(0);
+
+  useEffect(() => {
+    setKpi(kpiService.summary(year));
+    setForecast(costAnalysis.forecast(year));
+    costAnalysis.costPerUnit(year).then(setCosts);
+    costAnalysis.breakEven(year).then(setBreakEven);
+    inventoryService.stockValue().then(setStockValue);
+    assetService.totalValue().then(setAssetValue);
+  }, [year]);
+
+  return (
+    <>
+      <AppBar title="Farm Analytics" onBack={pop} />
+      <div style={{ padding: "8px 16px 32px", display: "flex", flexDirection: "column", gap: 12,
+        animation: "ag-fade .25s var(--ag-ease)" }}>
+
+        {/* KPI grid */}
+        {kpi && (
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+            {[
+              { label: "Revenue", value: compact(kpi.totalRevenue), fg: T.primary, bg: T.primarySoft },
+              { label: "Net Profit", value: compact(kpi.netProfit), fg: kpi.netProfit >= 0 ? T.primary : T.red, bg: kpi.netProfit >= 0 ? T.primarySoft : T.redSoft },
+              { label: "ROI", value: `${kpi.roi}%`, fg: T.blue, bg: T.blueSoft },
+              { label: "Margin", value: `${kpi.profitMargin}%`, fg: T.orange, bg: T.orangeSoft },
+              { label: "Stock Value", value: compact(stockValue), fg: T.yellow, bg: T.yellowSoft },
+              { label: "Asset Value", value: compact(assetValue), fg: T.blue, bg: T.blueSoft },
+            ].map((c) => (
+              <div key={c.label} style={{ background: c.bg, borderRadius: T.rLg, padding: "13px 14px" }}>
+                <div style={{ fontFamily: T.display, fontSize: 19, fontWeight: 700, color: c.fg }}>{c.value}</div>
+                <div style={{ fontSize: 11, color: T.inkSoft, marginTop: 2 }}>{c.label} · {year}</div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Cost per unit */}
+        <SectionHeader title="Cost Per Unit" />
+        {costs.filter((c) => c.costPerUnit !== null).length === 0 ? (
+          <div style={{ fontSize: 12.5, color: T.inkFaint, textAlign: "center", padding: "10px 0" }}>
+            Log production and tag ledger entries to an enterprise to see cost per egg / litre / kg.
+          </div>
+        ) : (
+          costs.filter((c) => c.costPerUnit !== null).map((c) => (
+            <Card key={c.enterprise.id} pad={13}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: 13.5 }}>{c.enterprise.label}</div>
+                  <div style={{ fontSize: 11.5, color: T.inkSoft, marginTop: 2 }}>
+                    {c.output.toLocaleString("en-IN")} {c.metric.unit} produced · {rupee(c.expense)} spent
+                  </div>
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontWeight: 700, fontSize: 15, color: T.orange, fontFamily: T.display }}>
+                    ₹{c.costPerUnit}
+                  </div>
+                  <div style={{ fontSize: 10.5, color: T.inkSoft }}>per {c.metric.unit || "unit"}</div>
+                </div>
+              </div>
+            </Card>
+          ))
+        )}
+
+        {/* Break-even */}
+        {breakEven.length > 0 && (
+          <>
+            <SectionHeader title="Break-even" />
+            {breakEven.map((b) => (
+              <Card key={b.enterprise.id} pad={13}>
+                <div style={{ fontWeight: 600, fontSize: 13.5, marginBottom: 6 }}>{b.enterprise.label}</div>
+                <div style={{ fontSize: 12, color: T.inkSoft }}>
+                  Needs <b style={{ color: T.ink }}>{b.breakEvenUnits.toLocaleString("en-IN")} {b.metric.unit}</b> sold
+                  at ₹{b.pricePerUnit}/{b.metric.unit || "unit"} to cover {rupee(b.expense)} costs
+                  {b.achievedPct !== null && (
+                    <span style={{ color: b.achievedPct >= 100 ? T.primary : T.orange, fontWeight: 700 }}>
+                      {" "}— {b.achievedPct}% achieved
+                    </span>
+                  )}
+                </div>
+                <div style={{ height: 5, background: T.line, borderRadius: 4, marginTop: 8 }}>
+                  <div style={{ height: 5, width: `${Math.min(100, b.achievedPct || 0)}%`,
+                    background: (b.achievedPct || 0) >= 100 ? T.primary : T.orange, borderRadius: 4 }} />
+                </div>
+              </Card>
+            ))}
+          </>
+        )}
+
+        {/* Cash forecast */}
+        <SectionHeader title="3-Month Cash Forecast" />
+        {forecast.length === 0 ? (
+          <div style={{ fontSize: 12.5, color: T.inkFaint, textAlign: "center", padding: "10px 0" }}>
+            Add ledger entries to enable forecasting.
+          </div>
+        ) : (
+          <Card pad={13}>
+            <div style={{ fontSize: 11, color: T.inkFaint, marginBottom: 10 }}>
+              Projected from your last 3 months' average income and expense.
+            </div>
+            {forecast.map((f) => (
+              <div key={f.label} style={{ display: "flex", justifyContent: "space-between",
+                padding: "7px 0", borderBottom: `1px solid ${T.lineSoft}`, fontSize: 13 }}>
+                <span style={{ color: T.inkSoft }}>{f.label}</span>
+                <span>
+                  <span style={{ color: T.primary }}>+{compact(f.income)}</span>
+                  {" / "}
+                  <span style={{ color: T.red }}>−{compact(f.expense)}</span>
+                  {" → "}
+                  <b style={{ color: f.projectedBalance >= 0 ? T.primary : T.red }}>{compact(f.projectedBalance)}</b>
+                </span>
+              </div>
+            ))}
+          </Card>
+        )}
+      </div>
+    </>
+  );
+}

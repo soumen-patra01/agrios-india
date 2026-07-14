@@ -24,6 +24,9 @@ import {
   ArrowRight, ArrowLeft, ChevronUp, Eye, EyeOff, Tag, FolderOpen,
   Upload, Link, Unlink, Workflow, Server, HardDrive,
   LayoutDashboard, ListFilter, SortAsc, SortDesc, Pencil, Copy, MoreHorizontal,
+  Syringe, Egg, BookOpen, ArrowLeftRight, Percent, Warehouse, Map, ClipboardCheck,
+  ListChecks, CalendarClock, Banknote, Handshake, Contact, Factory, UserCheck,
+  Satellite, Beef,
 } from "lucide-react";
 
 const REGISTRY = {
@@ -49,6 +52,9 @@ const REGISTRY = {
   ArrowRight, ArrowLeft, ChevronUp, Eye, EyeOff, Tag, FolderOpen,
   Upload, Link, Unlink, Workflow, Server, HardDrive,
   LayoutDashboard, ListFilter, SortAsc, SortDesc, Pencil, Copy, MoreHorizontal,
+  Syringe, Egg, BookOpen, ArrowLeftRight, Percent, Warehouse, Map, ClipboardCheck,
+  ListChecks, CalendarClock, Banknote, Handshake, Contact, Factory, UserCheck,
+  Satellite, Beef,
 };
 
 export default function Icon({ name, size = 20, color = "currentColor", strokeWidth = 2, style }) {
