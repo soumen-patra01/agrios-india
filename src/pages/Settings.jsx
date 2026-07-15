@@ -92,8 +92,8 @@ export default function Settings() {
         </Card>
 
         <Card pad={6}>
-          <Row icon="Info" label={t("about")} onClick={() => toast("AgriOS India · Phase 7A")} last>
-            <span style={{ fontSize: 13, color: T.inkFaint }}>v0.7.0</span>
+          <Row icon="Info" label={t("about")} onClick={() => toast("AgriOS India · Phase 7C")} last>
+            <span style={{ fontSize: 13, color: T.inkFaint }}>v0.9.0</span>
           </Row>
         </Card>
       </div>
