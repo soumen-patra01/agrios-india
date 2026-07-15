@@ -108,6 +108,7 @@ export const SERVICES = [
   { id: "marketplace", title: "Marketplace",      desc: "Buy & sell seeds, feed, equipment",   icon: "ShoppingBag", accent: "primary", kind: "marketplace" },
   { id: "svcMp",    title: "Service Marketplace", desc: "Book vet, drone, machinery & more",  icon: "Handshake", accent: "blue",    kind: "svcMarketplace" },
   { id: "logistics", title: "Logistics & Trade",  desc: "Shipments, cold chain, auctions & more", icon: "Truck", accent: "primary", kind: "logisticsHub" },
+  { id: "aiCommerce", title: "AI Commerce",       desc: "Recommendations, price forecasts & insights", icon: "BrainCircuit", accent: "blue", kind: "aiCommerceHub" },
   { id: "erp",       title: "Farm ERP",           desc: "Complete farm management system",     icon: "Tractor",   accent: "primary", kind: "farmErp" },
   { id: "livestock", title: "Livestock Manager", desc: "Poultry, dairy, goat, pig, sheep, fish & bees", icon: "Rabbit", accent: "primary", kind: "livestockHub" },
   { id: "vax",       title: "Vaccination Calendar", desc: "Upcoming & missed vaccinations",   icon: "Syringe",   accent: "red",     kind: "vaccinationCalendar" },

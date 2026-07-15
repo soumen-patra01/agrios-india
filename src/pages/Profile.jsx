@@ -72,7 +72,7 @@ export default function Profile() {
           <Icon name="LogOut" size={18} /> {t("logout")}
         </button>
 
-        <div style={{ textAlign: "center", fontSize: 11.5, color: T.inkFaint }}>AgriOS India · v0.9.0 (Phase 7C)</div>
+        <div style={{ textAlign: "center", fontSize: 11.5, color: T.inkFaint }}>AgriOS India · v1.0.0 (Phase 7D)</div>
       </div>
 
       <Dialog open={confirm} onClose={() => setConfirm(false)} title={t("logout") + "?"}

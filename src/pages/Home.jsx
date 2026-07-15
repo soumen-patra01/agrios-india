@@ -296,6 +296,27 @@ export default function Home() {
         </button>
       </div>
 
+      {/* AI Commerce banner */}
+      <div style={{ padding: `10px ${H_PAD}px 0` }}>
+        <button onClick={() => push({ kind: "aiCommerceHub" })}
+          style={{ width: "100%", padding: "14px 18px", borderRadius: T.rLg, cursor: "pointer",
+            background: `linear-gradient(135deg, #4338ca, #3730a3)`,
+            border: "none", fontFamily: T.body, textAlign: "left",
+            display: "flex", alignItems: "center", gap: 14 }}>
+          <div style={{ width: 44, height: 44, borderRadius: 12, background: "rgba(255,255,255,.15)",
+            display: "grid", placeItems: "center", flexShrink: 0 }}>
+            <Icon name="BrainCircuit" size={22} color="#fff" />
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>AI Commerce</div>
+            <div style={{ fontSize: 12, color: "rgba(255,255,255,.7)", marginTop: 2 }}>
+              Recommendations · Price forecasts · Buyer match · Insights
+            </div>
+          </div>
+          <Icon name="ChevronRight" size={18} color="rgba(255,255,255,.6)" />
+        </button>
+      </div>
+
       {/* schemes — horizontal */}
       <div style={{ paddingTop: 20 }}>
         <div style={{ padding: `0 ${H_PAD}px` }}><SectionHeader title={t("schemes")} action={t("seeAll")} onAction={() => push({ kind: "schemeExplorer" })} /></div>

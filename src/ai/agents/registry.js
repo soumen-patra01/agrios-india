@@ -12,11 +12,12 @@ import marketExpert from "./definitions/marketExpert.js";
 import financeExpert from "./definitions/financeExpert.js";
 import veterinaryExpert from "./definitions/veterinaryExpert.js";
 import educationExpert from "./definitions/educationExpert.js";
+import commerceAdvisor from "./definitions/commerceAdvisor.js";
 
 const AGENTS = [
   generalAssistant, farmDoctor, cropExpert, livestockExpert, businessAdvisor,
   loanAdvisor, governmentAdvisor, weatherExpert, marketExpert, financeExpert,
-  veterinaryExpert, educationExpert,
+  veterinaryExpert, educationExpert, commerceAdvisor,
 ];
 
 const byId = new Map(AGENTS.map((a) => [a.id, a]));
