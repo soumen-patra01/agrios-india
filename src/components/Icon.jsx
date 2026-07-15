@@ -27,6 +27,7 @@ import {
   Syringe, Egg, BookOpen, ArrowLeftRight, Percent, Warehouse, Map, ClipboardCheck,
   ListChecks, CalendarClock, Banknote, Handshake, Contact, Factory, UserCheck,
   Satellite, Beef, Heart, ShoppingCart, Minus,
+  Container, Gavel, FileSignature, IndianRupee, Route, Fuel, Calendar,
 } from "lucide-react";
 
 const REGISTRY = {
@@ -55,6 +56,7 @@ const REGISTRY = {
   Syringe, Egg, BookOpen, ArrowLeftRight, Percent, Warehouse, Map, ClipboardCheck,
   ListChecks, CalendarClock, Banknote, Handshake, Contact, Factory, UserCheck,
   Satellite, Beef, Heart, ShoppingCart, Minus,
+  Container, Gavel, FileSignature, IndianRupee, Route, Fuel, Calendar,
 };
 
 export default function Icon({ name, size = 20, color = "currentColor", strokeWidth = 2, style }) {

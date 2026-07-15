@@ -107,6 +107,7 @@ export const MARKET_SECTIONS = [
 export const SERVICES = [
   { id: "marketplace", title: "Marketplace",      desc: "Buy & sell seeds, feed, equipment",   icon: "ShoppingBag", accent: "primary", kind: "marketplace" },
   { id: "svcMp",    title: "Service Marketplace", desc: "Book vet, drone, machinery & more",  icon: "Handshake", accent: "blue",    kind: "svcMarketplace" },
+  { id: "logistics", title: "Logistics & Trade",  desc: "Shipments, cold chain, auctions & more", icon: "Truck", accent: "primary", kind: "logisticsHub" },
   { id: "erp",       title: "Farm ERP",           desc: "Complete farm management system",     icon: "Tractor",   accent: "primary", kind: "farmErp" },
   { id: "livestock", title: "Livestock Manager", desc: "Poultry, dairy, goat, pig, sheep, fish & bees", icon: "Rabbit", accent: "primary", kind: "livestockHub" },
   { id: "vax",       title: "Vaccination Calendar", desc: "Upcoming & missed vaccinations",   icon: "Syringe",   accent: "red",     kind: "vaccinationCalendar" },
@@ -123,7 +124,7 @@ export const SERVICES = [
   { id: "bank", title: "Bank", desc: "Loans & accounts", icon: "Building2", accent: "blue" },
   { id: "insurance", title: "Insurance", desc: "Crop & livestock cover", icon: "ShieldCheck", accent: "primary", kind: "svcMarketplace", props: { category: "insurance" } },
   { id: "labor", title: "Labor", desc: "Hire farm workers", icon: "Users", accent: "orange", kind: "svcMarketplace", props: { category: "farmWorker" } },
-  { id: "transport", title: "Transport", desc: "Move produce to market", icon: "Truck", accent: "yellow", kind: "svcMarketplace", props: { category: "transport" } },
+  { id: "transport", title: "Transport", desc: "Move produce to market", icon: "Truck", accent: "yellow", kind: "logisticsHub" },
 ];
 
 export const PROFILE_ITEMS = [
