@@ -11,7 +11,7 @@ export default function Services() {
   const [q, setQ] = useState("");
   const list = SERVICES.filter((x) => (x.title + x.desc).toLowerCase().includes(q.toLowerCase()));
   const open = (x) => x.kind
-    ? push({ kind: x.kind })
+    ? push({ kind: x.kind, props: x.props })
     : push({ kind: "feature", props: { title: x.title, desc: x.desc, icon: x.icon, a: x.accent } });
 
   return (
