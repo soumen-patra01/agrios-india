@@ -1,99 +1,110 @@
+import { lazy, Suspense } from "react";
 import { T } from "../theme/ThemeProvider.jsx";
 import { useApp } from "../store/AppStore.jsx";
 import BottomNav from "./BottomNav.jsx";
-import { ToastHost } from "../components/index.js";
+import { ToastHost, Spinner } from "../components/index.js";
 
+/* Core screens loaded eagerly (always visible on every session) */
 import Splash from "../pages/Splash.jsx";
 import LanguageSelect from "../pages/LanguageSelect.jsx";
 import Onboarding from "../pages/Onboarding.jsx";
 import AuthFlow from "../pages/AuthFlow.jsx";
 import Home from "../pages/Home.jsx";
-import AIHub from "../pages/AIHub.jsx";
-import Market from "../pages/Market.jsx";
-import Services from "../pages/Services.jsx";
-import Profile from "../pages/Profile.jsx";
-import Settings from "../pages/Settings.jsx";
-import FeatureDetail from "../pages/FeatureDetail.jsx";
-import AIChat from "../pages/AIChat.jsx";
-import WeatherDashboard from "../pages/WeatherDashboard.jsx";
-import FarmLocations from "../pages/FarmLocations.jsx";
-import NearbyServices from "../pages/NearbyServices.jsx";
-import MandiPrices from "../pages/MandiPrices.jsx";
-import SchemeExplorer from "../pages/SchemeExplorer.jsx";
-import FarmLedger from "../pages/FarmLedger.jsx";
-import CropCalendar        from "../pages/CropCalendar.jsx";
-import DiagnosticsHome     from "../pages/DiagnosticsHome.jsx";
-import DiagnosticFlow      from "../pages/DiagnosticFlow.jsx";
-import DiagnosticResult    from "../pages/DiagnosticResult.jsx";
-import DiagnosticHistory   from "../pages/DiagnosticHistory.jsx";
-import FarmERPHub          from "../pages/erp/FarmERPHub.jsx";
-import FarmProfiles        from "../pages/erp/FarmProfiles.jsx";
-import LandManager         from "../pages/erp/LandManager.jsx";
-import TaskManager         from "../pages/erp/TaskManager.jsx";
-import InventoryManager    from "../pages/erp/InventoryManager.jsx";
-import AssetManager        from "../pages/erp/AssetManager.jsx";
-import EmployeeManager     from "../pages/erp/EmployeeManager.jsx";
-import CRMManager          from "../pages/erp/CRMManager.jsx";
-import ProductionDashboard from "../pages/erp/ProductionDashboard.jsx";
-import ReportsCenter       from "../pages/erp/ReportsCenter.jsx";
-import FarmAnalytics       from "../pages/erp/FarmAnalytics.jsx";
-import AIInsights          from "../pages/erp/AIInsights.jsx";
-import DeviceManager       from "../pages/erp/DeviceManager.jsx";
-import PigManager          from "../pages/livestock/PigManager.jsx";
-import SheepManager        from "../pages/livestock/SheepManager.jsx";
-import VaccinationCalendar from "../pages/livestock/VaccinationCalendar.jsx";
-import LivestockHub        from "../pages/livestock/LivestockHub.jsx";
-import PoultryManager      from "../pages/livestock/PoultryManager.jsx";
-import DairyManager        from "../pages/livestock/DairyManager.jsx";
-import GoatManager         from "../pages/livestock/GoatManager.jsx";
-import FishManager         from "../pages/livestock/FishManager.jsx";
-import BeeManager          from "../pages/livestock/BeeManager.jsx";
-import BusinessDashboard   from "../pages/business/BusinessDashboard.jsx";
-import PLReport            from "../pages/business/PLReport.jsx";
-import CashFlowPage        from "../pages/business/CashFlowPage.jsx";
-import MarketplaceHub      from "../pages/marketplace/MarketplaceHub.jsx";
-import ProductDetail       from "../pages/marketplace/ProductDetail.jsx";
-import StoreView           from "../pages/marketplace/StoreView.jsx";
-import CartPage            from "../pages/marketplace/CartPage.jsx";
-import CheckoutPage        from "../pages/marketplace/CheckoutPage.jsx";
-import MyOrdersPage        from "../pages/marketplace/MyOrdersPage.jsx";
-import WishlistPage        from "../pages/marketplace/WishlistPage.jsx";
-import SellerDashboard     from "../pages/marketplace/SellerDashboard.jsx";
-import SvcMarketplaceHub   from "../pages/svcMarketplace/ServiceMarketplaceHub.jsx";
-import SvcDetail           from "../pages/svcMarketplace/ServiceDetail.jsx";
-import SvcProviderProfile  from "../pages/svcMarketplace/ProviderProfile.jsx";
-import SvcBookingPage      from "../pages/svcMarketplace/BookingPage.jsx";
-import SvcMyBookings       from "../pages/svcMarketplace/MyBookingsPage.jsx";
-import SvcProviderDash     from "../pages/svcMarketplace/ProviderDashboard.jsx";
-import LogisticsHub        from "../pages/logistics/LogisticsHub.jsx";
-import ShipmentsPage       from "../pages/logistics/ShipmentsPage.jsx";
-import ShipmentDetail      from "../pages/logistics/ShipmentDetail.jsx";
-import FleetDashboard      from "../pages/logistics/FleetDashboard.jsx";
-import WarehousePage       from "../pages/logistics/WarehousePage.jsx";
-import ContractsPage       from "../pages/logistics/ContractsPage.jsx";
-import AuctionPage         from "../pages/logistics/AuctionPage.jsx";
-import ProcurementPage     from "../pages/logistics/ProcurementPage.jsx";
-import ExportPage          from "../pages/logistics/ExportPage.jsx";
-import LogisticsAnalytics  from "../pages/logistics/LogisticsAnalytics.jsx";
-import AICommerceHub       from "../pages/aiCommerce/AICommerceHub.jsx";
-import RecommendationsPage  from "../pages/aiCommerce/RecommendationsPage.jsx";
-import PriceIntelligencePage from "../pages/aiCommerce/PriceIntelligencePage.jsx";
-import ForecastPage         from "../pages/aiCommerce/ForecastPage.jsx";
-import MatchmakingPage      from "../pages/aiCommerce/MatchmakingPage.jsx";
-import FraudRiskPage        from "../pages/aiCommerce/FraudRiskPage.jsx";
-import AICommerceBI         from "../pages/aiCommerce/BusinessIntelligencePage.jsx";
-import MLOpsHub            from "../pages/mlops/MLOpsHub.jsx";
-import DatasetBrowser      from "../pages/mlops/DatasetBrowser.jsx";
-import DatasetDetail       from "../pages/mlops/DatasetDetail.jsx";
-import AnnotationWorkspace from "../pages/mlops/AnnotationWorkspace.jsx";
-import ModelRegistryPage   from "../pages/mlops/ModelRegistryPage.jsx";
-import ExperimentList      from "../pages/mlops/ExperimentList.jsx";
-import TrainingDashboard   from "../pages/mlops/TrainingDashboard.jsx";
-import MonitoringDashboard from "../pages/mlops/MonitoringDashboard.jsx";
+
+/* Everything else lazy-loaded on first visit */
+const AIHub              = lazy(() => import("../pages/AIHub.jsx"));
+const Market             = lazy(() => import("../pages/Market.jsx"));
+const Services           = lazy(() => import("../pages/Services.jsx"));
+const Profile            = lazy(() => import("../pages/Profile.jsx"));
+const Settings           = lazy(() => import("../pages/Settings.jsx"));
+const FeatureDetail      = lazy(() => import("../pages/FeatureDetail.jsx"));
+const AIChat             = lazy(() => import("../pages/AIChat.jsx"));
+const WeatherDashboard   = lazy(() => import("../pages/WeatherDashboard.jsx"));
+const FarmLocations      = lazy(() => import("../pages/FarmLocations.jsx"));
+const NearbyServices     = lazy(() => import("../pages/NearbyServices.jsx"));
+const MandiPrices        = lazy(() => import("../pages/MandiPrices.jsx"));
+const SchemeExplorer     = lazy(() => import("../pages/SchemeExplorer.jsx"));
+const FarmLedger         = lazy(() => import("../pages/FarmLedger.jsx"));
+const CropCalendar       = lazy(() => import("../pages/CropCalendar.jsx"));
+const DiagnosticsHome    = lazy(() => import("../pages/DiagnosticsHome.jsx"));
+const DiagnosticFlow     = lazy(() => import("../pages/DiagnosticFlow.jsx"));
+const DiagnosticResult   = lazy(() => import("../pages/DiagnosticResult.jsx"));
+const DiagnosticHistory  = lazy(() => import("../pages/DiagnosticHistory.jsx"));
+const FarmERPHub         = lazy(() => import("../pages/erp/FarmERPHub.jsx"));
+const FarmProfiles       = lazy(() => import("../pages/erp/FarmProfiles.jsx"));
+const LandManager        = lazy(() => import("../pages/erp/LandManager.jsx"));
+const TaskManager        = lazy(() => import("../pages/erp/TaskManager.jsx"));
+const InventoryManager   = lazy(() => import("../pages/erp/InventoryManager.jsx"));
+const AssetManager       = lazy(() => import("../pages/erp/AssetManager.jsx"));
+const EmployeeManager    = lazy(() => import("../pages/erp/EmployeeManager.jsx"));
+const CRMManager         = lazy(() => import("../pages/erp/CRMManager.jsx"));
+const ProductionDashboard = lazy(() => import("../pages/erp/ProductionDashboard.jsx"));
+const ReportsCenter      = lazy(() => import("../pages/erp/ReportsCenter.jsx"));
+const FarmAnalytics      = lazy(() => import("../pages/erp/FarmAnalytics.jsx"));
+const AIInsights         = lazy(() => import("../pages/erp/AIInsights.jsx"));
+const DeviceManager      = lazy(() => import("../pages/erp/DeviceManager.jsx"));
+const PigManager         = lazy(() => import("../pages/livestock/PigManager.jsx"));
+const SheepManager       = lazy(() => import("../pages/livestock/SheepManager.jsx"));
+const VaccinationCalendar = lazy(() => import("../pages/livestock/VaccinationCalendar.jsx"));
+const LivestockHub       = lazy(() => import("../pages/livestock/LivestockHub.jsx"));
+const PoultryManager     = lazy(() => import("../pages/livestock/PoultryManager.jsx"));
+const DairyManager       = lazy(() => import("../pages/livestock/DairyManager.jsx"));
+const GoatManager        = lazy(() => import("../pages/livestock/GoatManager.jsx"));
+const FishManager        = lazy(() => import("../pages/livestock/FishManager.jsx"));
+const BeeManager         = lazy(() => import("../pages/livestock/BeeManager.jsx"));
+const BusinessDashboard  = lazy(() => import("../pages/business/BusinessDashboard.jsx"));
+const PLReport           = lazy(() => import("../pages/business/PLReport.jsx"));
+const CashFlowPage       = lazy(() => import("../pages/business/CashFlowPage.jsx"));
+const MarketplaceHub     = lazy(() => import("../pages/marketplace/MarketplaceHub.jsx"));
+const ProductDetail      = lazy(() => import("../pages/marketplace/ProductDetail.jsx"));
+const StoreView          = lazy(() => import("../pages/marketplace/StoreView.jsx"));
+const CartPage           = lazy(() => import("../pages/marketplace/CartPage.jsx"));
+const CheckoutPage       = lazy(() => import("../pages/marketplace/CheckoutPage.jsx"));
+const MyOrdersPage       = lazy(() => import("../pages/marketplace/MyOrdersPage.jsx"));
+const WishlistPage       = lazy(() => import("../pages/marketplace/WishlistPage.jsx"));
+const SellerDashboard    = lazy(() => import("../pages/marketplace/SellerDashboard.jsx"));
+const SvcMarketplaceHub  = lazy(() => import("../pages/svcMarketplace/ServiceMarketplaceHub.jsx"));
+const SvcDetail          = lazy(() => import("../pages/svcMarketplace/ServiceDetail.jsx"));
+const SvcProviderProfile = lazy(() => import("../pages/svcMarketplace/ProviderProfile.jsx"));
+const SvcBookingPage     = lazy(() => import("../pages/svcMarketplace/BookingPage.jsx"));
+const SvcMyBookings      = lazy(() => import("../pages/svcMarketplace/MyBookingsPage.jsx"));
+const SvcProviderDash    = lazy(() => import("../pages/svcMarketplace/ProviderDashboard.jsx"));
+const LogisticsHub       = lazy(() => import("../pages/logistics/LogisticsHub.jsx"));
+const ShipmentsPage      = lazy(() => import("../pages/logistics/ShipmentsPage.jsx"));
+const ShipmentDetail     = lazy(() => import("../pages/logistics/ShipmentDetail.jsx"));
+const FleetDashboard     = lazy(() => import("../pages/logistics/FleetDashboard.jsx"));
+const WarehousePage      = lazy(() => import("../pages/logistics/WarehousePage.jsx"));
+const ContractsPage      = lazy(() => import("../pages/logistics/ContractsPage.jsx"));
+const AuctionPage        = lazy(() => import("../pages/logistics/AuctionPage.jsx"));
+const ProcurementPage    = lazy(() => import("../pages/logistics/ProcurementPage.jsx"));
+const ExportPage         = lazy(() => import("../pages/logistics/ExportPage.jsx"));
+const LogisticsAnalytics = lazy(() => import("../pages/logistics/LogisticsAnalytics.jsx"));
+const AICommerceHub      = lazy(() => import("../pages/aiCommerce/AICommerceHub.jsx"));
+const RecommendationsPage  = lazy(() => import("../pages/aiCommerce/RecommendationsPage.jsx"));
+const PriceIntelligencePage = lazy(() => import("../pages/aiCommerce/PriceIntelligencePage.jsx"));
+const ForecastPage       = lazy(() => import("../pages/aiCommerce/ForecastPage.jsx"));
+const MatchmakingPage    = lazy(() => import("../pages/aiCommerce/MatchmakingPage.jsx"));
+const FraudRiskPage      = lazy(() => import("../pages/aiCommerce/FraudRiskPage.jsx"));
+const AICommerceBI       = lazy(() => import("../pages/aiCommerce/BusinessIntelligencePage.jsx"));
+const MLOpsHub           = lazy(() => import("../pages/mlops/MLOpsHub.jsx"));
+const DatasetBrowser     = lazy(() => import("../pages/mlops/DatasetBrowser.jsx"));
+const DatasetDetail      = lazy(() => import("../pages/mlops/DatasetDetail.jsx"));
+const AnnotationWorkspace = lazy(() => import("../pages/mlops/AnnotationWorkspace.jsx"));
+const ModelRegistryPage  = lazy(() => import("../pages/mlops/ModelRegistryPage.jsx"));
+const ExperimentList     = lazy(() => import("../pages/mlops/ExperimentList.jsx"));
+const TrainingDashboard  = lazy(() => import("../pages/mlops/TrainingDashboard.jsx"));
+const MonitoringDashboard = lazy(() => import("../pages/mlops/MonitoringDashboard.jsx"));
 
 const TAB_SCREENS = { home: Home, ai: AIHub, market: Market, services: Services, profile: Profile };
 
-/* Renders one pushed detail screen from a stack descriptor. */
+function LazyFallback() {
+  return (
+    <div style={{ display: "grid", placeItems: "center", minHeight: 200 }}>
+      <Spinner size={28} />
+    </div>
+  );
+}
+
 function StackScreen({ item }) {
   if (item.kind === "settings") return <Settings />;
   if (item.kind === "feature") return <FeatureDetail {...item.props} />;
@@ -180,7 +191,6 @@ function StackScreen({ item }) {
 export default function ScreenRouter() {
   const { stage, tab, stack } = useApp();
 
-  // Pre-app flow — full-screen, no bottom nav.
   if (stage !== "app") {
     const Flow = { splash: Splash, language: LanguageSelect, onboarding: Onboarding, auth: AuthFlow }[stage] || Splash;
     return (
@@ -197,9 +207,11 @@ export default function ScreenRouter() {
   return (
     <div style={{ maxWidth: 460, margin: "0 auto", minHeight: "100vh", background: T.bg, position: "relative" }}>
       <div style={{ paddingBottom: 84 }}>
-        {top
-          ? <div key={stack.length} style={{ animation: "ag-push-in .26s var(--ag-ease)" }}><StackScreen item={top} /></div>
-          : <div key={tab} style={{ animation: "ag-fade .22s var(--ag-ease)" }}><TabScreen /></div>}
+        <Suspense fallback={<LazyFallback />}>
+          {top
+            ? <div key={stack.length} style={{ animation: "ag-push-in .26s var(--ag-ease)" }}><StackScreen item={top} /></div>
+            : <div key={tab} style={{ animation: "ag-fade .22s var(--ag-ease)" }}><TabScreen /></div>}
+        </Suspense>
       </div>
       <BottomNav />
       <ToastHost />

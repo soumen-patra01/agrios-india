@@ -6,6 +6,15 @@ import { PROFILE_ITEMS } from "../constants/content.js";
 import { initials } from "../utils/format.js";
 import { useState } from "react";
 
+const PROVIDER_LABELS = {
+  "google.com": "Google",
+  "facebook.com": "Facebook",
+  "apple.com": "Apple",
+  "twitter.com": "Twitter",
+  google: "Google", facebook: "Facebook", apple: "Apple", twitter: "Twitter",
+  phone: "Phone", password: "Email",
+};
+
 export default function Profile() {
   const { t, user, push, logout } = useApp();
   const [confirm, setConfirm] = useState(false);
@@ -17,6 +26,10 @@ export default function Profile() {
     push({ kind: "feature", props: { title: t(item.title), desc: "Manage your " + t(item.title).toLowerCase() + ".", icon: item.icon, a: "primary" } });
   };
 
+  const displayName = user?.name || "Farmer";
+  const hasPhoto = !!user?.photo;
+  const providerLabel = PROVIDER_LABELS[user?.provider] || "";
+
   return (
     <>
       <AppBar title={t("profileTitle")} large action={
@@ -27,12 +40,24 @@ export default function Profile() {
       <div style={{ padding: "4px 16px 24px", display: "flex", flexDirection: "column", gap: 16, animation: "ag-fade .25s var(--ag-ease)" }}>
         {/* identity */}
         <Card elevated style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          <div style={{ width: 58, height: 58, borderRadius: 18, background: `linear-gradient(150deg, ${T.primary}, ${T.primaryDark})`, color: "#fff", display: "grid", placeItems: "center", fontFamily: T.display, fontWeight: 700, fontSize: 22 }}>
-            {initials(user?.name || "Farmer")}
-          </div>
+          {hasPhoto ? (
+            <img src={user.photo} alt="" referrerPolicy="no-referrer"
+              style={{ width: 58, height: 58, borderRadius: 18, objectFit: "cover" }} />
+          ) : (
+            <div style={{ width: 58, height: 58, borderRadius: 18, background: `linear-gradient(150deg, ${T.primary}, ${T.primaryDark})`, color: "#fff", display: "grid", placeItems: "center", fontFamily: T.display, fontWeight: 700, fontSize: 22 }}>
+              {initials(displayName)}
+            </div>
+          )}
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontFamily: T.display, fontSize: 19, fontWeight: 700 }}>{user?.name || "Farmer"}</div>
-            <div style={{ fontSize: 13, color: T.inkSoft }}>+91 {user?.phone || "—"}</div>
+            <div style={{ fontFamily: T.display, fontSize: 19, fontWeight: 700 }}>{displayName}</div>
+            {user?.phone && <div style={{ fontSize: 13, color: T.inkSoft }}>+91 {user.phone}</div>}
+            {user?.email && <div style={{ fontSize: 12.5, color: T.inkSoft, marginTop: 1 }}>{user.email}</div>}
+            {providerLabel && (
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 4, marginTop: 4,
+                padding: "2px 8px", borderRadius: 6, background: T.surface2, fontSize: 11, fontWeight: 600, color: T.inkSoft }}>
+                <Icon name="Shield" size={11} /> {providerLabel}
+              </div>
+            )}
           </div>
           <button onClick={() => tap("farm")} style={{ background: T.surface2, border: "none", borderRadius: 12, padding: "8px 10px", cursor: "pointer", color: T.primary, fontSize: 12.5, fontWeight: 600, fontFamily: T.body }}>Edit</button>
         </Card>
@@ -72,7 +97,7 @@ export default function Profile() {
           <Icon name="LogOut" size={18} /> {t("logout")}
         </button>
 
-        <div style={{ textAlign: "center", fontSize: 11.5, color: T.inkFaint }}>AgriOS India · v1.0.0 (Phase 7D)</div>
+        <div style={{ textAlign: "center", fontSize: 11.5, color: T.inkFaint }}>AgriOS India · v2.0.0 (Phase 2)</div>
       </div>
 
       <Dialog open={confirm} onClose={() => setConfirm(false)} title={t("logout") + "?"}
