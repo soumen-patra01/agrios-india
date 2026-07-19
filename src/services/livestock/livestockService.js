@@ -1,7 +1,4 @@
-/* Livestock management service — CRUD for animals, production records, events.
-   All data persisted in IndexedDB via livestockDb.js */
-
-import { openDb, uid } from "./livestockDb.js";
+import { repo } from "../firebase/firestoreRepo.js";
 
 export const ENTERPRISES = [
   { id: "poultry", label: "Poultry",    icon: "Bird",      accent: "orange" },
@@ -12,139 +9,48 @@ export const ENTERPRISES = [
   { id: "fish",    label: "Fish",       icon: "Fish",      accent: "blue"   },
   { id: "bee",     label: "Beekeeping", icon: "Bug",       accent: "yellow" },
 ];
-/* Duck and Rabbit are planned — add a row here + a HerdManager config to enable. */
+
+const animalsRepo     = repo("animals");
+const productionsRepo = repo("productions");
+const eventsRepo      = repo("events");
 
 /* ── ANIMALS ──────────────────────────────────────────────────────────────── */
 
 export const animalService = {
-  async add(data) {
-    const db = await openDb();
-    const record = { ...data, id: uid(), createdAt: new Date().toISOString() };
-    return new Promise((res, rej) => {
-      const req = db.transaction("animals", "readwrite").objectStore("animals").add(record);
-      req.onsuccess = () => res(record);
-      req.onerror   = () => rej(req.error);
-    });
-  },
-
-  async getAll(enterprise) {
-    const db = await openDb();
-    return new Promise((res, rej) => {
-      const store = db.transaction("animals", "readonly").objectStore("animals");
-      const req = enterprise
-        ? store.index("enterprise").getAll(enterprise)
-        : store.getAll();
-      req.onsuccess = () => res(req.result || []);
-      req.onerror   = () => rej(req.error);
-    });
-  },
-
-  async getById(id) {
-    const db = await openDb();
-    return new Promise((res, rej) => {
-      const req = db.transaction("animals", "readonly").objectStore("animals").get(id);
-      req.onsuccess = () => res(req.result || null);
-      req.onerror   = () => rej(req.error);
-    });
-  },
-
-  async update(id, patch) {
-    const db = await openDb();
-    const store = db.transaction("animals", "readwrite").objectStore("animals");
-    return new Promise((res, rej) => {
-      const getReq = store.get(id);
-      getReq.onsuccess = () => {
-        const updated = { ...getReq.result, ...patch, updatedAt: new Date().toISOString() };
-        const putReq = store.put(updated);
-        putReq.onsuccess = () => res(updated);
-        putReq.onerror   = () => rej(putReq.error);
-      };
-      getReq.onerror = () => rej(getReq.error);
-    });
-  },
-
-  async remove(id) {
-    const db = await openDb();
-    return new Promise((res, rej) => {
-      const req = db.transaction("animals", "readwrite").objectStore("animals").delete(id);
-      req.onsuccess = () => res();
-      req.onerror   = () => rej(req.error);
-    });
-  },
-
-  async count(enterprise) {
-    const list = await this.getAll(enterprise);
-    return list.length;
-  },
+  add:     (data)      => animalsRepo.add(data),
+  getAll:  (enterprise) => enterprise ? animalsRepo.getBy("enterprise", enterprise) : animalsRepo.getAll(),
+  getById: (id)        => animalsRepo.getById(id),
+  update:  (id, patch) => animalsRepo.update(id, patch),
+  remove:  (id)        => animalsRepo.remove(id),
+  async count(enterprise) { return (await this.getAll(enterprise)).length; },
 };
 
 /* ── PRODUCTION RECORDS ───────────────────────────────────────────────────── */
 
 export const productionService = {
-  async add(data) {
-    const db = await openDb();
-    const record = { ...data, id: uid(), createdAt: new Date().toISOString() };
-    return new Promise((res, rej) => {
-      const req = db.transaction("productions", "readwrite").objectStore("productions").add(record);
-      req.onsuccess = () => res(record);
-      req.onerror   = () => rej(req.error);
-    });
-  },
+  add: (data) => productionsRepo.add(data),
 
   async getForEnterprise(enterprise, limit = 90) {
-    const db = await openDb();
-    return new Promise((res, rej) => {
-      const req = db.transaction("productions", "readonly")
-        .objectStore("productions").index("enterprise").getAll(enterprise);
-      req.onsuccess = () => {
-        const sorted = (req.result || []).sort((a, b) => b.date.localeCompare(a.date));
-        res(sorted.slice(0, limit));
-      };
-      req.onerror = () => rej(req.error);
-    });
+    const list = await productionsRepo.getBy("enterprise", enterprise);
+    return list.sort((a, b) => b.date.localeCompare(a.date)).slice(0, limit);
   },
 
   async getForAnimal(animalId) {
-    const db = await openDb();
-    return new Promise((res, rej) => {
-      const req = db.transaction("productions", "readonly")
-        .objectStore("productions").index("animalId").getAll(animalId);
-      req.onsuccess = () => res((req.result || []).sort((a, b) => b.date.localeCompare(a.date)));
-      req.onerror   = () => rej(req.error);
-    });
+    const list = await productionsRepo.getBy("animalId", animalId);
+    return list.sort((a, b) => b.date.localeCompare(a.date));
   },
 
-  async remove(id) {
-    const db = await openDb();
-    return new Promise((res, rej) => {
-      const req = db.transaction("productions", "readwrite").objectStore("productions").delete(id);
-      req.onsuccess = () => res();
-      req.onerror   = () => rej(req.error);
-    });
-  },
+  remove: (id) => productionsRepo.remove(id),
 };
 
 /* ── EVENTS (vaccinations, treatments, harvests, breeding) ───────────────── */
 
 export const eventService = {
-  async add(data) {
-    const db = await openDb();
-    const record = { ...data, id: uid(), createdAt: new Date().toISOString() };
-    return new Promise((res, rej) => {
-      const req = db.transaction("events", "readwrite").objectStore("events").add(record);
-      req.onsuccess = () => res(record);
-      req.onerror   = () => rej(req.error);
-    });
-  },
+  add: (data) => eventsRepo.add(data),
 
   async getForEnterprise(enterprise) {
-    const db = await openDb();
-    return new Promise((res, rej) => {
-      const req = db.transaction("events", "readonly")
-        .objectStore("events").index("enterprise").getAll(enterprise);
-      req.onsuccess = () => res((req.result || []).sort((a, b) => b.date.localeCompare(a.date)));
-      req.onerror   = () => rej(req.error);
-    });
+    const list = await eventsRepo.getBy("enterprise", enterprise);
+    return list.sort((a, b) => b.date.localeCompare(a.date));
   },
 
   async getUpcoming(enterprise, days = 30) {
@@ -158,12 +64,5 @@ export const eventService = {
     });
   },
 
-  async remove(id) {
-    const db = await openDb();
-    return new Promise((res, rej) => {
-      const req = db.transaction("events", "readwrite").objectStore("events").delete(id);
-      req.onsuccess = () => res();
-      req.onerror   = () => rej(req.error);
-    });
-  },
+  remove: (id) => eventsRepo.remove(id),
 };

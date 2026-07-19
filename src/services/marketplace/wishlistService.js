@@ -1,7 +1,7 @@
 /* Wishlist — saved products and favourite sellers.
    Entry: { type: "product"|"seller", refId } */
 
-import { repo } from "./marketDb.js";
+import { repo } from "../firebase/firestoreRepo.js";
 
 const wishlist = repo("wishlist");
 

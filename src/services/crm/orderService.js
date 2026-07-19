@@ -2,7 +2,7 @@
    Order: {kind: sale|purchase, contactId, item, qty, unit, rate, amount,
            date, status, paidAmount, deliveryDate} */
 
-import { repo } from "../erp/erpDb.js";
+import { repo } from "../firebase/firestoreRepo.js";
 
 export const ORDER_STATUS = [
   { id: "open",      label: "Open"      },

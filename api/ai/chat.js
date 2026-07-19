@@ -28,6 +28,10 @@ function limited(ip) {
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: { message: "POST only" } });
 
+  const { verifyToken } = await import("../_middleware/verifyAuth.js");
+  const decoded = await verifyToken(req);
+  if (!decoded) return res.status(401).json({ error: { message: "Unauthorized" } });
+
   const key = process.env.ANTHROPIC_API_KEY;
   if (!key) return res.status(503).json({ error: { message: "AI is not configured on the server (missing ANTHROPIC_API_KEY)." } });
 

@@ -41,11 +41,17 @@ export default function CashFlowPage() {
   const [year, setYear]   = useState(new Date().getFullYear());
   const [flow, setFlow]   = useState([]);
   const [peaks, setPeaks] = useState({});
-  const years = plService.availableYears();
+  const [years, setYears] = useState([]);
 
   useEffect(() => {
-    setFlow(cashFlowService.monthlyFlow(year));
-    setPeaks(cashFlowService.peakMonths(year));
+    plService.availableYears().then(setYears);
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      setFlow(await cashFlowService.monthlyFlow(year));
+      setPeaks(await cashFlowService.peakMonths(year));
+    })();
   }, [year]);
 
   const activeFlow = flow.filter((m) => m.income > 0 || m.expense > 0 || m.opening !== 0);

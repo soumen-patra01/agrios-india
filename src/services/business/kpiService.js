@@ -4,11 +4,11 @@ import { plService } from "./plService.js";
 import { cashFlowService } from "./cashFlowService.js";
 
 export const kpiService = {
-  summary(year) {
-    const total  = plService.yearTotal(year);
-    const best   = plService.bestEnterprise(year);
-    const months = plService.byMonth(year).filter((m) => m.income > 0 || m.expense > 0);
-    const flow   = cashFlowService.monthlyFlow(year);
+  async summary(year) {
+    const total  = await plService.yearTotal(year);
+    const best   = await plService.bestEnterprise(year);
+    const months = (await plService.byMonth(year)).filter((m) => m.income > 0 || m.expense > 0);
+    const flow   = await cashFlowService.monthlyFlow(year);
 
     const margin = total.income > 0 ? +((total.net / total.income) * 100).toFixed(1) : 0;
     const roi    = total.expense > 0 ? +((total.net / total.expense) * 100).toFixed(1) : 0;

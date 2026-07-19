@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { T } from "../theme/ThemeProvider.jsx";
 import Icon from "../components/Icon.jsx";
 import {
@@ -41,10 +41,19 @@ export default function FarmLedger() {
   };
 
   /* eslint-disable react-hooks/exhaustive-deps */
-  const summary = useMemo(() => ledgerService.monthSummary(year, month + 1), [year, month, tick]);
-  const txns    = useMemo(() => {
-    const all = ledgerService.forMonth(year, month + 1);
-    return filter === "all" ? all : all.filter((t) => t.kind === filter);
+  const [summary, setSummary] = useState({ net: 0, income: 0, expense: 0 });
+  const [txns, setTxns]       = useState([]);
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      const s = await ledgerService.monthSummary(year, month + 1);
+      const all = await ledgerService.forMonth(year, month + 1);
+      if (!alive) return;
+      setSummary(s);
+      setTxns(filter === "all" ? all : all.filter((t) => t.kind === filter));
+    })();
+    return () => { alive = false; };
   }, [year, month, filter, tick]);
 
   const netPos = summary.net >= 0;
@@ -142,7 +151,7 @@ export default function FarmLedger() {
         title="Delete entry?"
         body={delTarget ? `${ledgerService.categoryLabel(delTarget.kind, delTarget.categoryId)} · ${rupee(delTarget.amount)}` : ""}
         icon="Trash2" danger confirmLabel="Delete" cancelLabel="Cancel"
-        onConfirm={() => { ledgerService.remove(delTarget.id); setDelTarget(null); refresh(); toast("Entry deleted", "info"); }} />
+        onConfirm={async () => { await ledgerService.remove(delTarget.id); setDelTarget(null); refresh(); toast("Entry deleted", "info"); }} />
     </>
   );
 }
@@ -169,10 +178,10 @@ function AddSheet({ open, onClose, onSaved }) {
 
   const canSubmit = form.amount && parseFloat(form.amount) > 0 && form.categoryId;
 
-  const submit = () => {
+  const submit = async () => {
     if (!canSubmit) return;
     const { kind } = form;
-    ledgerService.add({ ...form, amount: parseFloat(form.amount) });
+    await ledgerService.add({ ...form, amount: parseFloat(form.amount) });
     onSaved(kind);
     onClose();
     setForm({ kind: "income", amount: "", categoryId: "", enterpriseId: "crop", date: todayStr(), note: "" });

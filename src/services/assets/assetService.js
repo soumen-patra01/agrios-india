@@ -1,6 +1,6 @@
 /* Farm assets — machinery, vehicles, buildings, pumps — with maintenance log. */
 
-import { repo } from "../erp/erpDb.js";
+import { repo } from "../firebase/firestoreRepo.js";
 
 export const ASSET_CATEGORIES = [
   { id: "machinery", label: "Machinery",    icon: "Tractor"   },

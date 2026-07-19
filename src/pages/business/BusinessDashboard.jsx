@@ -35,11 +35,17 @@ export default function BusinessDashboard() {
   const [year, setYear]   = useState(new Date().getFullYear());
   const [kpi, setKpi]     = useState(null);
   const [byEnt, setByEnt] = useState([]);
-  const years = plService.availableYears();
+  const [years, setYears] = useState([]);
 
   useEffect(() => {
-    setKpi(kpiService.summary(year));
-    setByEnt(plService.byEnterprise(year));
+    plService.availableYears().then(setYears);
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      setKpi(await kpiService.summary(year));
+      setByEnt(await plService.byEnterprise(year));
+    })();
   }, [year]);
 
   const profitColor = kpi?.netProfit >= 0 ? T.primary : T.red;

@@ -3,20 +3,11 @@ import Login from "./Login.jsx";
 import OtpVerify from "./OtpVerify.jsx";
 
 export default function AuthFlow() {
-  const [auth, setAuth] = useState({ phone: null, token: null, isDemo: false });
+  const [phone, setPhone] = useState(null);
 
-  if (auth.phone) {
-    return (
-      <OtpVerify
-        phone={auth.phone}
-        token={auth.token}
-        isDemo={auth.isDemo}
-        onBack={() => setAuth({ phone: null, token: null, isDemo: false })}
-      />
-    );
+  if (phone) {
+    return <OtpVerify phone={phone} onBack={() => setPhone(null)} />;
   }
 
-  return (
-    <Login onNext={(phone, token, isDemo) => setAuth({ phone, token, isDemo })} />
-  );
+  return <Login onNext={(ph) => setPhone(ph)} />;
 }

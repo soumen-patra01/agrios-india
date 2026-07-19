@@ -1,15 +1,13 @@
-import { createContext, useContext, useCallback, useMemo, useState } from "react";
+import { createContext, useContext, useCallback, useEffect, useMemo, useState } from "react";
 import { storage } from "../utils/storage.js";
 import { makeT } from "../i18n/strings.js";
 import { LOCALES } from "../constants/languages.js";
+import { onAuthChange, logout as fbLogout } from "../services/firebase/auth.js";
+import { migrateToFirestore } from "../services/firebase/migrate.js";
 
-/* Central app store: language, auth/onboarding flow, navigation stack and
-   toast queue. Kept deliberately backend-free for Phase 1 — auth is UI-only. */
 const AppCtx = createContext(null);
 export const useApp = () => useContext(AppCtx);
 
-/* The splash screen always shows on cold load, then routes to the first
-   incomplete step of the flow. */
 export const nextAfterSplash = () => {
   if (!storage.get("lang")) return "language";
   if (!storage.get("onboarded")) return "onboarding";
@@ -20,10 +18,33 @@ export const nextAfterSplash = () => {
 export function AppProvider({ children }) {
   const [lang, setLangState] = useState(() => storage.get("lang", "en"));
   const [user, setUser] = useState(() => storage.get("user", null));
-  const [stage, setStage] = useState("splash"); // splash | language | onboarding | auth | app
-  const [tab, setTab] = useState("home");            // home | ai | market | services | profile
-  const [stack, setStack] = useState([]);            // pushed detail screens
+  const [stage, setStage] = useState("splash");
+  const [tab, setTab] = useState("home");
+  const [stack, setStack] = useState([]);
   const [toasts, setToasts] = useState([]);
+
+  useEffect(() => {
+    return onAuthChange((fbUser) => {
+      if (fbUser) {
+        const stored = storage.get("user", null);
+        if (stored && stored.uid === fbUser.uid) return;
+        const u = {
+          uid: fbUser.uid,
+          phone: fbUser.phoneNumber?.replace("+91", "") || stored?.phone || "",
+          email: fbUser.email || stored?.email || "",
+          name: fbUser.displayName || stored?.name || "",
+          photo: fbUser.photoURL || stored?.photo || "",
+          provider: fbUser.providerData?.[0]?.providerId || stored?.provider || "",
+          joined: stored?.joined || Date.now(),
+        };
+        storage.set("user", u);
+        setUser(u);
+      } else {
+        storage.remove("user");
+        setUser(null);
+      }
+    });
+  }, []);
 
   const t = useMemo(() => makeT(lang), [lang]);
   const locale = LOCALES[lang] || "en-IN";
@@ -32,8 +53,17 @@ export function AppProvider({ children }) {
 
   const setStageP = useCallback((s) => setStage(s), []);
   const finishOnboarding = useCallback(() => { storage.set("onboarded", true); setStage("auth"); }, []);
-  const login = useCallback((u) => { storage.set("user", u); setUser(u); setStage("app"); setTab("home"); }, []);
-  const logout = useCallback(() => { storage.remove("user"); setUser(null); setStack([]); setStage("auth"); }, []);
+  const login = useCallback((u) => {
+    storage.set("user", u); setUser(u); setStage("app"); setTab("home");
+    migrateToFirestore().catch(() => {});
+  }, []);
+  const logout = useCallback(async () => {
+    await fbLogout();
+    storage.remove("user");
+    setUser(null);
+    setStack([]);
+    setStage("auth");
+  }, []);
 
   const push = useCallback((screen) => setStack((s) => [...s, screen]), []);
   const pop = useCallback(() => setStack((s) => s.slice(0, -1)), []);

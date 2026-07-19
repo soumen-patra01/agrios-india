@@ -33,13 +33,19 @@ export default function PLReport() {
   const [monthly, setMonthly]   = useState([]);
   const [byEnt, setByEnt]       = useState([]);
   const [total, setTotal]       = useState({ income: 0, expense: 0, net: 0 });
-  const years = plService.availableYears();
+  const [years, setYears] = useState([]);
 
   useEffect(() => {
-    const m = plService.byMonth(year);
-    const e = plService.byEnterprise(year);
-    const t = plService.yearTotal(year);
-    setMonthly(m); setByEnt(e); setTotal(t);
+    plService.availableYears().then(setYears);
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      const m = await plService.byMonth(year);
+      const e = await plService.byEnterprise(year);
+      const t = await plService.yearTotal(year);
+      setMonthly(m); setByEnt(e); setTotal(t);
+    })();
   }, [year]);
 
   const maxIncome  = Math.max(...monthly.map((m) => m.income),  1);

@@ -30,7 +30,17 @@ export default function Home() {
     push({ kind: "chat", props: { agentId: x?.agentId ?? null } });
   };
 
-  const { net: monthNet, income: monthIn, expense: monthOut } = ledgerService.currentMonthSummary();
+  const [monthNet, setMonthNet] = useState(0);
+  const [monthIn, setMonthIn]   = useState(0);
+  const [monthOut, setMonthOut] = useState(0);
+
+  useEffect(() => {
+    let alive = true;
+    ledgerService.currentMonthSummary().then(({ net, income, expense }) => {
+      if (alive) { setMonthNet(net); setMonthIn(income); setMonthOut(expense); }
+    });
+    return () => { alive = false; };
+  }, []);
 
   const [showNotifBanner, setShowNotifBanner] = useState(
     () => notificationService.isSupported() && !notificationService.hasPrompted()

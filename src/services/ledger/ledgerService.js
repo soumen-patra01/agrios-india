@@ -1,10 +1,6 @@
-/* Farm ledger — income/expense transaction storage.
-   All data stays on-device in localStorage under the ldg: prefix.
-   Each transaction: {id, kind, amount, categoryId, enterpriseId, date, note} */
+import { repo } from "../firebase/firestoreRepo.js";
 
-import { storage } from "../../utils/storage.js";
-
-const KEY = "ldg:txns";
+const txns = repo("ledgerTxns");
 
 export const INCOME_CATEGORIES = [
   { id: "crop_sale",      label: "Crop sale",           icon: "Wheat"      },
@@ -40,36 +36,36 @@ export const ENTERPRISES = [
 ];
 
 export const ledgerService = {
-  all() {
-    return [...storage.get(KEY, [])].sort((a, b) => b.date.localeCompare(a.date));
+  async all() {
+    const list = await txns.getAll();
+    return list.sort((a, b) => b.date.localeCompare(a.date));
   },
 
-  forMonth(year, month) {
+  async forMonth(year, month) {
     const prefix = `${year}-${String(month).padStart(2, "0")}`;
-    return this.all().filter((t) => t.date.startsWith(prefix));
+    const all = await this.all();
+    return all.filter((t) => t.date.startsWith(prefix));
   },
 
-  monthSummary(year, month) {
-    const txns = this.forMonth(year, month);
-    const income  = txns.filter((t) => t.kind === "income").reduce((s, t) => s + t.amount, 0);
-    const expense = txns.filter((t) => t.kind === "expense").reduce((s, t) => s + t.amount, 0);
+  async monthSummary(year, month) {
+    const list = await this.forMonth(year, month);
+    const income  = list.filter((t) => t.kind === "income").reduce((s, t) => s + t.amount, 0);
+    const expense = list.filter((t) => t.kind === "expense").reduce((s, t) => s + t.amount, 0);
     return { income, expense, net: income - expense };
   },
 
-  currentMonthSummary() {
+  async currentMonthSummary() {
     const d = new Date();
     return this.monthSummary(d.getFullYear(), d.getMonth() + 1);
   },
 
-  add(txn) {
-    const list = storage.get(KEY, []);
-    const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-    storage.set(KEY, [...list, { ...txn, id }]);
-    return id;
+  async add(txn) {
+    const record = await txns.add(txn);
+    return record.id;
   },
 
-  remove(id) {
-    storage.set(KEY, storage.get(KEY, []).filter((t) => t.id !== id));
+  async remove(id) {
+    await txns.remove(id);
   },
 
   categoryLabel(kind, categoryId) {

@@ -9,6 +9,7 @@
 
 import { API_ENDPOINT, getDevKey } from "../config.js";
 import { parseStream } from "./streamParser.js";
+import { authFetch } from "../../services/firebase/authFetch.js";
 
 const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
 
@@ -33,7 +34,8 @@ async function anthropicFetch({ model, system, messages, tools, maxTokens }, sig
       }
     : { "content-type": "application/json" };
 
-  const res = await fetch(url, { method: "POST", headers, body: JSON.stringify(body), signal });
+  const fetcher = devKey ? fetch : authFetch;
+  const res = await fetcher(url, { method: "POST", headers, body: JSON.stringify(body), signal });
   if (!res.ok) {
     let detail = "";
     try { detail = (await res.json())?.error?.message || ""; } catch { /* opaque */ }

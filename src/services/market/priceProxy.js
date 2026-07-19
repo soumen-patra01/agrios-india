@@ -2,9 +2,11 @@
    Returns { unavailable: true } until PRICE_FEED_URL is set on the server.
    The marketTool and MandiPrices UI degrade gracefully on unavailability. */
 
+import { authFetch } from "../firebase/authFetch.js";
+
 export async function fetchLivePrice(cropId, mandiName, { signal } = {}) {
   try {
-    const res = await fetch("/api/prices", {
+    const res = await authFetch("/api/prices", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ cropId, mandi: mandiName }),

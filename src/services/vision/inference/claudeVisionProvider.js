@@ -3,6 +3,7 @@
 
 import { CAPABILITIES } from "./inferenceInterface.js";
 import { API_ENDPOINT, MODELS } from "../../../ai/config.js";
+import { authFetch } from "../../firebase/authFetch.js";
 
 export const claudeVisionProvider = {
   id:   "claude-vision",
@@ -30,7 +31,7 @@ export const claudeVisionProvider = {
       },
     ];
 
-    const res = await fetch(API_ENDPOINT, {
+    const res = await authFetch(API_ENDPOINT, {
       method:  "POST",
       headers: { "Content-Type": "application/json" },
       body:    JSON.stringify({ model: MODELS.answer, max_tokens: 1024, system, messages }),

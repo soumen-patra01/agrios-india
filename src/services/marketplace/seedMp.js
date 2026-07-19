@@ -2,7 +2,7 @@
    backend exists. Every seeded record carries demo:true so it can be cleared
    without touching anything the user created themselves. */
 
-import { repo } from "./marketDb.js";
+import { repo } from "../firebase/firestoreRepo.js";
 
 const sellers  = repo("sellers");
 const products = repo("products");

@@ -9,7 +9,7 @@ export const costAnalysis = {
   /* Cost per production unit per enterprise (year expenses / all-time-year output).
      Approximation on ledger enterprise tags — honest label in UI. */
   async costPerUnit(year) {
-    const pl = plService.byEnterprise(year);
+    const pl = await plService.byEnterprise(year);
     const snapshot = await productionAggregator.monthSnapshot();
     return snapshot.map((row) => {
       const plRow = pl.find((p) => p.id === row.enterprise.id);
@@ -40,8 +40,8 @@ export const costAnalysis = {
   },
 
   /* 3-month cash forecast from trailing 3-month average income/expense. */
-  forecast(year) {
-    const flow = cashFlowService.monthlyFlow(year);
+  async forecast(year) {
+    const flow = await cashFlowService.monthlyFlow(year);
     const active = flow.filter((m) => m.income > 0 || m.expense > 0);
     if (active.length === 0) return [];
     const recent = active.slice(-3);

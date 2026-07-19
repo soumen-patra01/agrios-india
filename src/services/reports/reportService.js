@@ -54,8 +54,8 @@ export const reportService = {
   },
 
   async _financial() {
-    const months = plService.byMonth(year()).filter((m) => m.income > 0 || m.expense > 0);
-    const byEnt = plService.byEnterprise(year());
+    const months = (await plService.byMonth(year())).filter((m) => m.income > 0 || m.expense > 0);
+    const byEnt = await plService.byEnterprise(year());
     return [
       { heading: "Month-wise P&L", table: {
         headers: ["Month", "Income (₹)", "Expense (₹)", "Net (₹)"],

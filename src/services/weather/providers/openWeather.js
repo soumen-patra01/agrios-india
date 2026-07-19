@@ -6,6 +6,8 @@
    This file exists to prove the provider seam: swapping weather sources is a
    registry change, not a rewrite. Wire the normalize() when the key is added. */
 
+import { authFetch } from "../../firebase/authFetch.js";
+
 const PROXY_URL = "/api/weather";
 
 export const openWeatherProvider = {
@@ -14,7 +16,7 @@ export const openWeatherProvider = {
   requiresKey: true,
 
   async fetchWeather({ lat, lon }, { signal } = {}) {
-    const res = await fetch(PROXY_URL, {
+    const res = await authFetch(PROXY_URL, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ provider: "openweather", lat, lon }),

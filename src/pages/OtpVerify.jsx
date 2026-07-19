@@ -3,10 +3,9 @@ import { T } from "../theme/ThemeProvider.jsx";
 import Icon from "../components/Icon.jsx";
 import { Button, OtpInput } from "../components/index.js";
 import { useApp } from "../store/AppStore.jsx";
+import { verifyOtp } from "../services/firebase/auth.js";
 
-const DEMO_CODE = "123456";
-
-export default function OtpVerify({ phone, token, isDemo, onBack }) {
+export default function OtpVerify({ phone, onBack }) {
   const { login, t } = useApp();
   const [code,    setCode]    = useState("");
   const [loading, setLoading] = useState(false);
@@ -17,20 +16,16 @@ export default function OtpVerify({ phone, token, isDemo, onBack }) {
     setError("");
     setLoading(true);
     try {
-      const res  = await fetch("/api/auth/verifyOtp", {
-        method:  "POST",
-        headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify({ token, code }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.error || "Verification failed — please try again");
-        setCode("");
-        return;
-      }
-      login({ phone, name: "", joined: Date.now() });
-    } catch {
-      setError("Network error — check your connection and try again");
+      const fbUser = await verifyOtp(code);
+      login({ phone, uid: fbUser.uid, name: "", joined: Date.now() });
+    } catch (err) {
+      const msg = err?.code === "auth/invalid-verification-code"
+        ? "Invalid code — please try again"
+        : err?.code === "auth/code-expired"
+        ? "Code expired — request a new one"
+        : "Verification failed — please try again";
+      setError(msg);
+      setCode("");
     } finally {
       setLoading(false);
     }
@@ -43,25 +38,6 @@ export default function OtpVerify({ phone, token, isDemo, onBack }) {
       <p style={{ fontSize: 14, color: T.inkSoft, margin: "0 0 24px", textAlign: "center" }}>
         {t("otpSub")} <b style={{ color: T.ink }}>+91 {phone}</b>
       </p>
-
-      {/* Demo banner — only shown when SMS key is not configured on the server */}
-      {isDemo && (
-        <div style={{ display: "flex", alignItems: "flex-start", gap: 10,
-          padding: "12px 14px", borderRadius: 14,
-          background: T.yellowSoft, border: `1px solid ${T.yellow}33`, marginBottom: 24 }}>
-          <Icon name="Info" size={16} style={{ color: T.yellow, flexShrink: 0, marginTop: 1 }} />
-          <div style={{ fontSize: 13, color: T.ink, lineHeight: 1.5 }}>
-            <b>Demo mode</b> — SMS is not configured yet. Use code{" "}
-            <button onClick={() => { setCode(DEMO_CODE); setError(""); }}
-              style={{ background: T.yellow, color: "#fff", border: "none",
-                borderRadius: 6, padding: "2px 8px", cursor: "pointer",
-                fontFamily: T.body, fontSize: 13, fontWeight: 700 }}>
-              {DEMO_CODE}
-            </button>
-            {" "}to continue.
-          </div>
-        </div>
-      )}
 
       <OtpInput value={code} onChange={(v) => { setCode(v); setError(""); }} />
 

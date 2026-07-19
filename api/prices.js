@@ -18,6 +18,9 @@ function limited(ip) {
 }
 
 export default async function handler(req, res) {
+  const { verifyToken } = await import("./_middleware/verifyAuth.js");
+  const decoded = await verifyToken(req);
+  if (!decoded) return res.status(401).json({ error: { message: "Unauthorized" } });
   if (req.method !== "POST") return res.status(405).json({ error: "POST only" });
 
   const ip = (req.headers["x-forwarded-for"] || "").split(",")[0].trim() || "unknown";
