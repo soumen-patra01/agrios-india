@@ -47,10 +47,11 @@ export default function Login({ onNext }) {
       await sendOtp(phone);
       onNext(phone);
     } catch (err) {
+      console.error("OTP error:", err?.code, err?.message, err);
       setError(
         err?.code === "auth/too-many-requests" ? "Too many attempts — try later"
         : err?.code === "auth/invalid-phone-number" ? "Invalid phone number"
-        : "Failed to send OTP — please try again"
+        : `Failed to send OTP — ${err?.code || err?.message || "please try again"}`
       );
     } finally { setLoading(false); }
   };
