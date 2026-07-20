@@ -30,7 +30,11 @@ export default function Market() {
             {topCrops.map((p, i) => (
               <div key={p.id} onClick={() => push({ kind: "mandiPrices" })}
                 style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 12px", borderTop: i ? `1px solid ${T.lineSoft}` : "none", cursor: "pointer" }}>
-                <IconTile name={p.icon} a={marketService.categories.find((c) => c.id === p.category)?.accent || "primary"} size={38} iconSize={18} />
+                {p.emoji ? (
+                  <div style={{ width: 38, height: 38, borderRadius: 12, background: T.surface2, display: "grid", placeItems: "center", flexShrink: 0, fontSize: 20 }}>{p.emoji}</div>
+                ) : (
+                  <IconTile name={p.icon} a={marketService.categories.find((c) => c.id === p.category)?.accent || "primary"} size={38} iconSize={18} />
+                )}
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 14, fontWeight: 600 }}>{p.name}</div>
                   <div style={{ fontSize: 12, color: T.inkSoft }}>MSP / seasonal band</div>
