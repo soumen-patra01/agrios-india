@@ -67,7 +67,7 @@ export default function Login({ onNext }) {
         err?.code === "auth/invalid-email" ? "Invalid email address"
         : err?.code === "auth/wrong-password" ? "Wrong password"
         : err?.code === "auth/weak-password" ? "Password must be at least 6 characters"
-        : "Login failed — please try again"
+        : `Login failed — ${err?.code || err?.message || "please try again"}`
       );
     } finally { setLoading(false); }
   };
