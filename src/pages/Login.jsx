@@ -104,12 +104,8 @@ export default function Login({ onNext }) {
       <div id="recaptcha-container" />
 
       {/* Logo */}
-      <div style={{ width: 64, height: 64, borderRadius: 20, margin: "0 auto 24px",
-        display: "grid", placeItems: "center",
-        background: `linear-gradient(150deg, ${T.primary}, ${T.primaryDark})`,
-        boxShadow: T.shadowMd }}>
-        <Icon name="Sprout" size={32} color="#fff" strokeWidth={2.3} />
-      </div>
+      <img src="/icon-192.png" alt="AgriOS" style={{ width: 64, height: 64, borderRadius: 20, margin: "0 auto 24px",
+        boxShadow: T.shadowMd }} />
       <h1 style={{ fontFamily: T.display, fontSize: 26, fontWeight: 800,
         margin: "0 0 6px", textAlign: "center", color: T.ink }}>{t("login")}</h1>
       <p style={{ fontSize: 14, color: T.inkSoft, margin: "0 0 24px", textAlign: "center" }}>

@@ -14,11 +14,8 @@ export default function Splash() {
     <div style={{ minHeight: "100vh", background: `radial-gradient(120% 80% at 50% 0%, ${T.primarySoft} 0%, ${T.bg} 55%)`,
       display: "grid", placeItems: "center", padding: 24 }}>
       <div style={{ textAlign: "center", animation: "ag-fade .5s var(--ag-ease)" }}>
-        <div style={{ width: 92, height: 92, borderRadius: 28, margin: "0 auto 22px", display: "grid", placeItems: "center",
-          background: `linear-gradient(150deg, ${T.primary}, ${T.primaryDark})`, boxShadow: T.shadowLg,
-          animation: "ag-pop .6s var(--ag-ease)" }}>
-          <Icon name="Sprout" size={46} color="#fff" strokeWidth={2.3} />
-        </div>
+        <img src="/icon-192.png" alt="AgriOS" style={{ width: 92, height: 92, borderRadius: 28, margin: "0 auto 22px",
+          boxShadow: T.shadowLg, animation: "ag-pop .6s var(--ag-ease)" }} />
         <div style={{ fontFamily: T.display, fontSize: 34, fontWeight: 800, letterSpacing: "-.02em", color: T.ink,
           animation: "ag-rise .6s .1s both var(--ag-ease)" }}>
           AgriOS <span style={{ color: T.primary }}>India</span>
