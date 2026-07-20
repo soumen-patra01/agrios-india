@@ -63,8 +63,8 @@ export default function MandiPrices() {
           <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 2 }}>
             <Chip active={!activeCategory} onClick={() => setActiveCategory(null)}>All</Chip>
             {marketService.categories.map((c) => (
-              <Chip key={c.id} active={c.id === activeCategory} icon={c.icon} onClick={() => setActiveCategory(c.id)}>
-                {c.label}
+              <Chip key={c.id} active={c.id === activeCategory} onClick={() => setActiveCategory(c.id)}>
+                {c.emoji || ""} {c.label}
               </Chip>
             ))}
           </div>
@@ -106,7 +106,13 @@ export default function MandiPrices() {
               <div key={crop.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px",
                 borderTop: i ? `1px solid ${T.lineSoft}` : "none", cursor: "pointer" }}
                 onClick={() => setSelected(crop)}>
-                <IconTile name={crop.icon} a={marketService.categories.find((c) => c.id === crop.category)?.accent || "primary"} size={40} iconSize={19} />
+                {crop.emoji ? (
+                  <div style={{ width: 40, height: 40, borderRadius: 13, background: T.surface2, display: "grid", placeItems: "center", flexShrink: 0, fontSize: 22 }}>
+                    {crop.emoji}
+                  </div>
+                ) : (
+                  <IconTile name={crop.icon} a={marketService.categories.find((c) => c.id === crop.category)?.accent || "primary"} size={40} iconSize={19} />
+                )}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 14, fontWeight: 600, color: T.ink }}>{crop.name}</div>
                   <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 2 }}>
