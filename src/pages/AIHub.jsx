@@ -6,9 +6,13 @@ import { useApp } from "../store/AppStore.jsx";
 import { AI_TOOLS } from "../constants/content.js";
 
 export default function AIHub() {
-  const { t, push } = useApp();
+  const { t, tc, push } = useApp();
   const [q, setQ] = useState("");
-  const list = AI_TOOLS.filter((x) => (x.title + x.desc).toLowerCase().includes(q.toLowerCase()));
+  const list = AI_TOOLS.filter((x) => {
+    const title = typeof x.title === "object" ? Object.values(x.title).join(" ") : x.title;
+    const desc = typeof x.desc === "object" ? Object.values(x.desc).join(" ") : x.desc;
+    return (title + desc).toLowerCase().includes(q.toLowerCase());
+  });
   const open = (x) => push({ kind: "chat", props: { agentId: x.agentId } });
 
   return (
@@ -36,8 +40,8 @@ export default function AIHub() {
                   <Icon name={x.icon} size={22} strokeWidth={2.1} />
                 </div>
                 <div>
-                  <div style={{ fontFamily: T.display, fontSize: 15, fontWeight: 700, lineHeight: 1.2 }}>{x.title}</div>
-                  <div style={{ fontSize: 12, color: T.inkSoft, marginTop: 4, lineHeight: 1.4 }}>{x.desc}</div>
+                  <div style={{ fontFamily: T.display, fontSize: 15, fontWeight: 700, lineHeight: 1.2 }}>{tc(x.title)}</div>
+                  <div style={{ fontSize: 12, color: T.inkSoft, marginTop: 4, lineHeight: 1.4 }}>{tc(x.desc)}</div>
                 </div>
               </Card>
             );

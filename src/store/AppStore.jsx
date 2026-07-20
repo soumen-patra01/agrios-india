@@ -1,6 +1,6 @@
 import { createContext, useContext, useCallback, useEffect, useMemo, useState } from "react";
 import { storage } from "../utils/storage.js";
-import { makeT } from "../i18n/strings.js";
+import { makeT, pickLang } from "../i18n/strings.js";
 import { LOCALES } from "../constants/languages.js";
 import { onAuthChange, logout as fbLogout } from "../services/firebase/auth.js";
 import { migrateToFirestore } from "../services/firebase/migrate.js";
@@ -47,6 +47,7 @@ export function AppProvider({ children }) {
   }, []);
 
   const t = useMemo(() => makeT(lang), [lang]);
+  const tc = useCallback((obj) => pickLang(lang, obj), [lang]);
   const locale = LOCALES[lang] || "en-IN";
 
   const setLang = useCallback((code) => { setLangState(code); storage.set("lang", code); }, []);
@@ -77,12 +78,12 @@ export function AppProvider({ children }) {
   const dismissToast = useCallback((id) => setToasts((q) => q.filter((x) => x.id !== id)), []);
 
   const value = useMemo(() => ({
-    lang, setLang, t, locale,
+    lang, setLang, t, tc, locale,
     user, login, logout,
     stage, setStage: setStageP, finishOnboarding,
     tab, switchTab, stack, push, pop,
     toasts, toast, dismissToast,
-  }), [lang, setLang, t, locale, user, login, logout, stage, setStageP, finishOnboarding,
+  }), [lang, setLang, t, tc, locale, user, login, logout, stage, setStageP, finishOnboarding,
       tab, switchTab, stack, push, pop, toasts, toast, dismissToast]);
 
   return <AppCtx.Provider value={value}>{children}</AppCtx.Provider>;

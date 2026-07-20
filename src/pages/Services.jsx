@@ -7,12 +7,16 @@ import { useApp } from "../store/AppStore.jsx";
 import { SERVICES } from "../constants/content.js";
 
 export default function Services() {
-  const { t, push } = useApp();
+  const { t, tc, push } = useApp();
   const [q, setQ] = useState("");
-  const list = SERVICES.filter((x) => (x.title + x.desc).toLowerCase().includes(q.toLowerCase()));
+  const list = SERVICES.filter((x) => {
+    const title = typeof x.title === "object" ? Object.values(x.title).join(" ") : x.title;
+    const desc = typeof x.desc === "object" ? Object.values(x.desc).join(" ") : x.desc;
+    return (title + desc).toLowerCase().includes(q.toLowerCase());
+  });
   const open = (x) => x.kind
     ? push({ kind: x.kind, props: x.props })
-    : push({ kind: "feature", props: { title: x.title, desc: x.desc, icon: x.icon, a: x.accent } });
+    : push({ kind: "feature", props: { title: tc(x.title), desc: tc(x.desc), icon: x.icon, a: x.accent } });
 
   return (
     <>
@@ -27,8 +31,8 @@ export default function Services() {
               <Card key={s.id} onClick={() => open(s)} pad={14} style={{ display: "flex", alignItems: "center", gap: 13 }}>
                 <IconTile name={s.icon} a={s.accent} size={46} iconSize={22} />
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontFamily: T.display, fontSize: 15, fontWeight: 700 }}>{s.title}</div>
-                  <div style={{ fontSize: 12.5, color: T.inkSoft, marginTop: 2 }}>{s.desc}</div>
+                  <div style={{ fontFamily: T.display, fontSize: 15, fontWeight: 700 }}>{tc(s.title)}</div>
+                  <div style={{ fontSize: 12.5, color: T.inkSoft, marginTop: 2 }}>{tc(s.desc)}</div>
                 </div>
                 <Icon name="ChevronRight" size={19} style={{ color: T.inkFaint }} />
               </Card>

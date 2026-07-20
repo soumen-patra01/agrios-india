@@ -6,7 +6,7 @@ import { useApp } from "../store/AppStore.jsx";
 import { ONBOARDING } from "../constants/content.js";
 
 export default function Onboarding() {
-  const { finishOnboarding, t } = useApp();
+  const { finishOnboarding, t, tc } = useApp();
   const [i, setI] = useState(0);
   const slide = ONBOARDING[i];
   const c = accent(slide.accent);
@@ -24,8 +24,8 @@ export default function Onboarding() {
         <div style={{ width: 128, height: 128, borderRadius: 40, background: c.bg, color: c.fg, display: "grid", placeItems: "center", marginBottom: 30, boxShadow: T.shadowMd }}>
           <Icon name={slide.icon} size={60} strokeWidth={1.9} />
         </div>
-        <h1 style={{ fontFamily: T.display, fontSize: 27, fontWeight: 800, margin: "0 0 12px", color: T.ink, maxWidth: 320, lineHeight: 1.2 }}>{slide.title}</h1>
-        <p style={{ fontSize: 15, color: T.inkSoft, lineHeight: 1.6, maxWidth: 320, margin: 0 }}>{slide.body}</p>
+        <h1 style={{ fontFamily: T.display, fontSize: 27, fontWeight: 800, margin: "0 0 12px", color: T.ink, maxWidth: 320, lineHeight: 1.2 }}>{tc(slide.title)}</h1>
+        <p style={{ fontSize: 15, color: T.inkSoft, lineHeight: 1.6, maxWidth: 320, margin: 0 }}>{tc(slide.body)}</p>
       </div>
 
       <div style={{ display: "flex", justifyContent: "center", gap: 7, marginBottom: 22 }}>

@@ -17,12 +17,13 @@ import { accent } from "../components/primitives.jsx";
 const H_PAD = 16;
 
 export default function Home() {
-  const { t, locale, user, push, switchTab } = useApp();
+  const { t, tc, locale, user, push, switchTab } = useApp();
   const [tasks, setTasks] = useState(TASKS);
   const [calTick, setCalTick] = useState(0);
   const hasCrops  = useMemo(() => cropCalendarService.all().length > 0, [calTick]);
   const calTasks  = useMemo(() => cropCalendarService.upcomingTasks(7), [calTick]);
-  const name = (user?.name || "Farmer").split(" ")[0];
+  const farmerFallback = { en: "Farmer", hi: "किसान", bn: "কৃষক" };
+  const name = (user?.name || tc(farmerFallback)).split(" ")[0];
 
   const openFeature = (title, desc, icon, a) => push({ kind: "feature", props: { title, desc, icon, a } });
   const openAI = (id) => {
@@ -78,7 +79,7 @@ export default function Home() {
 
       {/* weather */}
       <div style={{ padding: `6px ${H_PAD}px 0` }}>
-        <WeatherCard t={t} onOpen={() => push({ kind: "weather" })} />
+        <WeatherCard t={t} tc={tc} onOpen={() => push({ kind: "weather" })} />
       </div>
 
       {/* notification opt-in banner — shown once */}
@@ -88,8 +89,8 @@ export default function Home() {
             borderRadius: T.rLg, background: T.primarySoft, border: `1px solid ${T.primary}22` }}>
             <Icon name="BellRing" size={20} style={{ color: T.primary, flexShrink: 0 }} />
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: T.primary }}>Enable weather alerts?</div>
-              <div style={{ fontSize: 12, color: T.inkSoft }}>Get notified of storms and spray windows.</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: T.primary }}>{tc({ en: "Enable weather alerts?", hi: "मौसम अलर्ट चालू करें?", bn: "আবহাওয়া সতর্কতা চালু করবেন?" })}</div>
+              <div style={{ fontSize: 12, color: T.inkSoft }}>{tc({ en: "Get notified of storms and spray windows.", hi: "तूफान और स्प्रे समय की सूचना पाएँ।", bn: "ঝড় ও স্প্রে-র সময়ের বিজ্ঞপ্তি পান।" })}</div>
             </div>
             <button onClick={handleNotifAllow}
               style={{ background: T.primary, color: "#fff", border: "none", borderRadius: 10,
@@ -121,7 +122,7 @@ export default function Home() {
           {QUICK_ACTIONS.map((q) => (
             <button key={q.id} onClick={() => openAI(q.id)} style={{ background: "none", border: "none", cursor: "pointer", display: "grid", justifyItems: "center", gap: 7, padding: 0 }}>
               <IconTile name={q.icon} a={q.accent} size={54} iconSize={24} />
-              <span style={{ fontSize: 11.5, fontWeight: 600, color: T.inkSoft, textAlign: "center" }}>{q.title}</span>
+              <span style={{ fontSize: 11.5, fontWeight: 600, color: T.inkSoft, textAlign: "center" }}>{tc(q.title)}</span>
             </button>
           ))}
         </div>
@@ -172,8 +173,8 @@ export default function Home() {
                     border: `1.5px solid ${tk.done ? T.primary : T.line}`, background: tk.done ? T.primary : "transparent", transition: "all .15s" }}>
                   {tk.done && <Icon name="Check" size={14} color="#fff" strokeWidth={3} />}
                 </button>
-                <span style={{ flex: 1, fontSize: 14, color: tk.done ? T.inkFaint : T.ink, textDecoration: tk.done ? "line-through" : "none" }}>{tk.text}</span>
-                <span style={{ fontSize: 11, fontWeight: 600, color: T.inkSoft, background: T.surface2, padding: "3px 9px", borderRadius: 8 }}>{tk.tag}</span>
+                <span style={{ flex: 1, fontSize: 14, color: tk.done ? T.inkFaint : T.ink, textDecoration: tk.done ? "line-through" : "none" }}>{tc(tk.text)}</span>
+                <span style={{ fontSize: 11, fontWeight: 600, color: T.inkSoft, background: T.surface2, padding: "3px 9px", borderRadius: 8 }}>{tc(tk.tag)}</span>
               </div>
             ))}
           </Card>
@@ -192,9 +193,9 @@ export default function Home() {
             <Icon name="Microscope" size={26} color="#fff" />
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 15, fontWeight: 700, color: "#fff" }}>AI Crop & Livestock Diagnostics</div>
+            <div style={{ fontSize: 15, fontWeight: 700, color: "#fff" }}>{tc({ en: "AI Crop & Livestock Diagnostics", hi: "AI फसल और पशु निदान", bn: "AI ফসল ও পশু রোগ নির্ণয়" })}</div>
             <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.78)", marginTop: 3 }}>
-              Disease, pest & health analysis for crops and animals
+              {tc({ en: "Disease, pest & health analysis for crops and animals", hi: "फसल और पशुओं के रोग, कीट और स्वास्थ्य विश्लेषण", bn: "ফসল ও পশুর রোগ, পোকা ও স্বাস্থ্য বিশ্লেষণ" })}
             </div>
           </div>
           <Icon name="ChevronRight" size={20} color="rgba(255,255,255,.7)" />
@@ -213,9 +214,9 @@ export default function Home() {
             <Icon name="Layers" size={22} color="#fff" />
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>MLOps Platform</div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{tc({ en: "MLOps Platform", hi: "MLOps प्लेटफ़ॉर्म", bn: "MLOps প্ল্যাটফর্ম" })}</div>
             <div style={{ fontSize: 12, color: "rgba(255,255,255,.7)", marginTop: 2 }}>
-              Dataset · Annotation · Model Registry · Monitoring
+              {tc({ en: "Dataset · Annotation · Model Registry · Monitoring", hi: "डेटासेट · एनोटेशन · मॉडल रजिस्ट्री · मॉनिटरिंग", bn: "ডেটাসেট · অ্যানোটেশন · মডেল রেজিস্ট্রি · মনিটরিং" })}
             </div>
           </div>
           <Icon name="ChevronRight" size={18} color="rgba(255,255,255,.6)" />
@@ -234,9 +235,9 @@ export default function Home() {
             <Icon name="Tractor" size={22} color="#fff" />
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>Farm ERP</div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{tc({ en: "Farm ERP", hi: "फार्म ERP", bn: "ফার্ম ERP" })}</div>
             <div style={{ fontSize: 12, color: "rgba(255,255,255,.7)", marginTop: 2 }}>
-              Livestock · Land · Inventory · Team · Business · Reports
+              {tc({ en: "Livestock · Land · Inventory · Team · Business · Reports", hi: "पशुपालन · ज़मीन · इन्वेंटरी · टीम · व्यापार · रिपोर्ट", bn: "পশুপালন · জমি · ইনভেন্টরি · দল · ব্যবসা · রিপোর্ট" })}
             </div>
           </div>
           <Icon name="ChevronRight" size={18} color="rgba(255,255,255,.6)" />
@@ -255,9 +256,9 @@ export default function Home() {
             <Icon name="ShoppingBag" size={22} color="#fff" />
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>Marketplace</div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{tc({ en: "Marketplace", hi: "बाज़ार", bn: "বাজার" })}</div>
             <div style={{ fontSize: 12, color: "rgba(255,255,255,.7)", marginTop: 2 }}>
-              Seeds · Feed · Medicine · Equipment · Sell your produce
+              {tc({ en: "Seeds · Feed · Medicine · Equipment · Sell your produce", hi: "बीज · चारा · दवाई · उपकरण · अपनी उपज बेचें", bn: "বীজ · খাদ্য · ওষুধ · সরঞ্জাম · আপনার ফসল বিক্রি করুন" })}
             </div>
           </div>
           <Icon name="ChevronRight" size={18} color="rgba(255,255,255,.6)" />
@@ -276,9 +277,9 @@ export default function Home() {
             <Icon name="Handshake" size={22} color="#fff" />
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>Service Marketplace</div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{tc({ en: "Service Marketplace", hi: "सेवा बाज़ार", bn: "সেবা বাজার" })}</div>
             <div style={{ fontSize: 12, color: "rgba(255,255,255,.7)", marginTop: 2 }}>
-              Vet · Drone · Machinery · Soil Test · Farm Workers
+              {tc({ en: "Vet · Drone · Machinery · Soil Test · Farm Workers", hi: "पशु चिकित्सक · ड्रोन · मशीन · मिट्टी जाँच · मजदूर", bn: "পশু চিকিৎসক · ড্রোন · যন্ত্র · মাটি পরীক্ষা · শ্রমিক" })}
             </div>
           </div>
           <Icon name="ChevronRight" size={18} color="rgba(255,255,255,.6)" />
@@ -297,9 +298,9 @@ export default function Home() {
             <Icon name="Truck" size={22} color="#fff" />
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>Logistics & Trade</div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{tc({ en: "Logistics & Trade", hi: "लॉजिस्टिक्स और व्यापार", bn: "লজিস্টিক্স ও বাণিজ্য" })}</div>
             <div style={{ fontSize: 12, color: "rgba(255,255,255,.7)", marginTop: 2 }}>
-              Shipments · Cold Chain · Auctions · Contracts · Procurement
+              {tc({ en: "Shipments · Cold Chain · Auctions · Contracts · Procurement", hi: "शिपमेंट · कोल्ड चेन · नीलामी · अनुबंध · खरीद", bn: "শিপমেন্ট · কোল্ড চেইন · নিলাম · চুক্তি · ক্রয়" })}
             </div>
           </div>
           <Icon name="ChevronRight" size={18} color="rgba(255,255,255,.6)" />
@@ -318,9 +319,9 @@ export default function Home() {
             <Icon name="BrainCircuit" size={22} color="#fff" />
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>AI Commerce</div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{tc({ en: "AI Commerce", hi: "AI कॉमर्स", bn: "AI কমার্স" })}</div>
             <div style={{ fontSize: 12, color: "rgba(255,255,255,.7)", marginTop: 2 }}>
-              Recommendations · Price forecasts · Buyer match · Insights
+              {tc({ en: "Recommendations · Price forecasts · Buyer match · Insights", hi: "सुझाव · मूल्य पूर्वानुमान · खरीदार मैच · जानकारी", bn: "পরামর্শ · মূল্য পূর্বাভাস · ক্রেতা ম্যাচ · তথ্য" })}
             </div>
           </div>
           <Icon name="ChevronRight" size={18} color="rgba(255,255,255,.6)" />
@@ -336,9 +337,9 @@ export default function Home() {
             return (
               <div key={s.id} onClick={() => push({ kind: "schemeExplorer" })}
                 style={{ minWidth: 210, background: T.surface, border: `1px solid ${T.line}`, borderRadius: T.rLg, padding: 15, cursor: "pointer" }}>
-                <div style={{ display: "inline-flex", fontSize: 11, fontWeight: 700, color: c.fg, background: c.bg, padding: "4px 9px", borderRadius: 7 }}>{s.tag}</div>
+                <div style={{ display: "inline-flex", fontSize: 11, fontWeight: 700, color: c.fg, background: c.bg, padding: "4px 9px", borderRadius: 7 }}>{tc(s.tag)}</div>
                 <div style={{ fontFamily: T.display, fontSize: 16, fontWeight: 700, marginTop: 10 }}>{s.title}</div>
-                <div style={{ fontSize: 12.5, color: T.inkSoft, marginTop: 3 }}>{s.note}</div>
+                <div style={{ fontSize: 12.5, color: T.inkSoft, marginTop: 3 }}>{tc(s.note)}</div>
               </div>
             );
           })}
@@ -353,11 +354,11 @@ export default function Home() {
             <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 12px", borderTop: i ? `1px solid ${T.lineSoft}` : "none" }}>
               <IconTile name={p.crop === "Milk" ? "Milk" : "Wheat"} a="primary" size={38} iconSize={18} />
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 14, fontWeight: 600 }}>{p.crop}</div>
-                <div style={{ fontSize: 12, color: T.inkSoft }}>{p.mandi}</div>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>{tc(p.crop)}</div>
+                <div style={{ fontSize: 12, color: T.inkSoft }}>{tc(p.mandi)}</div>
               </div>
               <div style={{ textAlign: "right" }}>
-                <div style={{ fontSize: 14.5, fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>{rupee(p.price)}<span style={{ fontSize: 11, color: T.inkFaint, fontWeight: 500 }}>/{p.unit}</span></div>
+                <div style={{ fontSize: 14.5, fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>{rupee(p.price)}<span style={{ fontSize: 11, color: T.inkFaint, fontWeight: 500 }}>/{tc(p.unit)}</span></div>
                 <div style={{ fontSize: 11.5, fontWeight: 600, color: p.up ? T.primary : T.red, display: "flex", alignItems: "center", gap: 2, justifyContent: "flex-end" }}>
                   <Icon name={p.up ? "TrendingUp" : "TrendingDown"} size={12} /> {p.change}%
                 </div>
@@ -377,7 +378,7 @@ export default function Home() {
           </div>
           <div style={{ flex: 1 }}>
             <div style={{ fontFamily: T.display, fontSize: 16, fontWeight: 700 }}>{t("disease")}</div>
-            <div style={{ fontSize: 12.5, opacity: .9, marginTop: 2 }}>Snap a photo, get an instant diagnosis.</div>
+            <div style={{ fontSize: 12.5, opacity: .9, marginTop: 2 }}>{tc({ en: "Snap a photo, get an instant diagnosis.", hi: "फोटो खींचें, तुरंत निदान पाएँ।", bn: "ছবি তুলুন, তৎক্ষণাৎ রোগ নির্ণয় পান।" })}</div>
           </div>
           <Icon name="Camera" size={22} />
         </div>
@@ -388,10 +389,10 @@ export default function Home() {
         <SectionHeader title={t("calculators")} />
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
           {CALCULATORS.map((c) => (
-            <button key={c.id} onClick={() => openFeature(c.title + " calculator", "Quick on-device calculation.", c.icon, c.accent)}
+            <button key={c.id} onClick={() => openFeature(tc(c.title), tc({ en: "Quick on-device calculation.", hi: "त्वरित ऑन-डिवाइस गणना।", bn: "দ্রুত হিসাব।" }), c.icon, c.accent)}
               style={{ background: T.surface, border: `1px solid ${T.line}`, borderRadius: T.rLg, padding: "14px 10px", cursor: "pointer", display: "grid", justifyItems: "center", gap: 8 }}>
               <IconTile name={c.icon} a={c.accent} size={42} iconSize={20} />
-              <span style={{ fontSize: 12, fontWeight: 600, color: T.ink }}>{c.title}</span>
+              <span style={{ fontSize: 12, fontWeight: 600, color: T.ink }}>{tc(c.title)}</span>
             </button>
           ))}
         </div>
@@ -402,10 +403,10 @@ export default function Home() {
         <SectionHeader title={t("categories")} />
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
           {CATEGORIES.map((c) => (
-            <button key={c.id} onClick={() => openFeature(c.title, "Everything for " + c.title.toLowerCase() + ".", c.icon, c.accent)}
+            <button key={c.id} onClick={() => openFeature(tc(c.title), "", c.icon, c.accent)}
               style={{ background: T.surface, border: `1px solid ${T.line}`, borderRadius: T.rLg, padding: "16px 10px", cursor: "pointer", display: "grid", justifyItems: "center", gap: 8 }}>
               <IconTile name={c.icon} a={c.accent} size={46} iconSize={22} />
-              <span style={{ fontSize: 12.5, fontWeight: 600, color: T.ink }}>{c.title}</span>
+              <span style={{ fontSize: 12.5, fontWeight: 600, color: T.ink }}>{tc(c.title)}</span>
             </button>
           ))}
         </div>
@@ -418,13 +419,13 @@ export default function Home() {
           {FEATURED.map((s) => {
             const c = accent(s.accent);
             return (
-              <div key={s.id} onClick={() => openFeature(s.title, s.desc, s.icon, s.accent)}
+              <div key={s.id} onClick={() => openFeature(tc(s.title), tc(s.desc), s.icon, s.accent)}
                 style={{ minWidth: 190, background: T.surface, border: `1px solid ${T.line}`, borderRadius: T.rLg, padding: 15, cursor: "pointer" }}>
                 <div style={{ width: 44, height: 44, borderRadius: 14, background: c.bg, color: c.fg, display: "grid", placeItems: "center", marginBottom: 12 }}>
                   <Icon name={s.icon} size={22} />
                 </div>
-                <div style={{ fontFamily: T.display, fontSize: 15, fontWeight: 700 }}>{s.title}</div>
-                <div style={{ fontSize: 12.5, color: T.inkSoft, marginTop: 2 }}>{s.desc}</div>
+                <div style={{ fontFamily: T.display, fontSize: 15, fontWeight: 700 }}>{tc(s.title)}</div>
+                <div style={{ fontSize: 12.5, color: T.inkSoft, marginTop: 2 }}>{tc(s.desc)}</div>
               </div>
             );
           })}
@@ -436,11 +437,11 @@ export default function Home() {
         <SectionHeader title={t("news")} />
         <Card pad={6}>
           {NEWS.map((n, i) => (
-            <div key={n.id} onClick={() => openFeature(n.tag, n.title, "Newspaper", "blue")}
+            <div key={n.id} onClick={() => openFeature(tc(n.tag), tc(n.title), "Newspaper", "blue")}
               style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px", cursor: "pointer", borderTop: i ? `1px solid ${T.lineSoft}` : "none" }}>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: T.primary, marginBottom: 3 }}>{n.tag} · {n.time}</div>
-                <div style={{ fontSize: 13.5, color: T.ink, lineHeight: 1.4 }}>{n.title}</div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: T.primary, marginBottom: 3 }}>{tc(n.tag)} · {tc(n.time)}</div>
+                <div style={{ fontSize: 13.5, color: T.ink, lineHeight: 1.4 }}>{tc(n.title)}</div>
               </div>
               <Icon name="ChevronRight" size={18} style={{ color: T.inkFaint, flexShrink: 0 }} />
             </div>
@@ -453,7 +454,7 @@ export default function Home() {
 
 /* Live weather summary — real data via weatherService, tuned to the farmer's
    active location. Falls back gracefully when no location is set or offline. */
-function WeatherCard({ t, onOpen }) {
+function WeatherCard({ t, tc, onOpen }) {
   const [loc] = useState(() => locationService.getActive());
   const [st, setSt] = useState({ status: loc ? "loading" : "empty", data: null, alert: null });
 
@@ -477,7 +478,7 @@ function WeatherCard({ t, onOpen }) {
           <Icon name="MapPin" size={24} />
           <div>
             <div style={{ fontFamily: T.display, fontSize: 16, fontWeight: 700 }}>{t("weather")}</div>
-            <div style={{ fontSize: 12.5, opacity: .92, marginTop: 2 }}>Set your location for a live forecast →</div>
+            <div style={{ fontSize: 12.5, opacity: .92, marginTop: 2 }}>{tc({ en: "Set your location for a live forecast →", hi: "लाइव मौसम के लिए अपना स्थान सेट करें →", bn: "লাইভ আবহাওয়ার জন্য আপনার অবস্থান সেট করুন →" })}</div>
           </div>
         </div>
       </div>
@@ -492,7 +493,7 @@ function WeatherCard({ t, onOpen }) {
     return (
       <div onClick={onOpen} style={{ borderRadius: T.rLg, padding: 18, cursor: "pointer", color: "#fff", background: grad, boxShadow: T.shadowMd, display: "flex", alignItems: "center", gap: 10 }}>
         <Icon name="CloudOff" size={22} />
-        <span style={{ fontSize: 13.5 }}>Weather unavailable — tap to retry</span>
+        <span style={{ fontSize: 13.5 }}>{tc({ en: "Weather unavailable — tap to retry", hi: "मौसम उपलब्ध नहीं — फिर कोशिश करें", bn: "আবহাওয়া পাওয়া যায়নি — আবার চেষ্টা করুন" })}</span>
       </div>
     );
   }

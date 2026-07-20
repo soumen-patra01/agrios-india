@@ -5,12 +5,15 @@ import { useApp } from "../store/AppStore.jsx";
 import { MARKET_SECTIONS } from "../constants/content.js";
 import { marketService } from "../services/market/marketService.js";
 
-/* Top crops shown in the Market tab price strip (curated MSP snapshot). */
 const TOP_CROPS = ["paddy", "wheat", "mustard", "arhar", "potato", "milk"];
 
+const cropName = (crop, lang) =>
+  lang === "bn" ? (crop.bengali || crop.name) :
+  lang === "hi" ? (crop.hindi || crop.name) : crop.name;
+
 export default function Market() {
-  const { t, push } = useApp();
-  const open = (title, icon, a) => push({ kind: "feature", props: { title, desc: "Browse and connect — arriving in a later phase.", icon, a } });
+  const { t, tc, lang, push } = useApp();
+  const open = (title, icon, a) => push({ kind: "feature", props: { title, desc: tc({ en: "Browse and connect — arriving in a later phase.", hi: "ब्राउज़ और कनेक्ट — अगले चरण में आ रहा है।", bn: "ব্রাউজ ও সংযোগ — পরবর্তী ধাপে আসছে।" }), icon, a } });
 
   const topCrops = TOP_CROPS.map((id) => marketService.allCrops.find((c) => c.id === id)).filter(Boolean);
 
@@ -36,8 +39,8 @@ export default function Market() {
                   <IconTile name={p.icon} a={marketService.categories.find((c) => c.id === p.category)?.accent || "primary"} size={38} iconSize={18} />
                 )}
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 14, fontWeight: 600 }}>{p.name}</div>
-                  <div style={{ fontSize: 12, color: T.inkSoft }}>MSP / seasonal band</div>
+                  <div style={{ fontSize: 14, fontWeight: 600 }}>{cropName(p, lang)}</div>
+                  <div style={{ fontSize: 12, color: T.inkSoft }}>{tc({ en: "MSP / seasonal band", hi: "MSP / मौसमी सीमा", bn: "MSP / মৌসুমি পরিসীমা" })}</div>
                 </div>
                 <div style={{ textAlign: "right" }}>
                   {p.msp ? (
@@ -45,7 +48,7 @@ export default function Market() {
                       ₹{p.msp.toLocaleString("en-IN")}<span style={{ fontSize: 11, color: T.inkFaint, fontWeight: 500 }}>/{p.unit}</span>
                     </div>
                   ) : (
-                    <div style={{ fontSize: 12.5, color: T.inkSoft }}>Market price</div>
+                    <div style={{ fontSize: 12.5, color: T.inkSoft }}>{tc({ en: "Market price", hi: "बाज़ार भाव", bn: "বাজার দর" })}</div>
                   )}
                   <div style={{ fontSize: 11, color: T.inkSoft }}>
                     ₹{p.bandLow.toLocaleString("en-IN")}–{p.bandHigh.toLocaleString("en-IN")}
@@ -55,7 +58,9 @@ export default function Market() {
             ))}
           </Card>
           <div style={{ fontSize: 11.5, color: T.inkFaint, marginTop: 6, paddingLeft: 2 }}>
-            MSP 2024-25 · seasonal bands · <strong>not today's live rate</strong>
+            {tc({ en: <>MSP 2024-25 · seasonal bands · <strong>not today's live rate</strong></>,
+              hi: <>MSP 2024-25 · मौसमी सीमा · <strong>आज का लाइव भाव नहीं</strong></>,
+              bn: <>MSP 2024-25 · মৌসুমি পরিসীমা · <strong>আজকের লাইভ দর নয়</strong></> })}
           </div>
         </div>
 
@@ -64,8 +69,6 @@ export default function Market() {
           <SectionHeader title={t("marketTitle")} />
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             {MARKET_SECTIONS.map((s) => {
-              /* Tiles now route into the marketplace (with a category preset
-                 where one applies). "buyers" waits for the shared backend. */
               const go = {
                 prices:      () => push({ kind: "mandiPrices" }),
                 marketplace: () => push({ kind: "marketplace" }),
@@ -77,10 +80,10 @@ export default function Market() {
               }[s.id];
               return (
                 <Card key={s.id}
-                  onClick={() => go ? go() : open(s.title, s.icon, s.accent)}
+                  onClick={() => go ? go() : open(tc(s.title), s.icon, s.accent)}
                   pad={15} style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   <IconTile name={s.icon} a={s.accent} size={44} iconSize={21} />
-                  <div style={{ fontFamily: T.display, fontSize: 14.5, fontWeight: 700, lineHeight: 1.2 }}>{s.title}</div>
+                  <div style={{ fontFamily: T.display, fontSize: 14.5, fontWeight: 700, lineHeight: 1.2 }}>{tc(s.title)}</div>
                 </Card>
               );
             })}

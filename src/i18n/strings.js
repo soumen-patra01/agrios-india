@@ -121,3 +121,8 @@ export const makeT = (lang) => {
   const d = S[lang] || S.en;
   return (k) => d[k] ?? S.en[k] ?? k;
 };
+
+export const pickLang = (lang, obj) => {
+  if (!obj || typeof obj === "string") return obj || "";
+  return obj[lang] || obj.en || obj.hi || "";
+};

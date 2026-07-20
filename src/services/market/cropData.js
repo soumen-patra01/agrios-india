@@ -5,14 +5,14 @@
    Source: cacp.dacnet.nic.in / PIB press releases. Update each season announcement. */
 
 export const CROP_CATEGORIES = [
-  { id: "cereal",     label: "Cereals",       icon: "Wheat",      emoji: "🌾", accent: "primary" },
-  { id: "pulse",      label: "Pulses",        icon: "Leaf",       emoji: "🫘", accent: "orange" },
-  { id: "oilseed",    label: "Oilseeds",      icon: "Sprout",     emoji: "🌻", accent: "yellow" },
-  { id: "vegetable",  label: "Vegetables",    icon: "Package",    emoji: "🥬", accent: "primary" },
-  { id: "fruit",      label: "Fruits",        icon: "Apple",      emoji: "🍎", accent: "red" },
-  { id: "cash",       label: "Cash crops",    icon: "Leaf",       emoji: "🏭", accent: "orange" },
-  { id: "spice",      label: "Spices",        icon: "FlaskConical", emoji: "🌶️", accent: "red" },
-  { id: "livestock",  label: "Livestock",     icon: "Milk",       emoji: "🐄", accent: "blue" },
+  { id: "cereal",     label: { en: "Cereals", hi: "अनाज", bn: "শস্য" },       icon: "Wheat",      emoji: "🌾", accent: "primary" },
+  { id: "pulse",      label: { en: "Pulses", hi: "दालें", bn: "ডাল" },        icon: "Leaf",       emoji: "🫘", accent: "orange" },
+  { id: "oilseed",    label: { en: "Oilseeds", hi: "तिलहन", bn: "তৈলবীজ" },      icon: "Sprout",     emoji: "🌻", accent: "yellow" },
+  { id: "vegetable",  label: { en: "Vegetables", hi: "सब्ज़ी", bn: "সবজি" },    icon: "Package",    emoji: "🥬", accent: "primary" },
+  { id: "fruit",      label: { en: "Fruits", hi: "फल", bn: "ফল" },        icon: "Apple",      emoji: "🍎", accent: "red" },
+  { id: "cash",       label: { en: "Cash crops", hi: "नकदी फसलें", bn: "অর্থকরী ফসল" },    icon: "Leaf",       emoji: "🏭", accent: "orange" },
+  { id: "spice",      label: { en: "Spices", hi: "मसाले", bn: "মশলা" },        icon: "FlaskConical", emoji: "🌶️", accent: "red" },
+  { id: "livestock",  label: { en: "Livestock", hi: "पशुपालन", bn: "পশুপালন" },     icon: "Milk",       emoji: "🐄", accent: "blue" },
 ];
 
 /* season: kharif | rabi | zaid | year-round */

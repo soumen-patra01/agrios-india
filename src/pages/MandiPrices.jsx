@@ -6,7 +6,18 @@ import { useApp } from "../store/AppStore.jsx";
 import { marketService } from "../services/market/marketService.js";
 import { rupee } from "../utils/format.js";
 
-const SEASON_LABEL = { kharif: "Kharif", rabi: "Rabi", zaid: "Zaid", "year-round": "Year-round" };
+const cropName = (crop, lang) =>
+  lang === "bn" ? (crop.bengali || crop.name) :
+  lang === "hi" ? (crop.hindi || crop.name) : crop.name;
+
+const catLabel = (cat, tc) => tc(cat.label);
+
+const SEASON_LABEL = {
+  kharif: { en: "Kharif", hi: "खरीफ", bn: "খারিফ" },
+  rabi: { en: "Rabi", hi: "रबी", bn: "রবি" },
+  zaid: { en: "Zaid", hi: "ज़ायद", bn: "জায়েদ" },
+  "year-round": { en: "Year-round", hi: "साल भर", bn: "সারা বছর" },
+};
 const SEASON_COLOR = (T) => ({
   kharif: { bg: T.primarySoft, fg: T.primary },
   rabi: { bg: T.blueSoft, fg: T.blue },
@@ -15,7 +26,7 @@ const SEASON_COLOR = (T) => ({
 });
 
 export default function MandiPrices() {
-  const { pop, toast } = useApp();
+  const { pop, toast, lang, tc } = useApp();
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState(null);
   const [bookmarks, setBookmarks] = useState(() => marketService.bookmarks());
@@ -37,13 +48,15 @@ export default function MandiPrices() {
 
   return (
     <>
-      <AppBar title="Crop prices" onBack={pop} />
+      <AppBar title={tc({ en: "Crop prices", hi: "फसल भाव", bn: "ফসলের দর" })} onBack={pop} />
       <Screen gap={14}>
         {/* disclaimer */}
         <div style={{ display: "flex", gap: 8, padding: "10px 12px", borderRadius: T.rMd, background: T.yellowSoft }}>
           <Icon name="Info" size={16} style={{ color: T.yellow, flexShrink: 0, marginTop: 1 }} />
           <div style={{ fontSize: 12.5, color: T.ink, lineHeight: 1.5 }}>
-            <strong>MSP + seasonal band</strong> — not today's live mandi rate. Check <strong>eNAM</strong> or <strong>Agmarknet</strong> for today's price.
+            {tc({ en: <><strong>MSP + seasonal band</strong> — not today's live mandi rate. Check <strong>eNAM</strong> or <strong>Agmarknet</strong> for today's price.</>,
+              hi: <><strong>MSP + मौसमी सीमा</strong> — आज का लाइव मंडी भाव नहीं। आज का भाव <strong>eNAM</strong> या <strong>Agmarknet</strong> पर देखें।</>,
+              bn: <><strong>MSP + মৌসুমি পরিসীমা</strong> — আজকের লাইভ মান্ডি দর নয়। আজকের দাম <strong>eNAM</strong> বা <strong>Agmarknet</strong>-এ দেখুন।</> })}
           </div>
         </div>
 
@@ -52,7 +65,7 @@ export default function MandiPrices() {
           background: T.surface2, border: `1px solid ${query ? T.primary : "transparent"}`, transition: "border-color .18s" }}>
           <Icon name="Search" size={18} style={{ color: T.inkFaint }} />
           <input value={query} onChange={(e) => { setQuery(e.target.value); setActiveCategory(null); }}
-            placeholder="Search crops (paddy, wheat, arhar…)"
+            placeholder={tc({ en: "Search crops (paddy, wheat, arhar…)", hi: "फसल खोजें (धान, गेहूँ, अरहर…)", bn: "ফসল খুঁজুন (ধান, গম, অড়হর…)" })}
             style={{ flex: 1, padding: "12px 0", border: "none", outline: "none", background: "transparent",
               fontFamily: T.body, fontSize: 14.5, color: T.ink }} />
           {query && <button onClick={() => setQuery("")} style={{ background: "none", border: "none", cursor: "pointer", color: T.inkFaint, display: "flex" }}><Icon name="X" size={16} /></button>}
@@ -61,10 +74,10 @@ export default function MandiPrices() {
         {/* category chips */}
         {!query && (
           <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 2 }}>
-            <Chip active={!activeCategory} onClick={() => setActiveCategory(null)}>All</Chip>
+            <Chip active={!activeCategory} onClick={() => setActiveCategory(null)}>{tc({ en: "All", hi: "सभी", bn: "সব" })}</Chip>
             {marketService.categories.map((c) => (
               <Chip key={c.id} active={c.id === activeCategory} onClick={() => setActiveCategory(c.id)}>
-                {c.emoji || ""} {c.label}
+                {c.emoji || ""} {tc(c.label)}
               </Chip>
             ))}
           </div>
@@ -80,11 +93,11 @@ export default function MandiPrices() {
               {marketService.bookmarkedCrops().map((c) => (
                 <div key={c.id} onClick={() => setSelected(c)}
                   style={{ minWidth: 110, background: T.surface, border: `1px solid ${T.line}`, borderRadius: T.rLg, padding: "10px 12px", cursor: "pointer" }}>
-                  <div style={{ fontSize: 12.5, fontWeight: 700, color: T.ink }}>{c.name}</div>
+                  <div style={{ fontSize: 12.5, fontWeight: 700, color: T.ink }}>{cropName(c, lang)}</div>
                   {c.msp ? (
                     <div style={{ fontSize: 12, color: T.primary, marginTop: 3 }}>MSP ₹{c.msp}</div>
                   ) : (
-                    <div style={{ fontSize: 12, color: T.inkSoft, marginTop: 3 }}>No MSP</div>
+                    <div style={{ fontSize: 12, color: T.inkSoft, marginTop: 3 }}>{tc({ en: "No MSP", hi: "MSP नहीं", bn: "MSP নেই" })}</div>
                   )}
                 </div>
               ))}
@@ -96,7 +109,7 @@ export default function MandiPrices() {
         <Card pad={0}>
           {results.length === 0 && (
             <div style={{ padding: "28px 16px", textAlign: "center", color: T.inkSoft, fontSize: 13.5 }}>
-              No crops found for "{query}"
+              {tc({ en: `No crops found for "${query}"`, hi: `"${query}" के लिए कोई फसल नहीं मिली`, bn: `"${query}"-এর জন্য কোনো ফসল পাওয়া যায়নি` })}
             </div>
           )}
           {results.map((crop, i) => {
@@ -114,12 +127,11 @@ export default function MandiPrices() {
                   <IconTile name={crop.icon} a={marketService.categories.find((c) => c.id === crop.category)?.accent || "primary"} size={40} iconSize={19} />
                 )}
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: T.ink }}>{crop.name}</div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: T.ink }}>{cropName(crop, lang)}</div>
                   <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 2 }}>
                     <span style={{ fontSize: 11, fontWeight: 700, color: sc.fg, background: sc.bg, padding: "2px 7px", borderRadius: 6 }}>
-                      {SEASON_LABEL[crop.season]}
+                      {tc(SEASON_LABEL[crop.season])}
                     </span>
-                    {crop.hindi && <span style={{ fontSize: 11.5, color: T.inkSoft }}>{crop.hindi}</span>}
                   </div>
                 </div>
                 <div style={{ textAlign: "right", flexShrink: 0 }}>
@@ -128,7 +140,7 @@ export default function MandiPrices() {
                       ₹{crop.msp.toLocaleString("en-IN")}<span style={{ fontSize: 10.5, color: T.inkFaint, fontWeight: 500 }}>/{crop.unit}</span>
                     </div>
                   ) : (
-                    <div style={{ fontSize: 12, color: T.inkSoft }}>No MSP</div>
+                    <div style={{ fontSize: 12, color: T.inkSoft }}>{tc({ en: "No MSP", hi: "MSP नहीं", bn: "MSP নেই" })}</div>
                   )}
                   <div style={{ fontSize: 11, color: T.inkSoft, marginTop: 1 }}>
                     ₹{crop.bandLow.toLocaleString("en-IN")}–{crop.bandHigh.toLocaleString("en-IN")}
@@ -144,8 +156,12 @@ export default function MandiPrices() {
         </Card>
 
         <div style={{ fontSize: 11.5, color: T.inkFaint, textAlign: "center", lineHeight: 1.6 }}>
-          MSP: CACP / Govt. of India 2024-25 · Seasonal bands: historical typical range<br />
-          For live mandi rates: enam.gov.in · agmarknet.nic.in
+          {tc({ en: "MSP: CACP / Govt. of India 2024-25 · Seasonal bands: historical typical range",
+            hi: "MSP: CACP / भारत सरकार 2024-25 · मौसमी सीमा: ऐतिहासिक सामान्य सीमा",
+            bn: "MSP: CACP / ভারত সরকার 2024-25 · মৌসুমি পরিসীমা: ঐতিহাসিক সাধারণ পরিসীমা" })}<br />
+          {tc({ en: "For live mandi rates: enam.gov.in · agmarknet.nic.in",
+            hi: "लाइव मंडी भाव: enam.gov.in · agmarknet.nic.in",
+            bn: "লাইভ মান্ডি দর: enam.gov.in · agmarknet.nic.in" })}
         </div>
       </Screen>
 
@@ -156,6 +172,7 @@ export default function MandiPrices() {
 }
 
 function CropSheet({ crop, onClose, bookmarks, onToggle }) {
+  const { lang, tc } = useApp();
   const sc = SEASON_COLOR(T)[crop.season] || SEASON_COLOR(T)["year-round"];
   const isBookmarked = bookmarks.includes(crop.id);
 
@@ -166,8 +183,7 @@ function CropSheet({ crop, onClose, bookmarks, onToggle }) {
 
         <div style={{ display: "flex", alignItems: "flex-start", gap: 12, marginBottom: 16 }}>
           <div style={{ flex: 1 }}>
-            <div style={{ fontFamily: T.display, fontSize: 20, fontWeight: 700 }}>{crop.name}</div>
-            {crop.hindi && <div style={{ fontSize: 13, color: T.inkSoft }}>{crop.hindi}{crop.bengali ? ` · ${crop.bengali}` : ""}</div>}
+            <div style={{ fontFamily: T.display, fontSize: 20, fontWeight: 700 }}>{cropName(crop, lang)}</div>
           </div>
           <button onClick={() => onToggle(crop.id)}
             style={{ background: isBookmarked ? T.primarySoft : T.surface2, border: "none", borderRadius: 12, padding: 10, cursor: "pointer", color: isBookmarked ? T.primary : T.inkFaint, display: "flex" }}>
@@ -176,27 +192,27 @@ function CropSheet({ crop, onClose, bookmarks, onToggle }) {
         </div>
 
         <span style={{ display: "inline-flex", fontSize: 12, fontWeight: 700, color: sc.fg, background: sc.bg, padding: "4px 10px", borderRadius: 7, marginBottom: 16 }}>
-          {SEASON_LABEL[crop.season]} crop · per {crop.unit}
+          {tc(SEASON_LABEL[crop.season])} · {tc({ en: "per", hi: "प्रति", bn: "প্রতি" })} {crop.unit}
         </span>
 
         {/* MSP */}
         <div style={{ background: T.primarySoft, borderRadius: T.rLg, padding: 14, marginBottom: 12 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: T.primary, marginBottom: 4 }}>GOVERNMENT MSP (2024-25)</div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: T.primary, marginBottom: 4 }}>{tc({ en: "GOVERNMENT MSP (2024-25)", hi: "सरकारी MSP (2024-25)", bn: "সরকারি MSP (2024-25)" })}</div>
           {crop.msp ? (
             <div style={{ fontFamily: T.display, fontSize: 28, fontWeight: 800, color: T.primary }}>₹{crop.msp.toLocaleString("en-IN")}<span style={{ fontSize: 14, fontWeight: 500, color: T.inkSoft }}>/{crop.unit}</span></div>
           ) : (
-            <div style={{ fontSize: 15, fontWeight: 600, color: T.inkSoft }}>No MSP declared — market-determined price</div>
+            <div style={{ fontSize: 15, fontWeight: 600, color: T.inkSoft }}>{tc({ en: "No MSP declared — market-determined price", hi: "MSP घोषित नहीं — बाज़ार निर्धारित मूल्य", bn: "MSP ঘোষিত নয় — বাজার নির্ধারিত মূল্য" })}</div>
           )}
         </div>
 
         {/* Seasonal band */}
         <div style={{ background: T.surface2, borderRadius: T.rLg, padding: 14, marginBottom: 14 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: T.inkSoft, marginBottom: 4 }}>TYPICAL SEASONAL BAND</div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: T.inkSoft, marginBottom: 4 }}>{tc({ en: "TYPICAL SEASONAL BAND", hi: "सामान्य मौसमी सीमा", bn: "সাধারণ মৌসুমি পরিসীমা" })}</div>
           <div style={{ fontFamily: T.display, fontSize: 22, fontWeight: 700, color: T.ink }}>
             ₹{crop.bandLow.toLocaleString("en-IN")} – ₹{crop.bandHigh.toLocaleString("en-IN")}
             <span style={{ fontSize: 13, fontWeight: 500, color: T.inkSoft }}>/{crop.unit}</span>
           </div>
-          <div style={{ fontSize: 12, color: T.inkSoft, marginTop: 4 }}>Historical range · not a guarantee</div>
+          <div style={{ fontSize: 12, color: T.inkSoft, marginTop: 4 }}>{tc({ en: "Historical range · not a guarantee", hi: "ऐतिहासिक सीमा · गारंटी नहीं", bn: "ঐতিহাসিক পরিসীমা · গ্যারান্টি নয়" })}</div>
         </div>
 
         {/* selling tip */}
@@ -208,7 +224,9 @@ function CropSheet({ crop, onClose, bookmarks, onToggle }) {
         )}
 
         <div style={{ fontSize: 12, color: T.inkFaint, lineHeight: 1.6, marginBottom: 18 }}>
-          For today's actual mandi rate, check your local mandi board, the eNAM app, or Agmarknet.
+          {tc({ en: "For today's actual mandi rate, check your local mandi board, the eNAM app, or Agmarknet.",
+            hi: "आज के असली मंडी भाव के लिए अपने स्थानीय मंडी बोर्ड, eNAM ऐप या Agmarknet देखें।",
+            bn: "আজকের আসল মান্ডি দরের জন্য আপনার স্থানীয় মান্ডি বোর্ড, eNAM অ্যাপ বা Agmarknet দেখুন।" })}
         </div>
 
         <div style={{ display: "flex", gap: 10 }}>
