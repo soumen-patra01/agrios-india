@@ -13,27 +13,27 @@ import {
 } from "firebase/auth";
 import { auth } from "./config.js";
 
-let recaptchaVerifier = null;
 let confirmationResult = null;
 
 /* ── Phone OTP ───────────────────────────────────────────────────────────── */
 
-export function setupRecaptcha(elementId) {
-  if (recaptchaVerifier) recaptchaVerifier.clear();
-  recaptchaVerifier = new RecaptchaVerifier(auth, elementId, {
-    size: "invisible",
-  });
-  return recaptchaVerifier;
-}
+export function setupRecaptcha() {}
 
 export async function sendOtp(phone) {
-  if (!recaptchaVerifier) throw new Error("Call setupRecaptcha first");
-  confirmationResult = await signInWithPhoneNumber(
-    auth,
-    "+91" + phone,
-    recaptchaVerifier,
-  );
-  return { sent: true };
+  const verifier = new RecaptchaVerifier(auth, "recaptcha-container", {
+    size: "invisible",
+  });
+  try {
+    confirmationResult = await signInWithPhoneNumber(
+      auth,
+      "+91" + phone,
+      verifier,
+    );
+    return { sent: true };
+  } catch (err) {
+    verifier.clear();
+    throw err;
+  }
 }
 
 export async function verifyOtp(code) {
