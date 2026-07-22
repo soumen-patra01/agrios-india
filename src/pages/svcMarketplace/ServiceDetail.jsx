@@ -15,7 +15,7 @@ import { accent } from "../../components/primitives.jsx";
 const fmtDate = (d) => d.toLocaleDateString("en-IN", { weekday: "short", month: "short", day: "numeric" });
 
 export default function ServiceDetail({ serviceId }) {
-  const { pop, push } = useApp();
+  const { pop, push, tc } = useApp();
   const [svc, setSvc] = useState(null);
   const [provider, setProvider] = useState(null);
   const [reviews, setReviews] = useState([]);
@@ -49,7 +49,7 @@ export default function ServiceDetail({ serviceId }) {
 
   return (
     <>
-      <AppBar title="Service Detail" onBack={pop} />
+      <AppBar title={tc({en:"Service Detail",hi:"सेवा विवरण",bn:"পরিষেবার বিবরণ"})} onBack={pop} />
       <div style={{ padding: "4px 16px 32px", display: "flex", flexDirection: "column", gap: 16,
         animation: "ag-fade .25s var(--ag-ease)" }}>
 
@@ -67,12 +67,12 @@ export default function ServiceDetail({ serviceId }) {
         {/* pricing */}
         <Card pad={14}>
           <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-            <span style={{ fontSize: 22, fontWeight: 800, color: T.ink }}>{svc.price > 0 ? rupee(svc.price) : "Free"}</span>
+            <span style={{ fontSize: 22, fontWeight: 800, color: T.ink }}>{svc.price > 0 ? rupee(svc.price) : tc({en:"Free",hi:"मुफ्त",bn:"বিনামূল্যে"})}</span>
             <span style={{ fontSize: 12, color: T.inkSoft }}>{pricingLabel}</span>
           </div>
           {svc.duration > 0 && (
             <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 6, fontSize: 12, color: T.inkSoft }}>
-              <Icon name="Clock" size={14} /> {svc.duration} minutes
+              <Icon name="Clock" size={14} /> {svc.duration} {tc({en:"minutes",hi:"मिनट",bn:"মিনিট"})}
             </div>
           )}
         </Card>
@@ -98,13 +98,13 @@ export default function ServiceDetail({ serviceId }) {
         {/* availability preview */}
         {preview.length > 0 && (
           <div>
-            <SectionHeader title="Availability" />
+            <SectionHeader title={tc({en:"Availability",hi:"उपलब्धता",bn:"প্রাপ্যতা"})} />
             <div style={{ display: "flex", gap: 10 }}>
               {preview.map((d) => (
                 <Card key={d.dateStr} pad={12} style={{ flex: 1, textAlign: "center" }}>
                   <div style={{ fontSize: 11, color: T.inkSoft }}>{fmtDate(d.date)}</div>
                   <div style={{ fontSize: 16, fontWeight: 800, color: d.free > 0 ? T.primary : T.red, marginTop: 4 }}>{d.free}</div>
-                  <div style={{ fontSize: 10, color: T.inkFaint }}>slots free</div>
+                  <div style={{ fontSize: 10, color: T.inkFaint }}>{tc({en:"slots free",hi:"स्लॉट खाली",bn:"স্লট খালি"})}</div>
                 </Card>
               ))}
             </div>
@@ -114,7 +114,7 @@ export default function ServiceDetail({ serviceId }) {
         {/* requirements & deliverables */}
         {svc.requirements?.length > 0 && (
           <div>
-            <SectionHeader title="Requirements" />
+            <SectionHeader title={tc({en:"Requirements",hi:"आवश्यकताएं",bn:"প্রয়োজনীয়তা"})} />
             {svc.requirements.map((r, i) => (
               <div key={i} style={{ fontSize: 12.5, color: T.inkSoft, paddingLeft: 12, marginBottom: 4 }}>• {r}</div>
             ))}
@@ -122,7 +122,7 @@ export default function ServiceDetail({ serviceId }) {
         )}
         {svc.deliverables?.length > 0 && (
           <div>
-            <SectionHeader title="Deliverables" />
+            <SectionHeader title={tc({en:"Deliverables",hi:"डिलिवरेबल्स",bn:"ডেলিভারযোগ্য বিষয়"})} />
             {svc.deliverables.map((d, i) => (
               <div key={i} style={{ fontSize: 12.5, color: T.inkSoft, paddingLeft: 12, marginBottom: 4 }}>• {d}</div>
             ))}
@@ -131,12 +131,12 @@ export default function ServiceDetail({ serviceId }) {
 
         {/* book now */}
         <Button full icon="CalendarClock" onClick={() => push({ kind: "svcBooking", props: { serviceId: svc.id, providerId: svc.providerId } })}>
-          Book Now
+          {tc({en:"Book Now",hi:"अभी बुक करें",bn:"এখনই বুক করুন"})}
         </Button>
 
         {/* reviews */}
         <div>
-          <SectionHeader title={`Reviews (${stats.count})`} />
+          <SectionHeader title={`${tc({en:"Reviews",hi:"समीक्षाएं",bn:"পর্যালোচনা"})} (${stats.count})`} />
           {stats.count > 0 && (
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
               <span style={{ fontSize: 28, fontWeight: 800, color: T.ink }}>{stats.avg}</span>
@@ -145,12 +145,12 @@ export default function ServiceDetail({ serviceId }) {
             </div>
           )}
           {reviews.length === 0 ? (
-            <EmptyState icon="Star" title="No reviews yet" body="Be the first to review after a completed booking." />
+            <EmptyState icon="Star" title={tc({en:"No reviews yet",hi:"अभी तक कोई समीक्षा नहीं",bn:"এখনো কোনো পর্যালোচনা নেই"})} body={tc({en:"Be the first to review after a completed booking.",hi:"बुकिंग पूरी होने के बाद सबसे पहले समीक्षा करें।",bn:"বুকিং সম্পন্ন হওয়ার পর প্রথম পর্যালোচনা করুন।"})} />
           ) : reviews.map((r) => (
             <Card key={r.id} pad={12} style={{ marginBottom: 8 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
                 <RatingStars value={r.rating} size={12} />
-                {r.verified && <span style={{ fontSize: 10, color: T.primary, fontWeight: 700 }}>Verified</span>}
+                {r.verified && <span style={{ fontSize: 10, color: T.primary, fontWeight: 700 }}>{tc({en:"Verified",hi:"सत्यापित",bn:"যাচাইকৃত"})}</span>}
               </div>
               <div style={{ fontSize: 12.5, color: T.ink }}>{r.text}</div>
               <div style={{ fontSize: 11, color: T.inkFaint, marginTop: 4 }}>— {r.author}</div>

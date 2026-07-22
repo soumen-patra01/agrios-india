@@ -12,7 +12,7 @@ import { datasetRegistry } from "../../services/mlops/datasets/datasetRegistry.j
 import { promotionEngine } from "../../services/mlops/deployment/promotionEngine.js";
 
 export default function TrainingDashboard() {
-  const { pop } = useApp();
+  const { pop, tc } = useApp();
   const [pipelines, setPipelines] = useState([]);
   const [models, setModels] = useState([]);
   const [datasets, setDatasets] = useState([]);
@@ -60,19 +60,19 @@ export default function TrainingDashboard() {
 
   return (
     <>
-      <AppBar title="Training & Deployment" onBack={pop}
+      <AppBar title={tc({ en: "Training & Deployment", hi: "प्रशिक्षण और परिनियोजन", bn: "প্রশিক্ষণ ও ডিপ্লয়মেন্ট" })} onBack={pop}
         action={<button onClick={() => setCreating(true)} style={{ background: "none", border: "none",
           cursor: "pointer", color: "var(--ag-primary)" }}><Icon name="Plus" size={22} /></button>} />
 
       <div style={{ padding: "12px 16px 32px", animation: "ag-fade .22s var(--ag-ease)" }}>
 
-        <ApprovalBanner count={pendingCount} label="promotion requests pending" />
+        <ApprovalBanner count={pendingCount} label={tc({ en: "promotion requests pending", hi: "प्रमोशन अनुरोध लंबित हैं", bn: "প্রমোশন অনুরোধ মুলতুবি আছে" })} />
 
         {/* Promotion queue */}
         {promotionQueue.length > 0 && (
           <div style={{ marginBottom: 16 }}>
             <div style={{ fontSize: 12, fontWeight: 600, color: T.inkSoft, marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.05em" }}>
-              Promotion Queue
+              {tc({ en: "Promotion Queue", hi: "प्रमोशन कतार", bn: "প্রমোশন সারি" })}
             </div>
             {promotionQueue.map((req) => (
               <div key={req.id} style={{ background: "#fef9c3", border: "1px solid #f59e0b",
@@ -81,18 +81,18 @@ export default function TrainingDashboard() {
                   {req.fromStage} → {req.toStage}
                 </div>
                 <div style={{ fontSize: 12, color: "#b45309", marginBottom: 8 }}>
-                  Model: {req.modelId.slice(0, 20)}… · by {req.requestedBy}
+                  {tc({ en: "Model", hi: "मॉडल", bn: "মডেল" })}: {req.modelId.slice(0, 20)}… · {tc({ en: "by", hi: "द्वारा", bn: "দ্বারা" })} {req.requestedBy}
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
                   <button onClick={() => { approvePromotion(req.id); }}
                     style={{ flex: 1, padding: "7px", borderRadius: T.rMd, border: "none",
                       background: "var(--ag-primary)", color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 12, fontFamily: T.body }}>
-                    Approve
+                    {tc({ en: "Approve", hi: "स्वीकृत करें", bn: "অনুমোদন করুন" })}
                   </button>
                   <button onClick={() => { promotionEngine.reject(req.id); reload(); }}
                     style={{ flex: 1, padding: "7px", borderRadius: T.rMd, border: `1px solid ${T.line}`,
                       background: T.surface, color: T.ink, cursor: "pointer", fontSize: 12, fontFamily: T.body }}>
-                    Reject
+                    {tc({ en: "Reject", hi: "अस्वीकार करें", bn: "প্রত্যাখ্যান করুন" })}
                   </button>
                 </div>
               </div>
@@ -104,31 +104,31 @@ export default function TrainingDashboard() {
         {creating && (
           <div style={{ background: T.surface, borderRadius: T.rLg, border: `1px solid ${T.line}`,
             padding: "14px 16px", marginBottom: 16 }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: T.ink, marginBottom: 12 }}>New Training Pipeline</div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: T.ink, marginBottom: 12 }}>{tc({ en: "New Training Pipeline", hi: "नई प्रशिक्षण पाइपलाइन", bn: "নতুন প্রশিক্ষণ পাইপলাইন" })}</div>
             <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
-              placeholder="Pipeline name"
+              placeholder={tc({ en: "Pipeline name", hi: "पाइपलाइन का नाम", bn: "পাইপলাইনের নাম" })}
               style={{ width: "100%", padding: "9px 12px", borderRadius: T.rMd, border: `1px solid ${T.line}`,
                 background: T.bg, color: T.ink, fontSize: 14, fontFamily: T.body, marginBottom: 8, boxSizing: "border-box" }} />
             <select value={form.modelId} onChange={(e) => setForm({ ...form, modelId: e.target.value })}
               style={{ width: "100%", padding: "9px 12px", borderRadius: T.rMd, border: `1px solid ${T.line}`,
                 background: T.bg, color: T.ink, fontSize: 14, fontFamily: T.body, marginBottom: 8 }}>
-              <option value="">Select model (optional)</option>
+              <option value="">{tc({ en: "Select model (optional)", hi: "मॉडल चुनें (वैकल्पिक)", bn: "মডেল নির্বাচন করুন (ঐচ্ছিক)" })}</option>
               {models.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
             </select>
             <select value={form.datasetId} onChange={(e) => setForm({ ...form, datasetId: e.target.value })}
               style={{ width: "100%", padding: "9px 12px", borderRadius: T.rMd, border: `1px solid ${T.line}`,
                 background: T.bg, color: T.ink, fontSize: 14, fontFamily: T.body, marginBottom: 12 }}>
-              <option value="">Select dataset (optional)</option>
+              <option value="">{tc({ en: "Select dataset (optional)", hi: "डेटासेट चुनें (वैकल्पिक)", bn: "ডেটাসেট নির্বাচন করুন (ঐচ্ছিক)" })}</option>
               {datasets.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
             </select>
             <div style={{ display: "flex", gap: 8 }}>
               <button onClick={createPipeline} style={{ flex: 1, padding: "10px", borderRadius: T.rMd, border: "none",
                 background: "var(--ag-primary)", color: "#fff", fontWeight: 600, cursor: "pointer", fontFamily: T.body }}>
-                Create Pipeline
+                {tc({ en: "Create Pipeline", hi: "पाइपलाइन बनाएं", bn: "পাইপলাইন তৈরি করুন" })}
               </button>
               <button onClick={() => setCreating(false)} style={{ padding: "10px 16px", borderRadius: T.rMd,
                 border: `1px solid ${T.line}`, background: T.surface, color: T.ink, cursor: "pointer", fontFamily: T.body }}>
-                Cancel
+                {tc({ en: "Cancel", hi: "रद्द करें", bn: "বাতিল করুন" })}
               </button>
             </div>
           </div>
@@ -139,8 +139,8 @@ export default function TrainingDashboard() {
             <Icon name="RefreshCw" size={24} style={{ animation: "ag-blink 1.2s infinite" }} />
           </div>
         ) : pipelines.length === 0 ? (
-          <EmptyState icon="PlayCircle" title="No pipelines yet"
-            body="Create a training pipeline to orchestrate data prep, training, validation, and packaging." />
+          <EmptyState icon="PlayCircle" title={tc({ en: "No pipelines yet", hi: "अभी तक कोई पाइपलाइन नहीं", bn: "এখনও কোনো পাইপলাইন নেই" })}
+            body={tc({ en: "Create a training pipeline to orchestrate data prep, training, validation, and packaging.", hi: "डेटा तैयार करने, प्रशिक्षण, सत्यापन और पैकेजिंग को व्यवस्थित करने के लिए एक प्रशिक्षण पाइपलाइन बनाएं।", bn: "ডেটা প্রস্তুতি, প্রশিক্ষণ, যাচাইকরণ ও প্যাকেজিং সমন্বয় করতে একটি প্রশিক্ষণ পাইপলাইন তৈরি করুন।" })} />
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {pipelines.map((p) => (
@@ -157,7 +157,7 @@ export default function TrainingDashboard() {
                         borderRadius: T.rMd, border: "none", background: "var(--ag-primary)", color: "#fff",
                         fontWeight: 600, cursor: "pointer", fontSize: 12, fontFamily: T.body }}>
                       <Icon name="PlayCircle" size={14} color="#fff" />
-                      Run
+                      {tc({ en: "Run", hi: "चलाएं", bn: "চালান" })}
                     </button>
                   )}
                 </div>

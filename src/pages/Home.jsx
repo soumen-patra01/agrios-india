@@ -50,8 +50,8 @@ export default function Home() {
   const handleNotifAllow = async () => {
     const result = await notificationService.requestPermission();
     setShowNotifBanner(false);
-    if (result === "granted") toast("Weather alerts enabled", "success");
-    else toast("Notifications blocked — enable in browser settings", "info");
+    if (result === "granted") toast(tc({en:"Weather alerts enabled", hi:"मौसम अलर्ट चालू", bn:"আবহাওয়া সতর্কতা চালু হয়েছে"}), "success");
+    else toast(tc({en:"Notifications blocked — enable in browser settings", hi:"सूचनाएँ ब्लॉक — ब्राउज़र सेटिंग्स में चालू करें", bn:"বিজ্ঞপ্তি ব্লক — ব্রাউজার সেটিংসে চালু করুন"}), "info");
   };
 
   const handleNotifDismiss = () => {

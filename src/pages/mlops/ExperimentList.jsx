@@ -14,16 +14,23 @@ function StatusBadge({ status }) {
     failed:    { color: "var(--ag-red)",      bg: "#fee2e2" },
   };
   const { color, bg } = config[status] || config.created;
+  const { tc } = useApp();
+  const labels = {
+    created: tc({ en: "Created", hi: "बनाया गया", bn: "তৈরি হয়েছে" }),
+    running: tc({ en: "Running", hi: "चल रहा है", bn: "চলছে" }),
+    completed: tc({ en: "Completed", hi: "पूर्ण", bn: "সম্পন্ন" }),
+    failed: tc({ en: "Failed", hi: "विफल", bn: "ব্যর্থ" }),
+  };
   return (
     <span style={{ fontSize: 11, fontWeight: 600, color, background: bg,
       borderRadius: 99, padding: "2px 9px" }}>
-      {status}
+      {labels[status] || status}
     </span>
   );
 }
 
 export default function ExperimentList() {
-  const { pop, push } = useApp();
+  const { pop, push, tc } = useApp();
   const [experiments, setExperiments] = useState([]);
   const [models, setModels] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -61,7 +68,7 @@ export default function ExperimentList() {
 
   return (
     <>
-      <AppBar title="Experiments" onBack={pop}
+      <AppBar title={tc({ en: "Experiments", hi: "प्रयोग", bn: "পরীক্ষা" })} onBack={pop}
         action={<button onClick={() => setCreating(true)} style={{ background: "none", border: "none",
           cursor: "pointer", color: "var(--ag-primary)" }}><Icon name="Plus" size={22} /></button>} />
 
@@ -70,13 +77,13 @@ export default function ExperimentList() {
         {selected.length >= 2 && (
           <div style={{ background: T.surface, border: `1px solid ${T.line}`, borderRadius: T.rMd,
             padding: "10px 14px", marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <span style={{ fontSize: 13, color: T.ink }}>{selected.length} selected for comparison</span>
+            <span style={{ fontSize: 13, color: T.ink }}>{selected.length} {tc({ en: "selected for comparison", hi: "तुलना के लिए चयनित", bn: "তুলনার জন্য নির্বাচিত" })}</span>
             <button onClick={async () => {
               const result = await experimentTracker.compare(selected);
               push({ kind: "experimentComparison", props: { experiments: result } });
             }} style={{ fontSize: 12, fontWeight: 600, color: "var(--ag-primary)", background: "none",
               border: "1.5px solid var(--ag-primary)", borderRadius: T.rMd, padding: "5px 12px", cursor: "pointer", fontFamily: T.body }}>
-              Compare →
+              {tc({ en: "Compare →", hi: "तुलना करें →", bn: "তুলনা করুন →" })}
             </button>
           </div>
         )}
@@ -84,23 +91,23 @@ export default function ExperimentList() {
         {creating && (
           <div style={{ background: T.surface, borderRadius: T.rLg, border: `1px solid ${T.line}`,
             padding: "14px 16px", marginBottom: 16 }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: T.ink, marginBottom: 12 }}>New Experiment</div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: T.ink, marginBottom: 12 }}>{tc({ en: "New Experiment", hi: "नया प्रयोग", bn: "নতুন পরীক্ষা" })}</div>
             <input value={newExp.name} onChange={(e) => setNewExp({ ...newExp, name: e.target.value })}
-              placeholder="Experiment name"
+              placeholder={tc({ en: "Experiment name", hi: "प्रयोग का नाम", bn: "পরীক্ষার নাম" })}
               style={{ width: "100%", padding: "9px 12px", borderRadius: T.rMd, border: `1px solid ${T.line}`,
                 background: T.bg, color: T.ink, fontSize: 14, fontFamily: T.body, marginBottom: 8, boxSizing: "border-box" }} />
             <input value={newExp.description} onChange={(e) => setNewExp({ ...newExp, description: e.target.value })}
-              placeholder="Description (optional)"
+              placeholder={tc({ en: "Description (optional)", hi: "विवरण (वैकल्पिक)", bn: "বিবরণ (ঐচ্ছিক)" })}
               style={{ width: "100%", padding: "9px 12px", borderRadius: T.rMd, border: `1px solid ${T.line}`,
                 background: T.bg, color: T.ink, fontSize: 14, fontFamily: T.body, marginBottom: 12, boxSizing: "border-box" }} />
             <div style={{ display: "flex", gap: 8 }}>
               <button onClick={createExp} style={{ flex: 1, padding: "10px", borderRadius: T.rMd, border: "none",
                 background: "var(--ag-primary)", color: "#fff", fontWeight: 600, cursor: "pointer", fontFamily: T.body }}>
-                Create
+                {tc({ en: "Create", hi: "बनाएं", bn: "তৈরি করুন" })}
               </button>
               <button onClick={() => setCreating(false)} style={{ padding: "10px 16px", borderRadius: T.rMd,
                 border: `1px solid ${T.line}`, background: T.surface, color: T.ink, cursor: "pointer", fontFamily: T.body }}>
-                Cancel
+                {tc({ en: "Cancel", hi: "रद्द करें", bn: "বাতিল করুন" })}
               </button>
             </div>
           </div>
@@ -108,7 +115,7 @@ export default function ExperimentList() {
 
         {/* Model filter */}
         <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 8, marginBottom: 14, scrollbarWidth: "none" }}>
-          {[{ id: "all", name: "All Models" }, ...models].map((m) => (
+          {[{ id: "all", name: tc({ en: "All Models", hi: "सभी मॉडल", bn: "সব মডেল" }) }, ...models].map((m) => (
             <button key={m.id} onClick={() => setModelFilter(m.id)} style={{
               flexShrink: 0, padding: "5px 12px", borderRadius: 99, fontSize: 12, cursor: "pointer", fontFamily: T.body,
               border: `1.5px solid ${modelFilter === m.id ? "var(--ag-primary)" : T.line}`,
@@ -126,8 +133,8 @@ export default function ExperimentList() {
             <Icon name="RefreshCw" size={24} style={{ animation: "ag-blink 1.2s infinite" }} />
           </div>
         ) : filtered.length === 0 ? (
-          <EmptyState icon="FlaskConical" title="No experiments"
-            body="Create your first experiment to track hyperparameters and metrics." />
+          <EmptyState icon="FlaskConical" title={tc({ en: "No experiments", hi: "कोई प्रयोग नहीं", bn: "কোনো পরীক্ষা নেই" })}
+            body={tc({ en: "Create your first experiment to track hyperparameters and metrics.", hi: "हाइपरपैरामीटर और मेट्रिक्स ट्रैक करने के लिए अपना पहला प्रयोग बनाएं।", bn: "হাইপারপ্যারামিটার এবং মেট্রিক্স ট্র্যাক করতে আপনার প্রথম পরীক্ষা তৈরি করুন।" })} />
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {filtered.map((exp) => (
@@ -141,13 +148,13 @@ export default function ExperimentList() {
                 </div>
                 {exp.description && <div style={{ fontSize: 12, color: T.inkSoft, marginBottom: 6 }}>{exp.description}</div>}
                 <div style={{ display: "flex", gap: 12, fontSize: 11, color: T.inkFaint }}>
-                  <span>{Object.keys(exp.params).length} params</span>
-                  <span>{Object.keys(exp.hyperparams).length} hyperparams</span>
+                  <span>{Object.keys(exp.params).length} {tc({ en: "params", hi: "पैरामीटर", bn: "প্যারামিটার" })}</span>
+                  <span>{Object.keys(exp.hyperparams).length} {tc({ en: "hyperparams", hi: "हाइपरपैरामीटर", bn: "হাইপারপ্যারামিটার" })}</span>
                   <span style={{ marginLeft: "auto" }}>{new Date(exp.createdAt).toLocaleDateString()}</span>
                 </div>
                 {selected.includes(exp.id) && (
                   <div style={{ marginTop: 6, fontSize: 11, color: "var(--ag-primary)", fontWeight: 600 }}>
-                    ✓ Selected for comparison
+                    ✓ {tc({ en: "Selected for comparison", hi: "तुलना के लिए चयनित", bn: "তুলনার জন্য নির্বাচিত" })}
                   </div>
                 )}
               </div>

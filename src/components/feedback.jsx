@@ -39,14 +39,14 @@ export function EmptyState({ icon = "Inbox", title, body, action, onAction }) {
   );
 }
 
-export function ErrorState({ title = "Something went wrong", body = "Please try again in a moment.", onRetry }) {
+export function ErrorState({ title, body, onRetry }) {
   return (
     <div style={{ textAlign: "center", padding: "36px 24px" }}>
       <div style={{ width: 60, height: 60, borderRadius: 20, background: T.redSoft, display: "grid", placeItems: "center", margin: "0 auto 16px", color: T.red }}>
         <Icon name="CloudOff" size={26} />
       </div>
-      <div style={{ fontFamily: T.display, fontSize: 18, fontWeight: 700, marginBottom: 6, color: T.ink }}>{title}</div>
-      <div style={{ fontSize: 13.5, color: T.inkSoft, lineHeight: 1.55, maxWidth: 280, margin: "0 auto" }}>{body}</div>
+      <div style={{ fontFamily: T.display, fontSize: 18, fontWeight: 700, marginBottom: 6, color: T.ink }}>{title || "Something went wrong"}</div>
+      <div style={{ fontSize: 13.5, color: T.inkSoft, lineHeight: 1.55, maxWidth: 280, margin: "0 auto" }}>{body || "Please try again in a moment."}</div>
       {onRetry && <div style={{ marginTop: 18 }}><Button variant="soft" icon="RotateCcw" onClick={onRetry}>Retry</Button></div>}
     </div>
   );

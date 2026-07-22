@@ -10,8 +10,17 @@ import { sellerMatching } from "../../services/aiCommerce/sellerMatching.js";
 
 const SEV_COLOR = { high: "red", medium: "orange", low: "yellow" };
 
+function sevLabel(tc, sev) {
+  const map = {
+    high: { en: "high", hi: "उच्च", bn: "উচ্চ" },
+    medium: { en: "medium", hi: "मध्यम", bn: "মাঝারি" },
+    low: { en: "low", hi: "कम", bn: "কম" },
+  };
+  return tc(map[sev] || map.low);
+}
+
 export default function FraudRiskPage() {
-  const { pop } = useApp();
+  const { pop, tc } = useApp();
   const [tab, setTab] = useState("fraud");
   const [flags, setFlags] = useState(null);
   const [risks, setRisks] = useState(null);
@@ -29,19 +38,19 @@ export default function FraudRiskPage() {
 
   return (
     <>
-      <AppBar title="Fraud & Risk" onBack={pop} />
+      <AppBar title={tc({ en: "Fraud & Risk", hi: "धोखाधड़ी और जोखिम", bn: "প্রতারণা ও ঝুঁকি" })} onBack={pop} />
       <div style={{ padding: "4px 16px 32px", display: "flex", flexDirection: "column", gap: 14,
         animation: "ag-fade .25s var(--ag-ease)" }}>
 
         <div style={{ display: "flex", gap: 8 }}>
-          <Chip active={tab === "fraud"} onClick={() => setTab("fraud")}>Fraud flags</Chip>
-          <Chip active={tab === "risk"} onClick={() => setTab("risk")}>Risk scores</Chip>
+          <Chip active={tab === "fraud"} onClick={() => setTab("fraud")}>{tc({ en: "Fraud flags", hi: "धोखाधड़ी अलर्ट", bn: "প্রতারণা সতর্কতা" })}</Chip>
+          <Chip active={tab === "risk"} onClick={() => setTab("risk")}>{tc({ en: "Risk scores", hi: "जोखिम स्कोर", bn: "ঝুঁকি স্কোর" })}</Chip>
         </div>
 
         {tab === "fraud" && (
           flags === null ? null : flags.length === 0 ? (
-            <EmptyState icon="ShieldCheck" title="No fraud flags"
-              body="No suspicious listings detected. Load AI commerce demo data to see the detector in action." />
+            <EmptyState icon="ShieldCheck" title={tc({ en: "No fraud flags", hi: "कोई धोखाधड़ी अलर्ट नहीं", bn: "কোনো প্রতারণা সতর্কতা নেই" })}
+              body={tc({ en: "No suspicious listings detected. Load AI commerce demo data to see the detector in action.", hi: "कोई संदिग्ध लिस्टिंग नहीं मिली। डिटेक्टर को काम करते देखने के लिए AI कॉमर्स डेमो डेटा लोड करें।", bn: "কোনো সন্দেহজনক তালিকা পাওয়া যায়নি। ডিটেক্টর কীভাবে কাজ করে দেখতে AI কমার্স ডেমো ডেটা লোড করুন।" })} />
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {flags.map((f) => (
@@ -55,7 +64,7 @@ export default function FraudRiskPage() {
                       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                         <span style={{ fontSize: 13.5, fontWeight: 700, color: T.ink }}>{f.name}</span>
                         <span style={{ fontSize: 10, fontWeight: 700, color: T[SEV_COLOR[f.severity]],
-                          background: T[`${SEV_COLOR[f.severity]}Soft`], borderRadius: 5, padding: "1px 6px", textTransform: "uppercase" }}>{f.severity}</span>
+                          background: T[`${SEV_COLOR[f.severity]}Soft`], borderRadius: 5, padding: "1px 6px", textTransform: "uppercase" }}>{sevLabel(tc, f.severity)}</span>
                       </div>
                       <div style={{ fontSize: 11, color: T.inkFaint, marginTop: 1 }}>{f.sellerName}</div>
                       <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 3 }}>
@@ -80,7 +89,7 @@ export default function FraudRiskPage() {
               <Card pad={14} style={{ background: T.orangeSoft, border: "none" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                   <div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: T.ink }}>Supply-chain risk</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: T.ink }}>{tc({ en: "Supply-chain risk", hi: "आपूर्ति-श्रृंखला जोखिम", bn: "সরবরাহ-শৃঙ্খল ঝুঁকি" })}</div>
                     <div style={{ fontSize: 11.5, color: T.inkSoft, marginTop: 2 }}>{supplyRisk.reasons[0]?.label}</div>
                   </div>
                   <ScoreBadge score={supplyRisk.overall} size={44} invert />
@@ -88,7 +97,7 @@ export default function FraudRiskPage() {
               </Card>
             )}
             {risks === null ? null : risks.length === 0 ? (
-              <EmptyState icon="Gauge" title="No risk profiles" body="Load AI commerce demo data first." />
+              <EmptyState icon="Gauge" title={tc({ en: "No risk profiles", hi: "कोई जोखिम प्रोफ़ाइल नहीं", bn: "কোনো ঝুঁকি প্রোফাইল নেই" })} body={tc({ en: "Load AI commerce demo data first.", hi: "पहले AI कॉमर्स डेमो डेटा लोड करें।", bn: "প্রথমে AI কমার্স ডেমো ডেটা লোড করুন।" })} />
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {risks.map((r) => (

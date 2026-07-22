@@ -13,13 +13,12 @@ import { SERVICE_CATEGORIES, categoryMeta } from "../../services/svcMarketplace/
 import { rupee } from "../../utils/format.js";
 import { accent } from "../../components/primitives.jsx";
 
-const QUICK_LINKS = [
-  { kind: "svcMyBookings",  label: "My Bookings", icon: "CalendarClock", a: "blue"    },
-  { kind: "svcProviderDash",label: "Provide",     icon: "Handshake",     a: "primary" },
-];
-
 export default function ServiceMarketplaceHub({ category: initCat = "all" } = {}) {
-  const { pop, push, toast } = useApp();
+  const { pop, push, toast, tc } = useApp();
+  const QUICK_LINKS = [
+    { kind: "svcMyBookings",  label: tc({en:"My Bookings", hi:"मेरी बुकिंग", bn:"আমার বুকিং"}), icon: "CalendarClock", a: "blue"    },
+    { kind: "svcProviderDash",label: tc({en:"Provide",     hi:"सेवा प्रदान करें", bn:"পরিষেবা প্রদান করুন"}),     icon: "Handshake",     a: "primary" },
+  ];
   const [q, setQ] = useState("");
   const [cat, setCat] = useState(initCat);
   const [services, setServices] = useState(null);
@@ -40,7 +39,7 @@ export default function ServiceMarketplaceHub({ category: initCat = "all" } = {}
     setSeeding(true);
     const r = await seedSvc.load();
     setSeeding(false);
-    toast(`${r.services} services from ${r.providers} providers loaded`, "success");
+    toast(`${r.services} ${tc({en:"services from", hi:"सेवाएं", bn:"পরিষেবা"})} ${r.providers} ${tc({en:"providers loaded", hi:"प्रदाताओं से लोड की गईं", bn:"প্রদানকারীর কাছ থেকে লোড হয়েছে"})}`, "success");
     refresh();
   };
 
@@ -49,7 +48,7 @@ export default function ServiceMarketplaceHub({ category: initCat = "all" } = {}
 
   return (
     <>
-      <AppBar title="Service Marketplace" onBack={pop} />
+      <AppBar title={tc({en:"Service Marketplace", hi:"सेवा बाज़ार", bn:"পরিষেবা বাজার"})} onBack={pop} />
 
       <div style={{ padding: "4px 16px 32px", display: "flex", flexDirection: "column", gap: 16,
         animation: "ag-fade .25s var(--ag-ease)" }}>
@@ -65,25 +64,25 @@ export default function ServiceMarketplaceHub({ category: initCat = "all" } = {}
           ))}
         </div>
 
-        <SearchBar value={q} onChange={setQ} placeholder="Search vet, drone, machinery…" />
+        <SearchBar value={q} onChange={setQ} placeholder={tc({en:"Search vet, drone, machinery…", hi:"पशु चिकित्सक, ड्रोन, मशीनरी खोजें…", bn:"পশু চিকিৎসক, ড্রোন, যন্ত্রপাতি খুঁজুন…"})} />
 
         <div style={{ display: "flex", gap: 8, overflowX: "auto", margin: "-4px 0", paddingBottom: 4 }}>
-          <Chip active={cat === "all"} onClick={() => setCat("all")}>All</Chip>
+          <Chip active={cat === "all"} onClick={() => setCat("all")}>{tc({en:"All", hi:"सभी", bn:"সকল"})}</Chip>
           {SERVICE_CATEGORIES.map((c) => (
             <Chip key={c.id} active={cat === c.id} onClick={() => setCat(c.id)} icon={c.icon}>{c.label}</Chip>
           ))}
         </div>
 
         {services === null ? null : empty ? (
-          <EmptyState icon="Handshake" title="No services yet"
-            body="Load demo data to explore veterinary, drone, machinery, and other agricultural services. Become a provider to offer your own services."
-            action={seeding ? "Loading…" : "Load demo data"} onAction={seeding ? undefined : loadDemo} />
+          <EmptyState icon="Handshake" title={tc({en:"No services yet", hi:"अभी कोई सेवा नहीं", bn:"এখনও কোনো পরিষেবা নেই"})}
+            body={tc({en:"Load demo data to explore veterinary, drone, machinery, and other agricultural services. Become a provider to offer your own services.", hi:"पशु चिकित्सा, ड्रोन, मशीनरी और अन्य कृषि सेवाओं को देखने के लिए डेमो डेटा लोड करें। अपनी सेवाएं देने के लिए प्रदाता बनें।", bn:"পশুচিকিৎসা, ড্রোন, যন্ত্রপাতি এবং অন্যান্য কৃষি পরিষেবা দেখতে ডেমো ডেটা লোড করুন। আপনার নিজস্ব পরিষেবা দিতে একজন প্রদানকারী হন।"})}
+            action={seeding ? tc({en:"Loading…", hi:"लोड हो रहा है…", bn:"লোড হচ্ছে…"}) : tc({en:"Load demo data", hi:"डेमो डेटा लोड करें", bn:"ডেমো ডেটা লোড করুন"})} onAction={seeding ? undefined : loadDemo} />
         ) : (
           <>
             {/* providers strip */}
             {providers.length > 0 && cat === "all" && !q && (
               <div>
-                <SectionHeader title="Service Providers" />
+                <SectionHeader title={tc({en:"Service Providers", hi:"सेवा प्रदाता", bn:"পরিষেবা প্রদানকারী"})} />
                 <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 4 }}>
                   {providers.map((p) => (
                     <div key={p.id} style={{ minWidth: 155, flexShrink: 0 }}>
@@ -97,7 +96,7 @@ export default function ServiceMarketplaceHub({ category: initCat = "all" } = {}
             {/* featured strip */}
             {featured.length > 0 && !q && (
               <div>
-                <SectionHeader title="Featured Services" />
+                <SectionHeader title={tc({en:"Featured Services", hi:"चुनिंदा सेवाएं", bn:"বৈশিষ্ট্যযুক্ত পরিষেবা"})} />
                 <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 4 }}>
                   {featured.slice(0, 6).map((svc) => {
                     const meta = categoryMeta(svc.category);
@@ -113,7 +112,7 @@ export default function ServiceMarketplaceHub({ category: initCat = "all" } = {}
                         <div style={{ fontSize: 13, fontWeight: 700, color: T.ink, lineHeight: 1.3 }}>{svc.title}</div>
                         <div style={{ fontSize: 11, color: T.inkSoft, marginTop: 2 }}>{svc.providerName}</div>
                         <div style={{ fontSize: 14, fontWeight: 800, color: T.ink, marginTop: 6 }}>
-                          {svc.price > 0 ? rupee(svc.price) : "Free"}{svc.pricingType !== "fixed" ? `/${svc.pricingType.replace("per", "").toLowerCase()}` : ""}
+                          {svc.price > 0 ? rupee(svc.price) : tc({en:"Free", hi:"मुफ़्त", bn:"বিনামূল্যে"})}{svc.pricingType !== "fixed" ? `/${svc.pricingType.replace("per", "").toLowerCase()}` : ""}
                         </div>
                       </Card>
                     );
@@ -124,10 +123,10 @@ export default function ServiceMarketplaceHub({ category: initCat = "all" } = {}
 
             {/* all services */}
             <div>
-              <SectionHeader title={cat === "all" ? "All Services" : (SERVICE_CATEGORIES.find((c) => c.id === cat)?.label || "Services")} />
+              <SectionHeader title={cat === "all" ? tc({en:"All Services", hi:"सभी सेवाएं", bn:"সকল পরিষেবা"}) : (SERVICE_CATEGORIES.find((c) => c.id === cat)?.label || tc({en:"Services", hi:"सेवाएं", bn:"পরিষেবা"}))} />
               {services.length === 0 ? (
-                <EmptyState icon="SearchX" title="Nothing found"
-                  body={q ? `No services match "${q}".` : "No services in this category yet."} />
+                <EmptyState icon="SearchX" title={tc({en:"Nothing found", hi:"कुछ नहीं मिला", bn:"কিছু পাওয়া যায়নি"})}
+                  body={q ? `${tc({en:"No services match", hi:"कोई सेवा मेल नहीं खाती", bn:"কোনো পরিষেবা মেলেনি"})} "${q}".` : tc({en:"No services in this category yet.", hi:"इस श्रेणी में अभी कोई सेवा नहीं है।", bn:"এই বিভাগে এখনও কোনো পরিষেবা নেই।"})} />
               ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   {services.map((svc) => {
@@ -141,7 +140,7 @@ export default function ServiceMarketplaceHub({ category: initCat = "all" } = {}
                             <div style={{ fontSize: 11, color: T.inkSoft, marginTop: 1 }}>{svc.providerName}</div>
                             <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginTop: 5 }}>
                               <span style={{ fontSize: 14, fontWeight: 800, color: T.ink }}>
-                                {svc.price > 0 ? rupee(svc.price) : "Free"}
+                                {svc.price > 0 ? rupee(svc.price) : tc({en:"Free", hi:"मुफ़्त", bn:"বিনামূল্যে"})}
                               </span>
                               <span style={{ fontSize: 10.5, color: T.inkFaint }}>
                                 {svc.pricingType !== "fixed" ? `/${svc.pricingType.replace("per", "").toLowerCase()}` : ""}
@@ -158,9 +157,9 @@ export default function ServiceMarketplaceHub({ category: initCat = "all" } = {}
               )}
             </div>
 
-            <Button variant="soft" full icon="Trash2" onClick={async () => { await seedSvc.clear(); refresh(); toast("Demo data cleared", "info"); }}
+            <Button variant="soft" full icon="Trash2" onClick={async () => { await seedSvc.clear(); refresh(); toast(tc({en:"Demo data cleared", hi:"डेमो डेटा साफ़ किया गया", bn:"ডেমো ডেটা মুছে ফেলা হয়েছে"}), "info"); }}
               style={{ display: (services || []).some((s) => s.demo) ? "inline-flex" : "none" }}>
-              Clear demo data
+              {tc({en:"Clear demo data", hi:"डेमो डेटा साफ़ करें", bn:"ডেমো ডেটা সাফ করুন"})}
             </Button>
           </>
         )}

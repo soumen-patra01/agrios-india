@@ -22,9 +22,9 @@ export default function Services() {
     <>
       <AppBar title={t("servicesTitle")} large />
       <div style={{ padding: "4px 16px 24px", display: "flex", flexDirection: "column", gap: 16, animation: "ag-fade .25s var(--ag-ease)" }}>
-        <SearchBar value={q} onChange={setQ} placeholder="Search services…" />
+        <SearchBar value={q} onChange={setQ} placeholder={tc({ en: "Search services…", hi: "सेवाएँ खोजें…", bn: "সেবা খুঁজুন…" })} />
         {list.length === 0 ? (
-          <EmptyState icon="SearchX" title="No services found" body={`Nothing matches "${q}". Try a different word.`} />
+          <EmptyState icon="SearchX" title={tc({ en: "No services found", hi: "कोई सेवा नहीं मिली", bn: "কোনো সেবা পাওয়া যায়নি" })} body={tc({ en: `Nothing matches "${q}". Try a different word.`, hi: `"${q}" से कुछ नहीं मिला। दूसरा शब्द आज़माएँ।`, bn: `"${q}" মেলেনি। অন্য শব্দ চেষ্টা করুন।` })} />
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {list.map((s) => (

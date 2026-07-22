@@ -8,7 +8,7 @@ import { locationService } from "../services/location/locationService.js";
 import { searchPlaces } from "../services/location/geocoding.js";
 
 export default function FarmLocations() {
-  const { pop, toast } = useApp();
+  const { pop, toast, tc } = useApp();
   const [farms, setFarms] = useState(() => locationService.list());
   const [active, setActiveState] = useState(() => locationService.getActive()?.id || null);
   const [gpsBusy, setGpsBusy] = useState(false);
@@ -28,9 +28,9 @@ export default function FarmLocations() {
       const pos = await locationService.currentPosition();
       locationService.add({ name: pos.name, lat: pos.lat, lon: pos.lon });
       refresh();
-      toast("Location added", "success");
+      toast(tc({ en: "Location added", hi: "स्थान जोड़ा गया", bn: "অবস্থান যোগ হয়েছে" }), "success");
     } catch (e) {
-      toast(e.message || "Couldn't get your location", "error");
+      toast(e.message || tc({ en: "Couldn't get your location", hi: "आपका स्थान नहीं मिला", bn: "আপনার অবস্থান পাওয়া যায়নি" }), "error");
     } finally {
       setGpsBusy(false);
     }
@@ -43,7 +43,7 @@ export default function FarmLocations() {
     try {
       setResults(await searchPlaces(q));
     } catch {
-      toast("Search failed — check your connection", "error");
+      toast(tc({ en: "Search failed — check your connection", hi: "खोज विफल — इंटरनेट जाँचें", bn: "অনুসন্ধান ব্যর্থ — ইন্টারনেট দেখুন" }), "error");
     } finally {
       setSearching(false);
     }
@@ -53,7 +53,7 @@ export default function FarmLocations() {
     locationService.add({ name: p.label, lat: p.lat, lon: p.lon });
     setQuery(""); setResults([]);
     refresh();
-    toast("Location added", "success");
+    toast(tc({ en: "Location added", hi: "स्थान जोड़ा गया", bn: "অবস্থান যোগ হয়েছে" }), "success");
   };
 
   const makeActive = (id) => { locationService.setActive(id); setActiveState(id); };
@@ -65,21 +65,21 @@ export default function FarmLocations() {
 
   return (
     <>
-      <AppBar title="Farm locations" onBack={pop} />
+      <AppBar title={tc({ en: "Farm locations", hi: "खेत के स्थान", bn: "খামারের অবস্থান" })} onBack={pop} />
       <Screen gap={16}>
         {/* add via GPS */}
         <Button variant="primary" icon="LocateFixed" full onClick={useGPS} disabled={gpsBusy}>
-          {gpsBusy ? "Locating…" : "Use my current location"}
+          {gpsBusy ? tc({ en: "Locating…", hi: "खोज रहा है…", bn: "খুঁজছে…" }) : tc({ en: "Use my current location", hi: "मेरा वर्तमान स्थान उपयोग करें", bn: "আমার বর্তমান অবস্থান ব্যবহার করুন" })}
         </Button>
 
         {/* search a place */}
         <Card pad={14}>
           <div style={{ display: "flex", gap: 8 }}>
             <div style={{ flex: 1 }}>
-              <Input placeholder="Search a village, town or district" value={query}
+              <Input placeholder={tc({ en: "Search a village, town or district", hi: "गाँव, शहर या जिला खोजें", bn: "গ্রাম, শহর বা জেলা খুঁজুন" })} value={query}
                 icon="Search" onChange={setQuery} />
             </div>
-            <Button variant="soft" icon="Search" onClick={runSearch}>Find</Button>
+            <Button variant="soft" icon="Search" onClick={runSearch}>{tc({ en: "Find", hi: "खोजें", bn: "খুঁজুন" })}</Button>
           </div>
           {searching && <div style={{ padding: "14px 0", display: "grid", placeItems: "center" }}><Spinner /></div>}
           {results.map((r, i) => (
@@ -95,8 +95,8 @@ export default function FarmLocations() {
 
         {/* saved farms */}
         {farms.length === 0 ? (
-          <EmptyState icon="MapPin" title="No saved locations"
-            body="Add your farm by GPS or by searching a place above." />
+          <EmptyState icon="MapPin" title={tc({ en: "No saved locations", hi: "कोई सहेजा गया स्थान नहीं", bn: "কোনো সংরক্ষিত অবস্থান নেই" })}
+            body={tc({ en: "Add your farm by GPS or by searching a place above.", hi: "GPS या ऊपर खोजकर अपना खेत जोड़ें।", bn: "GPS বা উপরে অনুসন্ধান করে আপনার খামার যোগ করুন।" })} />
         ) : (
           farms.map((f) => {
             const isActive = f.id === active;
@@ -110,12 +110,12 @@ export default function FarmLocations() {
                   </div>
                   {isActive ? (
                     <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 11.5, fontWeight: 700, color: T.primary, background: T.primarySoft, padding: "5px 10px", borderRadius: 999 }}>
-                      <Icon name="Check" size={13} /> Active
+                      <Icon name="Check" size={13} /> {tc({ en: "Active", hi: "सक्रिय", bn: "সক্রিয়" })}
                     </span>
                   ) : (
                     <button onClick={() => makeActive(f.id)}
                       style={{ fontSize: 12.5, fontWeight: 600, color: T.primary, background: "none", border: `1px solid ${T.line}`, borderRadius: 999, padding: "5px 12px", cursor: "pointer" }}>
-                      Set active
+                      {tc({ en: "Set active", hi: "सक्रिय करें", bn: "সক্রিয় করুন" })}
                     </button>
                   )}
                   <button onClick={() => setConfirmDel(f)} aria-label="Delete"
@@ -130,9 +130,9 @@ export default function FarmLocations() {
       </Screen>
 
       <Dialog open={!!confirmDel} onClose={() => setConfirmDel(null)}
-        title="Remove location?"
-        body={`"${confirmDel?.name}" will be removed from this device.`}
-        confirmLabel="Remove" cancelLabel="Cancel" danger onConfirm={doDelete} />
+        title={tc({ en: "Remove location?", hi: "स्थान हटाएँ?", bn: "অবস্থান সরাবেন?" })}
+        body={tc({ en: `"${confirmDel?.name}" will be removed from this device.`, hi: `"${confirmDel?.name}" इस डिवाइस से हटा दिया जाएगा।`, bn: `"${confirmDel?.name}" এই ডিভাইস থেকে সরানো হবে।` })}
+        confirmLabel={tc({ en: "Remove", hi: "हटाएँ", bn: "সরান" })} cancelLabel={tc({ en: "Cancel", hi: "रद्द करें", bn: "বাতিল" })} danger onConfirm={doDelete} />
     </>
   );
 }

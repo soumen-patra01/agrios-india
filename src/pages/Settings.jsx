@@ -31,7 +31,7 @@ function Toggle({ on, onChange }) {
 }
 
 export default function Settings() {
-  const { t, pop, lang, setLang, toast } = useApp();
+  const { t, tc, pop, lang, setLang, toast } = useApp();
   const { mode, setTheme } = useTheme();
   const [notif, setNotif] = useState(() => notificationService.isEnabled());
   const [langSheet, setLangSheet] = useState(false);
@@ -42,12 +42,12 @@ export default function Settings() {
       const result = await notificationService.requestPermission();
       const granted = result === "granted";
       setNotif(granted);
-      toast(granted ? "Notifications enabled" : "Blocked — enable in browser settings", granted ? "success" : "info");
+      toast(granted ? tc({ en: "Notifications enabled", hi: "सूचनाएँ चालू", bn: "বিজ্ঞপ্তি চালু হয়েছে" }) : tc({ en: "Blocked — enable in browser settings", hi: "ब्लॉक — ब्राउज़र सेटिंग्स में चालू करें", bn: "ব্লক — ব্রাউজার সেটিংসে চালু করুন" }), granted ? "success" : "info");
       return;
     }
     notificationService.setEnabled(v);
     setNotif(v);
-    toast(v ? "Notifications on" : "Notifications off", "success");
+    toast(v ? tc({ en: "Notifications on", hi: "सूचनाएँ चालू", bn: "বিজ্ঞপ্তি চালু" }) : tc({ en: "Notifications off", hi: "सूचनाएँ बंद", bn: "বিজ্ঞপ্তি বন্ধ" }), "success");
   };
 
   const themeOpts = [
@@ -83,16 +83,16 @@ export default function Settings() {
           <Row icon="Languages" label={t("language")} onClick={() => setLangSheet(true)}>
             <span style={{ fontSize: 13, color: T.inkSoft, fontWeight: 600 }}>{current?.native} <Icon name="ChevronRight" size={16} style={{ verticalAlign: -3, color: T.inkFaint }} /></span>
           </Row>
-          <Row icon="ShieldCheck" label={t("security")} onClick={() => toast("Security settings — coming soon")}>
+          <Row icon="ShieldCheck" label={t("security")} onClick={() => toast(tc({ en: "Security settings — coming soon", hi: "सुरक्षा सेटिंग्स — जल्द आ रहा है", bn: "নিরাপত্তা সেটিংস — শীঘ্রই আসছে" }))}>
             <Icon name="ChevronRight" size={18} style={{ color: T.inkFaint }} />
           </Row>
-          <Row icon="SlidersHorizontal" label={t("permissions")} onClick={() => toast("Permissions — coming soon")} last>
+          <Row icon="SlidersHorizontal" label={t("permissions")} onClick={() => toast(tc({ en: "Permissions — coming soon", hi: "अनुमतियाँ — जल्द आ रहा है", bn: "অনুমতি — শীঘ্রই আসছে" }))} last>
             <Icon name="ChevronRight" size={18} style={{ color: T.inkFaint }} />
           </Row>
         </Card>
 
         <Card pad={6}>
-          <Row icon="Info" label={t("about")} onClick={() => toast("AgriOS India · Phase 7D")} last>
+          <Row icon="Info" label={t("about")} onClick={() => toast("AgriOS India · v2.0.0")} last>
             <span style={{ fontSize: 13, color: T.inkFaint }}>v2.0.0</span>
           </Row>
         </Card>
@@ -103,12 +103,13 @@ export default function Settings() {
           {LANGUAGES.map((l) => {
             const on = l.code === lang;
             return (
-              <button key={l.code} onClick={() => { setLang(l.code); setLangSheet(false); toast("Language updated", "success"); }}
+              <button key={l.code} onClick={() => { setLang(l.code); setLangSheet(false); toast(tc({ en: "Language updated", hi: "भाषा बदली गई", bn: "ভাষা পরিবর্তন হয়েছে" }), "success"); }}
                 style={{ textAlign: "left", padding: "13px 15px", borderRadius: T.rLg, cursor: "pointer", fontFamily: T.body,
                   border: `1.5px solid ${on ? T.primary : T.line}`, background: on ? T.primarySoft : T.surface }}>
                 <div style={{ fontFamily: T.display, fontSize: 16, fontWeight: 700, color: on ? T.primary : T.ink }}>{l.native}</div>
                 <div style={{ fontSize: 12, color: T.inkSoft }}>{l.label}</div>
               </button>
+
             );
           })}
         </div>

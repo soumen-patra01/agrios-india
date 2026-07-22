@@ -16,17 +16,17 @@ const PROVIDER_LABELS = {
 };
 
 export default function Profile() {
-  const { t, user, push, logout } = useApp();
+  const { t, tc, user, push, logout } = useApp();
   const [confirm, setConfirm] = useState(false);
 
   const tap = (id) => {
     if (id === "settings") return push({ kind: "settings" });
     if (id === "language") return push({ kind: "settings" });
     const item = PROFILE_ITEMS.find((x) => x.id === id);
-    push({ kind: "feature", props: { title: t(item.title), desc: "Manage your " + t(item.title).toLowerCase() + ".", icon: item.icon, a: "primary" } });
+    push({ kind: "feature", props: { title: t(item.title), desc: tc({ en: "Manage your " + t(item.title).toLowerCase() + ".", hi: "अपना " + t(item.title) + " प्रबंधित करें।", bn: "আপনার " + t(item.title) + " পরিচালনা করুন।" }), icon: item.icon, a: "primary" } });
   };
 
-  const displayName = user?.name || "Farmer";
+  const displayName = user?.name || tc({ en: "Farmer", hi: "किसान", bn: "কৃষক" });
   const hasPhoto = !!user?.photo;
   const providerLabel = PROVIDER_LABELS[user?.provider] || "";
 
@@ -59,7 +59,7 @@ export default function Profile() {
               </div>
             )}
           </div>
-          <button onClick={() => tap("farm")} style={{ background: T.surface2, border: "none", borderRadius: 12, padding: "8px 10px", cursor: "pointer", color: T.primary, fontSize: 12.5, fontWeight: 600, fontFamily: T.body }}>Edit</button>
+          <button onClick={() => tap("farm")} style={{ background: T.surface2, border: "none", borderRadius: 12, padding: "8px 10px", cursor: "pointer", color: T.primary, fontSize: 12.5, fontWeight: 600, fontFamily: T.body }}>{tc({ en: "Edit", hi: "बदलें", bn: "সম্পাদনা" })}</button>
         </Card>
 
         {/* subscription */}
@@ -70,8 +70,8 @@ export default function Profile() {
             <Icon name="Crown" size={22} />
           </div>
           <div style={{ flex: 1 }}>
-            <div style={{ fontFamily: T.display, fontSize: 16, fontWeight: 700 }}>AgriOS Premium</div>
-            <div style={{ fontSize: 12.5, opacity: .92 }}>Unlock every AI assistant & report</div>
+            <div style={{ fontFamily: T.display, fontSize: 16, fontWeight: 700 }}>{tc({ en: "AgriOS Premium", hi: "AgriOS प्रीमियम", bn: "AgriOS প্রিমিয়াম" })}</div>
+            <div style={{ fontSize: 12.5, opacity: .92 }}>{tc({ en: "Unlock every AI assistant & report", hi: "सभी AI सहायक और रिपोर्ट अनलॉक करें", bn: "সমস্ত AI সহায়ক ও রিপোর্ট আনলক করুন" })}</div>
           </div>
           <Icon name="ChevronRight" size={20} />
         </div>
@@ -97,7 +97,7 @@ export default function Profile() {
           <Icon name="LogOut" size={18} /> {t("logout")}
         </button>
 
-        <div style={{ textAlign: "center", fontSize: 11.5, color: T.inkFaint }}>AgriOS India · v2.0.0 (Phase 2)</div>
+        <div style={{ textAlign: "center", fontSize: 11.5, color: T.inkFaint }}>{tc({ en: "AgriOS India · v2.0.0", hi: "AgriOS India · v2.0.0", bn: "AgriOS India · v2.0.0" })}</div>
       </div>
 
       <Dialog open={confirm} onClose={() => setConfirm(false)} title={t("logout") + "?"}

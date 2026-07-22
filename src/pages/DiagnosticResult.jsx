@@ -9,14 +9,14 @@ import { domainRegistry } from "../services/diagnostics/domainRegistry.js";
 import { reportService } from "../services/diagnostics/reportService.js";
 
 const TABS = [
-  { id: "diagnosis",       label: "Diagnosis",       icon: "Microscope"   },
-  { id: "recommendations", label: "Treatment",        icon: "Stethoscope"  },
-  { id: "risk",            label: "Risk",             icon: "ShieldAlert"  },
-  { id: "followup",        label: "Follow-up",        icon: "CalendarDays" },
+  { id: "diagnosis",       label: {en:"Diagnosis", hi:"निदान", bn:"রোগ নির্ণয়"},       icon: "Microscope"   },
+  { id: "recommendations", label: {en:"Treatment", hi:"उपचार", bn:"চিকিৎসা"},        icon: "Stethoscope"  },
+  { id: "risk",            label: {en:"Risk", hi:"जोखिम", bn:"ঝুঁকি"},             icon: "ShieldAlert"  },
+  { id: "followup",        label: {en:"Follow-up", hi:"अनुवर्ती", bn:"ফলো-আপ"},        icon: "CalendarDays" },
 ];
 
 export default function DiagnosticResult({ record }) {
-  const { pop, push } = useApp();
+  const { pop, push, tc } = useApp();
   const [tab, setTab] = useState("diagnosis");
 
   if (!record) return null;
@@ -43,10 +43,10 @@ export default function DiagnosticResult({ record }) {
         <Icon name="ShieldAlert" size={18} style={{ color: "var(--ag-red)", flexShrink: 0 }} />
         <div>
           <div style={{ fontWeight: 700, color: "var(--ag-red)", fontSize: 14, marginBottom: 3 }}>
-            EMERGENCY — Immediate Action Required
+            {tc({en:"EMERGENCY — Immediate Action Required", hi:"आपातकाल — तुरंत कार्रवाई आवश्यक", bn:"জরুরি — অবিলম্বে পদক্ষেপ প্রয়োজন"})}
           </div>
           <div style={{ fontSize: 13, color: T.ink }}>
-            This condition requires urgent expert attention. Contact a veterinarian or agriculture officer immediately.
+            {tc({en:"This condition requires urgent expert attention. Contact a veterinarian or agriculture officer immediately.", hi:"इस स्थिति में तत्काल विशेषज्ञ ध्यान आवश्यक है। तुरंत पशु चिकित्सक या कृषि अधिकारी से संपर्क करें।", bn:"এই অবস্থায় জরুরি বিশেষজ্ঞ মনোযোগ প্রয়োজন। অবিলম্বে পশু চিকিৎসক বা কৃষি অফিসারের সাথে যোগাযোগ করুন।"})}
           </div>
         </div>
       </div>
@@ -64,7 +64,7 @@ export default function DiagnosticResult({ record }) {
             {record.species ? ` · ${record.species}` : ""}
           </div>
           <div style={{ fontFamily: T.display, fontSize: 19, fontWeight: 800, color: T.ink, lineHeight: 1.2 }}>
-            {record.primaryDiagnosis || "Unable to Detect"}
+            {record.primaryDiagnosis || tc({en:"Unable to Detect", hi:"पता नहीं चल सका", bn:"শনাক্ত করা যায়নি"})}
           </div>
         </div>
         <SeverityBadge severity={record.severity} pulse={isEmerg} />
@@ -86,7 +86,7 @@ export default function DiagnosticResult({ record }) {
             boxShadow: tab === t.id ? "0 1px 3px rgba(0,0,0,.1)" : "none",
             transition: "all .15s", display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
           <Icon name={t.icon} size={14} />
-          {t.label}
+          {tc(t.label)}
         </button>
       ))}
     </div>
@@ -100,13 +100,13 @@ export default function DiagnosticResult({ record }) {
       {tab === "diagnosis" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           {record.observations?.length > 0 && (
-            <Section icon="Search" title="Observations">
+            <Section icon="Search" title={tc({en:"Observations", hi:"अवलोकन", bn:"পর্যবেক্ষণ"})}>
               {record.observations.map((o, i) => <BulletItem key={i} text={o} />)}
             </Section>
           )}
 
           {record.possibleDiseases?.length > 1 && (
-            <Section icon="BarChart3" title="Possible Diseases">
+            <Section icon="BarChart3" title={tc({en:"Possible Diseases", hi:"संभावित रोग", bn:"সম্ভাব্য রোগ"})}>
               {record.possibleDiseases.map((d, i) => (
                 <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center",
                   padding: "8px 0", borderBottom: i < record.possibleDiseases.length - 1 ? `1px solid ${T.lineSoft}` : "none" }}>
@@ -124,20 +124,20 @@ export default function DiagnosticResult({ record }) {
           )}
 
           {record.differentialDiagnosis?.length > 0 && (
-            <Section icon="GitBranch" title="Differential Diagnosis">
+            <Section icon="GitBranch" title={tc({en:"Differential Diagnosis", hi:"विभेदक निदान", bn:"ডিফারেনশিয়াল রোগ নির্ণয়"})}>
               {record.differentialDiagnosis.map((d, i) => <BulletItem key={i} text={d} />)}
             </Section>
           )}
 
           {record.riskFactors?.length > 0 && (
-            <Section icon="AlertTriangle" title="Risk Factors">
+            <Section icon="AlertTriangle" title={tc({en:"Risk Factors", hi:"जोखिम कारक", bn:"ঝুঁকির কারণ"})}>
               {record.riskFactors.map((r, i) => <BulletItem key={i} text={r} color="var(--ag-orange)" />)}
             </Section>
           )}
 
           {record.knowledgeSource && (
             <div style={{ fontSize: 11.5, color: T.inkFaint, padding: "8px 0" }}>
-              <b>Knowledge source:</b> {record.knowledgeSource}
+              <b>{tc({en:"Knowledge source:", hi:"ज्ञान स्रोत:", bn:"জ্ঞানের উৎস:"})}</b> {record.knowledgeSource}
             </div>
           )}
         </div>
@@ -164,7 +164,7 @@ export default function DiagnosticResult({ record }) {
                   ))}
                 </Section>
               ))
-            : <EmptySection text="No specific recommendations available. Please consult an expert." />
+            : <EmptySection text={tc({en:"No specific recommendations available. Please consult an expert.", hi:"कोई विशिष्ट सिफारिश उपलब्ध नहीं। कृपया विशेषज्ञ से परामर्श करें।", bn:"কোনো নির্দিষ্ট সুপারিশ নেই। অনুগ্রহ করে বিশেষজ্ঞের সাথে পরামর্শ করুন।"})} />
           }
 
           {recs.disclaimer && (
@@ -180,11 +180,11 @@ export default function DiagnosticResult({ record }) {
       {tab === "risk" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {record.risk && (
-            <Section icon="ShieldAlert" title="Risk Assessment">
-              <RiskRow label="Disease Spread"     level={record.risk.spread?.level} />
-              <RiskRow label="Economic Impact"    level={record.risk.economicImpact?.level} />
-              <RiskRow label="Mortality Risk"     level={record.risk.mortalityRisk?.level} />
-              <RiskRow label="Yield Loss"         level={record.risk.yieldLoss?.level} />
+            <Section icon="ShieldAlert" title={tc({en:"Risk Assessment", hi:"जोखिम मूल्यांकन", bn:"ঝুঁকি মূল্যায়ন"})}>
+              <RiskRow label={tc({en:"Disease Spread", hi:"रोग फैलाव", bn:"রোগ বিস্তার"})}     level={record.risk.spread?.level} />
+              <RiskRow label={tc({en:"Economic Impact", hi:"आर्थिक प्रभाव", bn:"অর্থনৈতিক প্রভাব"})}    level={record.risk.economicImpact?.level} />
+              <RiskRow label={tc({en:"Mortality Risk", hi:"मृत्यु जोखिम", bn:"মৃত্যু ঝুঁকি"})}     level={record.risk.mortalityRisk?.level} />
+              <RiskRow label={tc({en:"Yield Loss", hi:"उपज हानि", bn:"ফলন ক্ষতি"})}         level={record.risk.yieldLoss?.level} />
             </Section>
           )}
 
@@ -204,7 +204,7 @@ export default function DiagnosticResult({ record }) {
 
           {/* Escalation flags */}
           {esc.flags?.length > 0 && (
-            <Section icon="ArrowUpCircle" title="Next Steps">
+            <Section icon="ArrowUpCircle" title={tc({en:"Next Steps", hi:"अगले कदम", bn:"পরবর্তী পদক্ষেপ"})}>
               {esc.flags.map((f) => (
                 <EscalationFlag key={f.id} flag={f} onAction={(cta) => handleEscalation(cta)} />
               ))}
@@ -218,8 +218,8 @@ export default function DiagnosticResult({ record }) {
                 cursor: "pointer", fontFamily: T.body, textAlign: "left" }}>
               <Icon name="ClipboardList" size={18} style={{ color: "var(--ag-primary)" }} />
               <div>
-                <div style={{ fontSize: 14, fontWeight: 600, color: T.ink }}>Copy Referral Summary</div>
-                <div style={{ fontSize: 12, color: T.inkSoft }}>Share with your veterinarian or agri officer</div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: T.ink }}>{tc({en:"Copy Referral Summary", hi:"रेफरल सारांश कॉपी करें", bn:"রেফারেল সারাংশ কপি করুন"})}</div>
+                <div style={{ fontSize: 12, color: T.inkSoft }}>{tc({en:"Share with your veterinarian or agri officer", hi:"अपने पशु चिकित्सक या कृषि अधिकारी से साझा करें", bn:"আপনার পশু চিকিৎসক বা কৃষি অফিসারের সাথে শেয়ার করুন"})}</div>
               </div>
             </button>
           )}
@@ -230,20 +230,20 @@ export default function DiagnosticResult({ record }) {
       {tab === "followup" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           {record.followUp && (
-            <Section icon="CalendarDays" title={`Follow-up in ${record.followUp.days} days`}>
+            <Section icon="CalendarDays" title={tc({en:`Follow-up in ${record.followUp.days} days`, hi:`${record.followUp.days} दिनों में अनुवर्ती`, bn:`${record.followUp.days} দিনে ফলো-আপ`})}>
               {record.followUp.checkPoints?.length > 0
                 ? record.followUp.checkPoints.map((c, i) => <BulletItem key={i} text={c} />)
-                : <p style={{ fontSize: 13.5, color: T.inkSoft }}>Monitor the condition and contact an expert if it worsens.</p>}
+                : <p style={{ fontSize: 13.5, color: T.inkSoft }}>{tc({en:"Monitor the condition and contact an expert if it worsens.", hi:"स्थिति पर नज़र रखें और बिगड़ने पर विशेषज्ञ से संपर्क करें।", bn:"অবস্থা পর্যবেক্ষণ করুন এবং খারাপ হলে বিশেষজ্ঞের সাথে যোগাযোগ করুন।"})}</p>}
             </Section>
           )}
 
           {record.recoveryTimeline && (
-            <Section icon="TrendingUp" title="Recovery Timeline">
+            <Section icon="TrendingUp" title={tc({en:"Recovery Timeline", hi:"रिकवरी समयसीमा", bn:"পুনরুদ্ধারের সময়সীমা"})}>
               <p style={{ fontSize: 14, color: T.ink, lineHeight: 1.6, margin: 0 }}>{record.recoveryTimeline}</p>
             </Section>
           )}
 
-          <Section icon="Info" title="Disclaimer">
+          <Section icon="Info" title={tc({en:"Disclaimer", hi:"अस्वीकरण", bn:"দাবিত্যাগ"})}>
             <p style={{ fontSize: 12.5, color: T.inkSoft, lineHeight: 1.6, margin: 0 }}>
               {record.disclaimer}
             </p>
@@ -266,7 +266,7 @@ export default function DiagnosticResult({ record }) {
 
   return (
     <>
-      <AppBar title="Diagnosis Result" onBack={pop}
+      <AppBar title={tc({en:"Diagnosis Result", hi:"निदान परिणाम", bn:"রোগ নির্ণয়ের ফলাফল"})} onBack={pop}
         action={
           <div style={{ display: "flex", gap: 8 }}>
             <HdrBtn icon="Share2" onClick={share} />

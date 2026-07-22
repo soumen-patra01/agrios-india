@@ -10,15 +10,19 @@ import {
 } from "../services/ledger/ledgerService.js";
 import { compact, rupee } from "../utils/format.js";
 
-const MONTHS = [
-  "January","February","March","April","May","June",
-  "July","August","September","October","November","December",
+const MONTHS_I18N = [
+  {en:"January",hi:"जनवरी",bn:"জানুয়ারি"},{en:"February",hi:"फरवरी",bn:"ফেব্রুয়ারি"},
+  {en:"March",hi:"मार्च",bn:"মার্চ"},{en:"April",hi:"अप्रैल",bn:"এপ্রিল"},
+  {en:"May",hi:"मई",bn:"মে"},{en:"June",hi:"जून",bn:"জুন"},
+  {en:"July",hi:"जुलाई",bn:"জুলাই"},{en:"August",hi:"अगस्त",bn:"আগস্ট"},
+  {en:"September",hi:"सितंबर",bn:"সেপ্টেম্বর"},{en:"October",hi:"अक्टूबर",bn:"অক্টোবর"},
+  {en:"November",hi:"नवंबर",bn:"নভেম্বর"},{en:"December",hi:"दिसंबर",bn:"ডিসেম্বর"},
 ];
 const todayStr = () => new Date().toISOString().slice(0, 10);
 const fmtDate  = (d) => new Date(d + "T12:00:00").toLocaleDateString("en-IN", { day: "numeric", month: "short" });
 
 export default function FarmLedger() {
-  const { pop, toast } = useApp();
+  const { pop, toast, tc, t } = useApp();
   const now = new Date();
   const [year, setYear]   = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth()); // 0-indexed
@@ -60,12 +64,12 @@ export default function FarmLedger() {
 
   return (
     <>
-      <AppBar title="Farm ledger" onBack={pop} action={
+      <AppBar title={tc({en:"Farm ledger",hi:"खेत का हिसाब",bn:"খামারের হিসাব"})} onBack={pop} action={
         <button onClick={() => setAddOpen(true)}
           style={{ background: T.primary, border: "none", borderRadius: 12, padding: "8px 13px",
             cursor: "pointer", color: "#fff", display: "flex", alignItems: "center", gap: 6,
             fontFamily: T.body, fontSize: 13, fontWeight: 600 }}>
-          <Icon name="PlusCircle" size={17} /> Add
+          <Icon name="PlusCircle" size={17} /> {tc({en:"Add",hi:"जोड़ें",bn:"যোগ করুন"})}
         </button>
       } />
 
@@ -76,7 +80,7 @@ export default function FarmLedger() {
             style={{ background: T.surface2, border: "none", borderRadius: 10, padding: 8, cursor: "pointer", display: "flex", color: T.ink }}>
             <Icon name="ChevronLeft" size={20} />
           </button>
-          <div style={{ fontFamily: T.display, fontSize: 17, fontWeight: 700 }}>{MONTHS[month]} {year}</div>
+          <div style={{ fontFamily: T.display, fontSize: 17, fontWeight: 700 }}>{tc(MONTHS_I18N[month])} {year}</div>
           <button onClick={nextMonth} disabled={atCurrentMonth}
             style={{ background: T.surface2, border: "none", borderRadius: 10, padding: 8,
               cursor: atCurrentMonth ? "default" : "pointer", display: "flex",
@@ -87,17 +91,17 @@ export default function FarmLedger() {
 
         {/* P&L summary */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
-          <SumTile label="Net" icon={netPos ? "TrendingUp" : "TrendingDown"}
+          <SumTile label={t("net")} icon={netPos ? "TrendingUp" : "TrendingDown"}
             value={(netPos ? "+" : "-") + compact(Math.abs(summary.net))}
             bg={netPos ? T.primarySoft : T.redSoft} fg={netPos ? T.primary : T.red} />
-          <SumTile label="Income" icon="ArrowDownCircle" value={compact(summary.income)} bg={T.primarySoft} fg={T.primary} />
-          <SumTile label="Expense" icon="ArrowUpCircle"  value={compact(summary.expense)} bg={T.redSoft}     fg={T.red}     />
+          <SumTile label={t("income")} icon="ArrowDownCircle" value={compact(summary.income)} bg={T.primarySoft} fg={T.primary} />
+          <SumTile label={t("expense")} icon="ArrowUpCircle"  value={compact(summary.expense)} bg={T.redSoft}     fg={T.red}     />
         </div>
 
         {/* Filter chips */}
         <div style={{ display: "flex", gap: 8 }}>
-          {[["all", "All"], ["income", "Income"], ["expense", "Expense"]].map(([k, l]) => (
-            <Chip key={k} active={filter === k} onClick={() => setFilter(k)}>{l}</Chip>
+          {[["all", {en:"All",hi:"सभी",bn:"সব"}], ["income", {en:"Income",hi:"आय",bn:"আয়"}], ["expense", {en:"Expense",hi:"खर्च",bn:"ব্যয়"}]].map(([k, l]) => (
+            <Chip key={k} active={filter === k} onClick={() => setFilter(k)}>{tc(l)}</Chip>
           ))}
         </div>
 
@@ -105,8 +109,8 @@ export default function FarmLedger() {
         {txns.length === 0 ? (
           <div style={{ textAlign: "center", padding: "52px 0", color: T.inkSoft }}>
             <Icon name="Receipt" size={36} style={{ color: T.inkFaint, display: "block", margin: "0 auto 12px" }} />
-            <div style={{ fontSize: 15, fontWeight: 600 }}>No entries yet</div>
-            <div style={{ fontSize: 13, color: T.inkFaint, marginTop: 4 }}>Tap + Add to record income or expenses</div>
+            <div style={{ fontSize: 15, fontWeight: 600 }}>{tc({en:"No entries yet",hi:"अभी कोई प्रविष्टि नहीं",bn:"এখনও কোনো এন্ট্রি নেই"})}</div>
+            <div style={{ fontSize: 13, color: T.inkFaint, marginTop: 4 }}>{tc({en:"Tap + Add to record income or expenses",hi:"आय या खर्च दर्ज करने के लिए + जोड़ें दबाएं",bn:"আয় বা ব্যয় লিখতে + যোগ করুন টিপুন"})}</div>
           </div>
         ) : (
           <Card pad={0}>
@@ -140,18 +144,18 @@ export default function FarmLedger() {
         )}
 
         <div style={{ fontSize: 11.5, color: T.inkFaint, textAlign: "center", lineHeight: 1.6 }}>
-          All data stored on this device only
+          {tc({en:"All data stored on this device only",hi:"सारा डेटा केवल इस डिवाइस पर संग्रहीत है",bn:"সমস্ত তথ্য শুধুমাত্র এই ডিভাইসে সংরক্ষিত"})}
         </div>
       </Screen>
 
       <AddSheet open={addOpen} onClose={() => setAddOpen(false)}
-        onSaved={(kind) => { refresh(); toast(kind === "income" ? "Income recorded" : "Expense recorded", "success"); }} />
+        onSaved={(kind) => { refresh(); toast(kind === "income" ? tc({en:"Income recorded",hi:"आय दर्ज हुई",bn:"আয় লিপিবদ্ধ হয়েছে"}) : tc({en:"Expense recorded",hi:"खर्च दर्ज हुआ",bn:"ব্যয় লিপিবদ্ধ হয়েছে"}), "success"); }} />
 
       <Dialog open={!!delTarget} onClose={() => setDelTarget(null)}
-        title="Delete entry?"
+        title={tc({en:"Delete entry?",hi:"प्रविष्टि हटाएं?",bn:"এন্ট্রি মুছবেন?"})}
         body={delTarget ? `${ledgerService.categoryLabel(delTarget.kind, delTarget.categoryId)} · ${rupee(delTarget.amount)}` : ""}
-        icon="Trash2" danger confirmLabel="Delete" cancelLabel="Cancel"
-        onConfirm={async () => { await ledgerService.remove(delTarget.id); setDelTarget(null); refresh(); toast("Entry deleted", "info"); }} />
+        icon="Trash2" danger confirmLabel={tc({en:"Delete",hi:"हटाएं",bn:"মুছুন"})} cancelLabel={t("cancel")}
+        onConfirm={async () => { await ledgerService.remove(delTarget.id); setDelTarget(null); refresh(); toast(tc({en:"Entry deleted",hi:"प्रविष्टि हटाई गई",bn:"এন্ট্রি মোছা হয়েছে"}), "info"); }} />
     </>
   );
 }
@@ -169,11 +173,12 @@ function SumTile({ label, value, icon, bg, fg }) {
 }
 
 function AddSheet({ open, onClose, onSaved }) {
+  const { tc } = useApp();
   const [form, setForm] = useState({ kind: "income", amount: "", categoryId: "", enterpriseId: "crop", date: todayStr(), note: "" });
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
 
   const cats = form.kind === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
-  const catOpts = [{ value: "", label: "Select category…" }, ...cats.map((c) => ({ value: c.id, label: c.label }))];
+  const catOpts = [{ value: "", label: tc({en:"Select category…",hi:"श्रेणी चुनें…",bn:"বিভাগ নির্বাচন করুন…"}) }, ...cats.map((c) => ({ value: c.id, label: c.label }))];
   const entOpts = ENTERPRISES.map((e) => ({ value: e.id, label: e.label }));
 
   const canSubmit = form.amount && parseFloat(form.amount) > 0 && form.categoryId;
@@ -190,12 +195,12 @@ function AddSheet({ open, onClose, onSaved }) {
   const switchKind = (k) => setForm((f) => ({ ...f, kind: k, categoryId: "" }));
 
   return (
-    <BottomSheet open={open} onClose={onClose} title="Add entry"
-      footer={<Button full onClick={submit} disabled={!canSubmit}>Save entry</Button>}>
+    <BottomSheet open={open} onClose={onClose} title={tc({en:"Add entry",hi:"प्रविष्टि जोड़ें",bn:"এন্ট্রি যোগ করুন"})}
+      footer={<Button full onClick={submit} disabled={!canSubmit}>{tc({en:"Save entry",hi:"प्रविष्टि सहेजें",bn:"এন্ট্রি সংরক্ষণ করুন"})}</Button>}>
 
       {/* Income / Expense toggle */}
       <div style={{ display: "flex", background: T.surface2, borderRadius: T.rLg, padding: 4, marginBottom: 16 }}>
-        {[["income", "Income", "ArrowDownCircle"], ["expense", "Expense", "ArrowUpCircle"]].map(([k, l, ico]) => (
+        {[["income", {en:"Income",hi:"आय",bn:"আয়"}, "ArrowDownCircle"], ["expense", {en:"Expense",hi:"खर्च",bn:"ব্যয়"}, "ArrowUpCircle"]].map(([k, l, ico]) => (
           <button key={k} onClick={() => switchKind(k)}
             style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 7,
               padding: "11px 0", borderRadius: T.rMd, border: "none", cursor: "pointer", fontFamily: T.body,
@@ -203,18 +208,18 @@ function AddSheet({ open, onClose, onSaved }) {
               background: form.kind === k ? T.surface : "transparent",
               color: form.kind === k ? (k === "income" ? T.primary : T.red) : T.inkSoft,
               boxShadow: form.kind === k ? T.shadowSm : "none" }}>
-            <Icon name={ico} size={16} /> {l}
+            <Icon name={ico} size={16} /> {tc(l)}
           </button>
         ))}
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        <Input label="Amount (₹)" value={form.amount} onChange={(v) => set("amount", v)}
+        <Input label={tc({en:"Amount (₹)",hi:"राशि (₹)",bn:"পরিমাণ (₹)"})} value={form.amount} onChange={(v) => set("amount", v)}
           type="number" inputMode="decimal" placeholder="0.00" prefix="₹" />
-        <Dropdown label="Category" value={form.categoryId} onChange={(v) => set("categoryId", v)} options={catOpts} />
-        <Dropdown label="Enterprise" value={form.enterpriseId} onChange={(v) => set("enterpriseId", v)} options={entOpts} />
-        <Input label="Date" value={form.date} onChange={(v) => set("date", v)} type="date" />
-        <Input label="Note (optional)" value={form.note} onChange={(v) => set("note", v)} placeholder="e.g. North field paddy sale" />
+        <Dropdown label={tc({en:"Category",hi:"श्रेणी",bn:"বিভাগ"})} value={form.categoryId} onChange={(v) => set("categoryId", v)} options={catOpts} />
+        <Dropdown label={tc({en:"Enterprise",hi:"उद्यम",bn:"এন্টারপ্রাইজ"})} value={form.enterpriseId} onChange={(v) => set("enterpriseId", v)} options={entOpts} />
+        <Input label={tc({en:"Date",hi:"तारीख",bn:"তারিখ"})} value={form.date} onChange={(v) => set("date", v)} type="date" />
+        <Input label={tc({en:"Note (optional)",hi:"नोट (वैकल्पिक)",bn:"নোট (ঐচ্ছিক)"})} value={form.note} onChange={(v) => set("note", v)} placeholder={tc({en:"e.g. North field paddy sale",hi:"जैसे उत्तरी खेत धान बिक्री",bn:"যেমন উত্তর মাঠের ধান বিক্রি"})} />
       </div>
     </BottomSheet>
   );

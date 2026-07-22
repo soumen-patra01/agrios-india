@@ -10,7 +10,7 @@ import { domainRegistry } from "../services/diagnostics/domainRegistry.js";
 const SEVERITY_FILTERS = ["All", "Critical", "Severe", "Moderate", "Mild", "Healthy"];
 
 export default function DiagnosticHistory() {
-  const { pop, push } = useApp();
+  const { pop, push, tc } = useApp();
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [domainFilter,   setDomainFilter]   = useState("all");
@@ -43,7 +43,7 @@ export default function DiagnosticHistory() {
 
   return (
     <>
-      <AppBar title="Diagnosis History" onBack={pop} />
+      <AppBar title={tc({en:"Diagnosis History", hi:"निदान इतिहास", bn:"রোগ নির্ণয়ের ইতিহাস"})} onBack={pop} />
 
       <div style={{ padding: "12px 16px 32px", animation: "ag-fade .22s var(--ag-ease)" }}>
 
@@ -86,7 +86,7 @@ export default function DiagnosticHistory() {
         {/* Summary count */}
         {!loading && records.length > 0 && (
           <div style={{ fontSize: 12, color: T.inkFaint, marginBottom: 14 }}>
-            {filtered.length} of {records.length} records
+            {tc({en:`${filtered.length} of ${records.length} records`, hi:`${records.length} में से ${filtered.length} रिकॉर्ड`, bn:`${records.length}-এর মধ্যে ${filtered.length}টি রেকর্ড`})}
           </div>
         )}
 
@@ -96,10 +96,10 @@ export default function DiagnosticHistory() {
             <Icon name="RefreshCw" size={24} style={{ animation: "ag-blink 1.2s infinite" }} />
           </div>
         ) : filtered.length === 0 ? (
-          <EmptyState icon="History" title="No diagnoses yet"
+          <EmptyState icon="History" title={tc({en:"No diagnoses yet", hi:"अभी कोई निदान नहीं", bn:"এখনও কোনো রোগ নির্ণয় নেই"})}
             body={records.length === 0
-              ? "Start your first AI diagnosis by selecting a domain from the Diagnostics home."
-              : "No records match the selected filters."} />
+              ? tc({en:"Start your first AI diagnosis by selecting a domain from the Diagnostics home.", hi:"डायग्नोस्टिक्स होम से एक श्रेणी चुनकर अपना पहला AI निदान शुरू करें।", bn:"ডায়াগনস্টিক্স হোম থেকে একটি বিভাগ নির্বাচন করে আপনার প্রথম AI রোগ নির্ণয় শুরু করুন।"})
+              : tc({en:"No records match the selected filters.", hi:"चयनित फ़िल्टर से कोई रिकॉर्ड मेल नहीं खाता।", bn:"নির্বাচিত ফিল্টারের সাথে কোনো রেকর্ড মেলেনি।"})} />
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {filtered.map((r) => (

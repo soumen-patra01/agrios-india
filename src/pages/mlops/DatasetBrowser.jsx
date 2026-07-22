@@ -17,7 +17,7 @@ function QualityDot({ score }) {
 }
 
 export default function DatasetBrowser() {
-  const { pop, push } = useApp();
+  const { pop, push, tc } = useApp();
   const [datasets, setDatasets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -52,7 +52,7 @@ export default function DatasetBrowser() {
 
   return (
     <>
-      <AppBar title="Dataset Browser" onBack={pop}
+      <AppBar title={tc({en:"Dataset Browser",hi:"डेटासेट ब्राउज़र",bn:"ডেটাসেট ব্রাউজার"})} onBack={pop}
         action={<button onClick={() => setShowCreate(true)} style={{ background: "none", border: "none",
           cursor: "pointer", color: "var(--ag-primary)" }}><Icon name="Plus" size={22} /></button>} />
 
@@ -62,7 +62,7 @@ export default function DatasetBrowser() {
         <div style={{ position: "relative", marginBottom: 12 }}>
           <Icon name="Search" size={15} color={T.inkSoft} style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)" }} />
           <input value={search} onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search datasets…"
+            placeholder={tc({en:"Search datasets…",hi:"डेटासेट खोजें…",bn:"ডেটাসেট খুঁজুন…"})}
             style={{ width: "100%", padding: "9px 12px 9px 32px", borderRadius: T.rMd, border: `1px solid ${T.line}`,
               background: T.surface, color: T.ink, fontSize: 14, fontFamily: T.body, boxSizing: "border-box" }} />
         </div>
@@ -85,9 +85,9 @@ export default function DatasetBrowser() {
         {showCreate && (
           <div style={{ background: T.surface, borderRadius: T.rLg, border: `1px solid ${T.line}`,
             padding: "14px 16px", marginBottom: 16 }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: T.ink, marginBottom: 12 }}>Register Dataset</div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: T.ink, marginBottom: 12 }}>{tc({en:"Register Dataset",hi:"डेटासेट रजिस्टर करें",bn:"ডেটাসেট নিবন্ধন করুন"})}</div>
             <input value={newDs.name} onChange={(e) => setNewDs({ ...newDs, name: e.target.value })}
-              placeholder="Dataset name"
+              placeholder={tc({en:"Dataset name",hi:"डेटासेट का नाम",bn:"ডেটাসেটের নাম"})}
               style={{ width: "100%", padding: "9px 12px", borderRadius: T.rMd, border: `1px solid ${T.line}`,
                 background: T.bg, color: T.ink, fontSize: 14, fontFamily: T.body, marginBottom: 8, boxSizing: "border-box" }} />
             <select value={newDs.category} onChange={(e) => setNewDs({ ...newDs, category: e.target.value })}
@@ -96,19 +96,19 @@ export default function DatasetBrowser() {
               {DATASET_CATEGORIES.map((c) => <option key={c} value={c}>{c.replace(/_/g, " ")}</option>)}
             </select>
             <input value={newDs.description} onChange={(e) => setNewDs({ ...newDs, description: e.target.value })}
-              placeholder="Description (optional)"
+              placeholder={tc({en:"Description (optional)",hi:"विवरण (वैकल्पिक)",bn:"বিবরণ (ঐচ্ছিক)"})}
               style={{ width: "100%", padding: "9px 12px", borderRadius: T.rMd, border: `1px solid ${T.line}`,
                 background: T.bg, color: T.ink, fontSize: 14, fontFamily: T.body, marginBottom: 12, boxSizing: "border-box" }} />
             <div style={{ display: "flex", gap: 8 }}>
               <button onClick={createDataset}
                 style={{ flex: 1, padding: "10px", borderRadius: T.rMd, border: "none",
                   background: "var(--ag-primary)", color: "#fff", fontWeight: 600, cursor: "pointer", fontFamily: T.body }}>
-                Register
+                {tc({en:"Register",hi:"रजिस्टर करें",bn:"নিবন্ধন করুন"})}
               </button>
               <button onClick={() => setShowCreate(false)}
                 style={{ padding: "10px 16px", borderRadius: T.rMd, border: `1px solid ${T.line}`,
                   background: T.surface, color: T.ink, cursor: "pointer", fontFamily: T.body }}>
-                Cancel
+                {tc({en:"Cancel",hi:"रद्द करें",bn:"বাতিল করুন"})}
               </button>
             </div>
           </div>
@@ -117,7 +117,7 @@ export default function DatasetBrowser() {
         {/* Stats row */}
         {!loading && (
           <div style={{ fontSize: 12, color: T.inkFaint, marginBottom: 12 }}>
-            {filtered.length} of {datasets.length} datasets
+            {tc({en:`${filtered.length} of ${datasets.length} datasets`,hi:`${datasets.length} में से ${filtered.length} डेटासेट`,bn:`${datasets.length}-এর মধ্যে ${filtered.length} ডেটাসেট`})}
           </div>
         )}
 
@@ -127,8 +127,8 @@ export default function DatasetBrowser() {
             <Icon name="RefreshCw" size={24} style={{ animation: "ag-blink 1.2s infinite" }} />
           </div>
         ) : filtered.length === 0 ? (
-          <EmptyState icon="Database" title="No datasets yet"
-            body="Register your first dataset to start building the MLOps pipeline." />
+          <EmptyState icon="Database" title={tc({en:"No datasets yet",hi:"अभी तक कोई डेटासेट नहीं",bn:"এখনও কোনো ডেটাসেট নেই"})}
+            body={tc({en:"Register your first dataset to start building the MLOps pipeline.",hi:"MLOps पाइपलाइन बनाना शुरू करने के लिए अपना पहला डेटासेट रजिस्टर करें।",bn:"MLOps পাইপলাইন তৈরি শুরু করতে আপনার প্রথম ডেটাসেট নিবন্ধন করুন।"})} />
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {filtered.map((ds) => (
@@ -143,7 +143,7 @@ export default function DatasetBrowser() {
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 14, fontWeight: 600, color: T.ink }}>{ds.name}</div>
                   <div style={{ fontSize: 12, color: T.inkSoft }}>{ds.category.replace(/_/g, " ")} · v{ds.version}</div>
-                  <div style={{ fontSize: 11, color: T.inkFaint }}>{ds.imageCount} images · {ds.annotationCount} annotations</div>
+                  <div style={{ fontSize: 11, color: T.inkFaint }}>{tc({en:`${ds.imageCount} images · ${ds.annotationCount} annotations`,hi:`${ds.imageCount} इमेज · ${ds.annotationCount} एनोटेशन`,bn:`${ds.imageCount} ছবি · ${ds.annotationCount} অ্যানোটেশন`})}</div>
                 </div>
                 <QualityDot score={ds.qualityScore} />
                 <Icon name="ChevronRight" size={16} color={T.inkFaint} />

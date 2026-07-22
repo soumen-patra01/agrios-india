@@ -9,17 +9,17 @@ import ApprovalBanner from "../../components/mlops/ApprovalBanner.jsx";
 import { mlAnalytics } from "../../services/mlops/analytics/mlAnalytics.js";
 import { auditLog } from "../../services/mlops/governance/auditLog.js";
 
-const QUICK_ACTIONS = [
-  { label: "Datasets",     icon: "Database",       kind: "datasetBrowser",   color: "var(--ag-primary)" },
-  { label: "Annotate",     icon: "Crosshair",      kind: "annotationWorkspace", color: "#8b5cf6" },
-  { label: "Models",       icon: "Layers",         kind: "modelRegistryPage", color: "#0ea5e9" },
-  { label: "Experiments",  icon: "FlaskConical",   kind: "experimentList",   color: "#f59e0b" },
-  { label: "Training",     icon: "PlayCircle",     kind: "trainingDashboard", color: "#22c55e" },
-  { label: "Monitoring",   icon: "Activity",       kind: "monitoringDashboard",color: "#ef4444" },
-];
-
 export default function MLOpsHub() {
-  const { pop, push } = useApp();
+  const { pop, push, tc } = useApp();
+
+  const QUICK_ACTIONS = [
+    { label: tc({en: "Datasets", hi: "डेटासेट", bn: "ডেটাসেট"}),     icon: "Database",       kind: "datasetBrowser",   color: "var(--ag-primary)" },
+    { label: tc({en: "Annotate", hi: "एनोटेट", bn: "অ্যানোটেট"}),     icon: "Crosshair",      kind: "annotationWorkspace", color: "#8b5cf6" },
+    { label: tc({en: "Models", hi: "मॉडल", bn: "মডেল"}),       icon: "Layers",         kind: "modelRegistryPage", color: "#0ea5e9" },
+    { label: tc({en: "Experiments", hi: "प्रयोग", bn: "পরীক্ষা"}),  icon: "FlaskConical",   kind: "experimentList",   color: "#f59e0b" },
+    { label: tc({en: "Training", hi: "प्रशिक्षण", bn: "প্রশিক্ষণ"}),     icon: "PlayCircle",     kind: "trainingDashboard", color: "#22c55e" },
+    { label: tc({en: "Monitoring", hi: "निगरानी", bn: "পর্যবেক্ষণ"}),   icon: "Activity",       kind: "monitoringDashboard",color: "#ef4444" },
+  ];
   const [data, setData] = useState(null);
   const [recentAudit, setRecentAudit] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -38,20 +38,20 @@ export default function MLOpsHub() {
 
   return (
     <>
-      <AppBar title="MLOps Platform" onBack={pop} />
+      <AppBar title={tc({en: "MLOps Platform", hi: "MLOps प्लेटफ़ॉर्म", bn: "MLOps প্ল্যাটফর্ম"})} onBack={pop} />
 
       <div style={{ padding: "12px 16px 32px", animation: "ag-fade .22s var(--ag-ease)" }}>
 
-        <ApprovalBanner count={pending} label="items need review"
+        <ApprovalBanner count={pending} label={tc({en: "items need review", hi: "आइटम समीक्षा चाहिए", bn: "আইটেম পর্যালোচনা প্রয়োজন"})}
           onAction={() => push({ kind: "modelRegistryPage" })} />
 
         {/* Hero metrics */}
         {!loading && data && (
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 16 }}>
-            <MetricCard label="Datasets"    value={data.counts.datasets}    icon="Database"     color="var(--ag-primary)" />
-            <MetricCard label="Models"      value={data.counts.models}      icon="Layers"       color="#0ea5e9" />
-            <MetricCard label="Experiments" value={data.counts.experiments} icon="FlaskConical" color="#f59e0b" />
-            <MetricCard label="Diagnoses"   value={data.businessKPIs?.totalDiagnoses ?? 0} icon="Microscope" color="#8b5cf6" />
+            <MetricCard label={tc({en: "Datasets", hi: "डेटासेट", bn: "ডেটাসেট"})}    value={data.counts.datasets}    icon="Database"     color="var(--ag-primary)" />
+            <MetricCard label={tc({en: "Models", hi: "मॉडल", bn: "মডেল"})}      value={data.counts.models}      icon="Layers"       color="#0ea5e9" />
+            <MetricCard label={tc({en: "Experiments", hi: "प्रयोग", bn: "পরীক্ষা"})} value={data.counts.experiments} icon="FlaskConical" color="#f59e0b" />
+            <MetricCard label={tc({en: "Diagnoses", hi: "निदान", bn: "রোগনির্ণয়"})}   value={data.businessKPIs?.totalDiagnoses ?? 0} icon="Microscope" color="#8b5cf6" />
           </div>
         )}
 
@@ -59,18 +59,18 @@ export default function MLOpsHub() {
         {!loading && data && (
           <div style={{ background: T.surface, borderRadius: T.rLg, padding: "14px 16px",
             border: `1px solid ${T.line}`, marginBottom: 16, display: "flex", alignItems: "center", gap: 16 }}>
-            <DriftGauge severity={data.driftStatus.severity} label="Model Drift" size={100} />
+            <DriftGauge severity={data.driftStatus.severity} label={tc({en: "Model Drift", hi: "मॉडल ड्रिफ्ट", bn: "মডেল ড্রিফট"})} size={100} />
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 14, fontWeight: 700, color: T.ink, marginBottom: 4 }}>Drift Detection</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: T.ink, marginBottom: 4 }}>{tc({en: "Drift Detection", hi: "ड्रिफ्ट पहचान", bn: "ড্রিফট সনাক্তকরণ"})}</div>
               <div style={{ fontSize: 12, color: T.inkSoft }}>
                 {data.driftStatus.detected
-                  ? "Drift detected — review monitoring dashboard"
-                  : "Model behavior is stable"}
+                  ? tc({en: "Drift detected — review monitoring dashboard", hi: "ड्रिफ्ट पाया गया — निगरानी डैशबोर्ड देखें", bn: "ড্রিফট সনাক্ত — পর্যবেক্ষণ ড্যাশবোর্ড দেখুন"})
+                  : tc({en: "Model behavior is stable", hi: "मॉडल व्यवहार स्थिर है", bn: "মডেল আচরণ স্থিতিশীল"})}
               </div>
               <button onClick={() => push({ kind: "monitoringDashboard" })}
                 style={{ marginTop: 8, fontSize: 12, color: "var(--ag-primary)", background: "none",
                   border: "none", cursor: "pointer", padding: 0, fontFamily: T.body }}>
-                View monitoring →
+                {tc({en: "View monitoring", hi: "निगरानी देखें", bn: "পর্যবেক্ষণ দেখুন"})} →
               </button>
             </div>
           </div>
@@ -78,7 +78,7 @@ export default function MLOpsHub() {
 
         {/* Quick actions grid */}
         <div style={{ fontSize: 12, fontWeight: 600, color: T.inkSoft, marginBottom: 10, textTransform: "uppercase", letterSpacing: "0.05em" }}>
-          Quick Access
+          {tc({en: "Quick Access", hi: "त्वरित पहुँच", bn: "দ্রুত অ্যাক্সেস"})}
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginBottom: 20 }}>
           {QUICK_ACTIONS.map((a) => (
@@ -100,7 +100,7 @@ export default function MLOpsHub() {
         {recentAudit.length > 0 && (
           <>
             <div style={{ fontSize: 12, fontWeight: 600, color: T.inkSoft, marginBottom: 10, textTransform: "uppercase", letterSpacing: "0.05em" }}>
-              Recent Activity
+              {tc({en: "Recent Activity", hi: "हालिया गतिविधि", bn: "সাম্প্রতিক কার্যকলাপ"})}
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               {recentAudit.map((entry, i) => (
@@ -109,7 +109,7 @@ export default function MLOpsHub() {
                   <Icon name="GitMerge" size={14} color={T.inkFaint} />
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <span style={{ fontSize: 12, fontWeight: 600, color: T.ink }}>{entry.action}</span>
-                    <span style={{ fontSize: 11, color: T.inkSoft }}> on {entry.entity} {entry.entityId?.slice(0, 10)}</span>
+                    <span style={{ fontSize: 11, color: T.inkSoft }}> {tc({en: "on", hi: "पर", bn: "এ"})} {entry.entity} {entry.entityId?.slice(0, 10)}</span>
                   </div>
                   <span style={{ fontSize: 11, color: T.inkFaint, flexShrink: 0 }}>
                     {new Date(entry.timestamp).toLocaleDateString()}

@@ -26,7 +26,7 @@ const nextDays = (n) => {
 const fmtShort = (d) => d.toLocaleDateString("en-IN", { weekday: "short", day: "numeric" });
 
 export default function BookingPage({ serviceId, providerId }) {
-  const { pop, push, toast } = useApp();
+  const { pop, push, toast, tc } = useApp();
   const [svc, setSvc] = useState(null);
   const [provider, setProvider] = useState(null);
   const [date, setDate] = useState(null);
@@ -55,7 +55,7 @@ export default function BookingPage({ serviceId, providerId }) {
   }, [date, providerId]);
 
   const handleBook = async () => {
-    if (!date || !selStart) { toast("Pick a date and time slot", "error"); return; }
+    if (!date || !selStart) { toast(tc({en:"Pick a date and time slot", hi:"तारीख और समय स्लॉट चुनें", bn:"একটি তারিখ এবং সময় স্লট নির্বাচন করুন"}), "error"); return; }
     setSubmitting(true);
     try {
       await bookingService.create({
@@ -67,7 +67,7 @@ export default function BookingPage({ serviceId, providerId }) {
       });
       setSuccess(true);
     } catch (e) {
-      toast(e.message || "Booking failed", "error");
+      toast(e.message || tc({en:"Booking failed", hi:"बुकिंग विफल रही", bn:"বুকিং ব্যর্থ হয়েছে"}), "error");
     }
     setSubmitting(false);
   };
@@ -79,7 +79,7 @@ export default function BookingPage({ serviceId, providerId }) {
 
   return (
     <>
-      <AppBar title="Book Service" onBack={pop} />
+      <AppBar title={tc({en:"Book Service", hi:"सेवा बुक करें", bn:"পরিষেবা বুক করুন"})} onBack={pop} />
       <div style={{ padding: "4px 16px 32px", display: "flex", flexDirection: "column", gap: 16,
         animation: "ag-fade .25s var(--ag-ease)" }}>
 
@@ -91,7 +91,7 @@ export default function BookingPage({ serviceId, providerId }) {
               <div style={{ fontSize: 14, fontWeight: 700, color: T.ink }}>{svc.title}</div>
               <div style={{ fontSize: 11, color: T.inkSoft }}>{provider.name}</div>
               <div style={{ fontSize: 14, fontWeight: 800, color: T.ink, marginTop: 4 }}>
-                {svc.price > 0 ? rupee(svc.price) : "Free"}{" "}
+                {svc.price > 0 ? rupee(svc.price) : tc({en:"Free", hi:"मुफ़्त", bn:"বিনামূল্যে"})}{" "}
                 <span style={{ fontSize: 11, color: T.inkFaint, fontWeight: 500 }}>{pricingLabel}</span>
               </div>
             </div>
@@ -99,13 +99,13 @@ export default function BookingPage({ serviceId, providerId }) {
         </Card>
 
         {/* booking type */}
-        <Dropdown label="Booking Type" value={bookingType}
+        <Dropdown label={tc({en:"Booking Type", hi:"बुकिंग प्रकार", bn:"বুকিং প্রকার"})} value={bookingType}
           onChange={(v) => setBookingType(v)}
           options={BOOKING_TYPES.map((b) => ({ value: b.id, label: b.label }))} />
 
         {/* date picker */}
         <div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: T.ink, marginBottom: 8 }}>Select Date</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: T.ink, marginBottom: 8 }}>{tc({en:"Select Date", hi:"तारीख चुनें", bn:"তারিখ নির্বাচন করুন"})}</div>
           <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 4 }}>
             {days.map((d) => {
               const active = date && d.toDateString() === date.toDateString();
@@ -126,37 +126,37 @@ export default function BookingPage({ serviceId, providerId }) {
         {/* time slots */}
         {date && (
           <div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: T.ink, marginBottom: 8 }}>Select Time</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: T.ink, marginBottom: 8 }}>{tc({en:"Select Time", hi:"समय चुनें", bn:"সময় নির্বাচন করুন"})}</div>
             <TimeSlotPicker slots={slots} selected={selStart}
               onSelect={(start, end) => { setSelStart(start); setSelEnd(end); }} />
           </div>
         )}
 
-        <Input label="Location / Address" value={location} onChange={(v) => setLocation(v)}
-          icon="MapPin" placeholder="Your farm or meeting point" />
+        <Input label={tc({en:"Location / Address", hi:"स्थान / पता", bn:"অবস্থান / ঠিকানা"})} value={location} onChange={(v) => setLocation(v)}
+          icon="MapPin" placeholder={tc({en:"Your farm or meeting point", hi:"आपका खेत या मिलने का स्थान", bn:"আপনার খামার বা সাক্ষাতের স্থান"})} />
 
-        <Input label="Notes (optional)" value={notes} onChange={(v) => setNotes(v)}
-          icon="FileText" placeholder="Special instructions…" />
+        <Input label={tc({en:"Notes (optional)", hi:"टिप्पणियाँ (वैकल्पिक)", bn:"মন্তব্য (ঐচ্ছিক)"})} value={notes} onChange={(v) => setNotes(v)}
+          icon="FileText" placeholder={tc({en:"Special instructions…", hi:"विशेष निर्देश…", bn:"বিশেষ নির্দেশাবলী…"})} />
 
         {/* payment */}
-        <Dropdown label="Payment Method" value={payment}
+        <Dropdown label={tc({en:"Payment Method", hi:"भुगतान का तरीका", bn:"পেমেন্ট পদ্ধতি"})} value={payment}
           onChange={(v) => setPayment(v)}
           options={PAYMENT_METHODS.map((p) => ({ value: p.id, label: p.label }))} />
 
         <div style={{ fontSize: 11, color: T.inkFaint, padding: "0 4px", lineHeight: 1.5 }}>
-          No money is collected through the app. Payment is settled directly with the service provider.
+          {tc({en:"No money is collected through the app. Payment is settled directly with the service provider.", hi:"ऐप के माध्यम से कोई पैसा एकत्र नहीं किया जाता है। भुगतान सीधे सेवा प्रदाता के साथ किया जाता है।", bn:"অ্যাপের মাধ্যমে কোনো অর্থ সংগ্রহ করা হয় না। পেমেন্ট সরাসরি পরিষেবা প্রদানকারীর সাথে নিষ্পত্তি করা হয়।"})}
         </div>
 
         <Button full icon="CalendarClock" disabled={submitting || !date || !selStart}
           onClick={handleBook}>
-          {submitting ? "Booking…" : "Confirm Booking"}
+          {submitting ? tc({en:"Booking…", hi:"बुक हो रहा है…", bn:"বুক করা হচ্ছে…"}) : tc({en:"Confirm Booking", hi:"बुकिंग की पुष्टि करें", bn:"বুকিং নিশ্চিত করুন"})}
         </Button>
       </div>
 
-      <Dialog open={success} title="Booking Confirmed!" icon="CalendarClock"
+      <Dialog open={success} title={tc({en:"Booking Confirmed!", hi:"बुकिंग की पुष्टि हो गई!", bn:"বুকিং নিশ্চিত হয়েছে!"})} icon="CalendarClock"
         onClose={() => { setSuccess(false); push({ kind: "svcMyBookings" }); pop(); pop(); }}
-        body={`Your ${svc.title} with ${provider.name} on ${date ? date.toLocaleDateString("en-IN") : ""} at ${selStart} has been booked.`}
-        confirmLabel="View My Bookings"
+        body={`${tc({en:"Your", hi:"आपकी", bn:"আপনার"})} ${svc.title} ${tc({en:"with", hi:"के साथ", bn:"এর সাথে"})} ${provider.name} ${tc({en:"on", hi:"दिनांक", bn:"তারিখে"})} ${date ? date.toLocaleDateString("en-IN") : ""} ${tc({en:"at", hi:"समय", bn:"সময়ে"})} ${selStart} ${tc({en:"has been booked.", hi:"बुक कर दी गई है।", bn:"বুক করা হয়েছে।"})}`}
+        confirmLabel={tc({en:"View My Bookings", hi:"मेरी बुकिंग देखें", bn:"আমার বুকিং দেখুন"})}
         onConfirm={() => { setSuccess(false); push({ kind: "svcMyBookings" }); pop(); pop(); }} />
     </>
   );

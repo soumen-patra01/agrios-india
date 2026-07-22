@@ -25,11 +25,11 @@ export default function AIHub() {
           <div style={{ position: "absolute", right: -10, bottom: -20, opacity: .16 }}><Icon name="Sparkles" size={120} /></div>
           <div style={{ fontFamily: T.display, fontSize: 22, fontWeight: 800, position: "relative" }}>{t("aiSub")}</div>
           <div style={{ fontSize: 13.5, opacity: .92, marginTop: 6, maxWidth: 260, position: "relative" }}>
-            Ten specialists that understand Indian farming — from diagnosis to loans.
+            {tc({ en: "Ten specialists that understand Indian farming — from diagnosis to loans.", hi: "दस विशेषज्ञ जो भारतीय खेती समझते हैं — रोग पहचान से लेकर ऋण तक।", bn: "দশ বিশেষজ্ঞ যারা ভারতীয় কৃষি বোঝেন — রোগ নির্ণয় থেকে ঋণ পর্যন্ত।" })}
           </div>
         </div>
 
-        <SearchBar value={q} onChange={setQ} placeholder="Search assistants…" />
+        <SearchBar value={q} onChange={setQ} placeholder={tc({ en: "Search assistants…", hi: "सहायक खोजें…", bn: "সহায়ক খুঁজুন…" })} />
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           {list.map((x) => {

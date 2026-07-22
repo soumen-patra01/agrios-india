@@ -6,7 +6,7 @@ import { useApp } from "../store/AppStore.jsx";
 import { verifyOtp } from "../services/firebase/auth.js";
 
 export default function OtpVerify({ phone, onBack }) {
-  const { login, t } = useApp();
+  const { login, t, tc } = useApp();
   const [code,    setCode]    = useState("");
   const [loading, setLoading] = useState(false);
   const [error,   setError]   = useState("");
@@ -20,10 +20,10 @@ export default function OtpVerify({ phone, onBack }) {
       login({ phone, uid: fbUser.uid, name: "", joined: Date.now() });
     } catch (err) {
       const msg = err?.code === "auth/invalid-verification-code"
-        ? "Invalid code — please try again"
+        ? tc({ en: "Invalid code — please try again", hi: "अमान्य कोड — पुनः प्रयास करें", bn: "অবৈধ কোড — আবার চেষ্টা করুন" })
         : err?.code === "auth/code-expired"
-        ? "Code expired — request a new one"
-        : "Verification failed — please try again";
+        ? tc({ en: "Code expired — request a new one", hi: "कोड समाप्त — नया अनुरोध करें", bn: "কোড মেয়াদোত্তীর্ণ — নতুন অনুরোধ করুন" })
+        : tc({ en: "Verification failed — please try again", hi: "सत्यापन विफल — पुनः प्रयास करें", bn: "যাচাই ব্যর্থ — আবার চেষ্টা করুন" });
       setError(msg);
       setCode("");
     } finally {
@@ -52,7 +52,7 @@ export default function OtpVerify({ phone, onBack }) {
 
       <div style={{ flex: 1 }} />
       <Button full size="lg" disabled={!ok} onClick={verify}>
-        {loading ? "Verifying…" : t("verify")}
+        {loading ? tc({ en: "Verifying…", hi: "सत्यापित हो रहा है…", bn: "যাচাই হচ্ছে…" }) : t("verify")}
       </Button>
       <button onClick={onBack}
         style={{ background: "none", border: "none", cursor: "pointer",

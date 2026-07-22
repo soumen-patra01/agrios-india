@@ -16,11 +16,11 @@ const SEV = {
 
 const hourLabel = (t, locale) =>
   new Date(t).toLocaleTimeString(locale, { hour: "numeric", hour12: true }).replace(" ", "");
-const dayLabel = (t, locale, i) =>
-  i === 0 ? "Today" : new Date(t).toLocaleDateString(locale, { weekday: "short" });
+const dayLabel = (t, locale, i, tc) =>
+  i === 0 ? tc({en:"Today",hi:"आज",bn:"আজ"}) : new Date(t).toLocaleDateString(locale, { weekday: "short" });
 
 export default function WeatherDashboard() {
-  const { pop, push, locale, toast } = useApp();
+  const { pop, push, locale, toast, tc } = useApp();
   const [loc, setLoc] = useState(() => locationService.getActive());
   const [state, setState] = useState({ status: "idle", data: null, alerts: [], stale: false });
   const [gpsBusy, setGpsBusy] = useState(false);
@@ -44,9 +44,9 @@ export default function WeatherDashboard() {
       const pos = await locationService.currentPosition();
       const farm = locationService.add({ name: pos.name, lat: pos.lat, lon: pos.lon });
       setLoc(farm);
-      toast("Location set", "success");
+      toast(tc({en:"Location set",hi:"स्थान सेट हो गया",bn:"অবস্থান সেট হয়েছে"}), "success");
     } catch (e) {
-      toast(e.message || "Couldn't get your location", "error");
+      toast(e.message || tc({en:"Couldn't get your location",hi:"आपका स्थान नहीं मिल सका",bn:"আপনার অবস্থান পাওয়া যায়নি"}), "error");
     } finally {
       setGpsBusy(false);
     }
@@ -57,7 +57,7 @@ export default function WeatherDashboard() {
   return (
     <>
       <AppBar
-        title="Weather"
+        title={tc({en:"Weather",hi:"मौसम",bn:"আবহাওয়া"})}
         onBack={pop}
         action={
           <button onClick={() => load(loc, true)} aria-label="Refresh"
@@ -72,7 +72,7 @@ export default function WeatherDashboard() {
         <button onClick={() => push({ kind: "farmLocations" })}
           style={{ display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", cursor: "pointer", color: T.ink, padding: "0 2px" }}>
           <Icon name="MapPin" size={16} style={{ color: T.primary }} />
-          <span style={{ fontSize: 14, fontWeight: 600 }}>{loc?.name || "No location set"}</span>
+          <span style={{ fontSize: 14, fontWeight: 600 }}>{loc?.name || tc({en:"No location set",hi:"कोई स्थान सेट नहीं",bn:"কোনো অবস্থান সেট নেই"})}</span>
           <Icon name="ChevronDown" size={15} style={{ color: T.inkFaint }} />
         </button>
 
@@ -81,25 +81,25 @@ export default function WeatherDashboard() {
         )}
 
         {status === "empty" && (
-          <EmptyState icon="MapPin" title="Set your location"
-            body="Weather and alerts are tailored to your farm. Use GPS or pick a place."
-            action={gpsBusy ? "Locating…" : "Use my location"} onAction={useGPS} />
+          <EmptyState icon="MapPin" title={tc({en:"Set your location",hi:"अपना स्थान सेट करें",bn:"আপনার অবস্থান সেট করুন"})}
+            body={tc({en:"Weather and alerts are tailored to your farm. Use GPS or pick a place.",hi:"मौसम और अलर्ट आपके खेत के अनुसार हैं। GPS या स्थान चुनें।",bn:"আবহাওয়া ও সতর্কতা আপনার খামারের জন্য। GPS বা স্থান বেছে নিন।"})}
+            action={gpsBusy ? tc({en:"Locating…",hi:"खोज रहा है…",bn:"খুঁজছে…"}) : tc({en:"Use my location",hi:"मेरा स्थान उपयोग करें",bn:"আমার অবস্থান ব্যবহার করুন"})} onAction={useGPS} />
         )}
 
         {status === "error" && (
-          <ErrorState title="Couldn't load weather" body="Check your connection and try again." onRetry={() => load(loc, true)} />
+          <ErrorState title={tc({en:"Couldn't load weather",hi:"मौसम लोड नहीं हो सका",bn:"আবহাওয়া লোড হয়নি"})} body={tc({en:"Check your connection and try again.",hi:"अपना कनेक्शन जाँचें और पुनः प्रयास करें।",bn:"আপনার সংযোগ পরীক্ষা করুন ও আবার চেষ্টা করুন।"})} onRetry={() => load(loc, true)} />
         )}
 
         {data && (
           <>
             {stale && (
               <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12.5, color: T.inkSoft, padding: "0 2px" }}>
-                <Icon name="CloudOff" size={14} /> Showing last saved forecast (offline).
+                <Icon name="CloudOff" size={14} /> {tc({en:"Showing last saved forecast (offline).",hi:"अंतिम सहेजा गया पूर्वानुमान दिखा रहा है (ऑफ़लाइन)।",bn:"শেষ সংরক্ষিত পূর্বাভাস দেখাচ্ছে (অফলাইন)।"})}
               </div>
             )}
 
             {/* current conditions hero */}
-            <CurrentHero cur={data.current} locName={loc?.name} />
+            <CurrentHero cur={data.current} locName={loc?.name} tc={tc} />
 
             {/* alerts */}
             {alerts.length > 0 && (
@@ -122,7 +122,7 @@ export default function WeatherDashboard() {
             {/* hourly */}
             {data.hourly?.length > 0 && (
               <Card pad={14}>
-                <SectionLabel icon="Clock" text="Next 24 hours" />
+                <SectionLabel icon="Clock" text={tc({en:"Next 24 hours",hi:"अगले 24 घंटे",bn:"পরবর্তী ২৪ ঘণ্টা"})} />
                 <div style={{ display: "flex", gap: 14, overflowX: "auto", paddingBottom: 4, marginTop: 6 }}>
                   {data.hourly.filter((_, i) => i % 2 === 0).map((h, i) => (
                     <div key={i} style={{ display: "grid", justifyItems: "center", gap: 5, minWidth: 44 }}>
@@ -146,10 +146,10 @@ export default function WeatherDashboard() {
             {/* 7-day */}
             {data.daily?.length > 0 && (
               <Card pad={6}>
-                <div style={{ padding: "10px 12px 4px" }}><SectionLabel icon="CalendarDays" text="7-day forecast" /></div>
+                <div style={{ padding: "10px 12px 4px" }}><SectionLabel icon="CalendarDays" text={tc({en:"7-day forecast",hi:"7-दिन का पूर्वानुमान",bn:"৭-দিনের পূর্বাভাস"})} /></div>
                 {data.daily.map((d, i) => (
                   <div key={d.date} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", borderTop: i ? `1px solid ${T.lineSoft}` : "none" }}>
-                    <span style={{ width: 46, fontSize: 13, fontWeight: 600, color: T.ink }}>{dayLabel(d.date, locale, i)}</span>
+                    <span style={{ width: 46, fontSize: 13, fontWeight: 600, color: T.ink }}>{dayLabel(d.date, locale, i, tc)}</span>
                     <Icon name={d.icon} size={19} style={{ color: T.blue, flexShrink: 0 }} />
                     <span style={{ flex: 1, fontSize: 11.5, color: T.blue, display: "flex", alignItems: "center", gap: 3 }}>
                       <Icon name="Droplets" size={11} />{d.precipProb ?? 0}%
@@ -162,11 +162,11 @@ export default function WeatherDashboard() {
             )}
 
             <Button variant="soft" icon="Compass" full onClick={() => push({ kind: "nearby" })}>
-              Find services near me
+              {tc({en:"Find services near me",hi:"मेरे पास सेवाएँ खोजें",bn:"আমার কাছে পরিষেবা খুঁজুন"})}
             </Button>
 
             <div style={{ fontSize: 11.5, color: T.inkFaint, textAlign: "center", lineHeight: 1.5 }}>
-              Forecast from Open-Meteo · updated {new Date(data.updatedAt).toLocaleTimeString(locale, { hour: "numeric", minute: "2-digit" })}
+              {tc({en:"Forecast from Open-Meteo · updated",hi:"Open-Meteo से पूर्वानुमान · अपडेट",bn:"Open-Meteo থেকে পূর্বাভাস · আপডেট"})} {new Date(data.updatedAt).toLocaleTimeString(locale, { hour: "numeric", minute: "2-digit" })}
             </div>
           </>
         )}
@@ -175,7 +175,7 @@ export default function WeatherDashboard() {
   );
 }
 
-function CurrentHero({ cur, locName }) {
+function CurrentHero({ cur, locName, tc }) {
   return (
     <div style={{ borderRadius: T.rLg, padding: 20, color: "#fff", position: "relative", overflow: "hidden",
       background: cur.isDay ? "linear-gradient(135deg, #2C6E9E, #1E5178)" : "linear-gradient(135deg, #2A3550, #171E30)", boxShadow: T.shadowMd }}>
@@ -183,10 +183,10 @@ function CurrentHero({ cur, locName }) {
       <div style={{ position: "relative" }}>
         <div style={{ fontSize: 12.5, opacity: 0.9, fontWeight: 600 }}>{locName}</div>
         <div style={{ fontFamily: T.display, fontSize: 52, fontWeight: 800, lineHeight: 1.05, marginTop: 4 }}>{cur.temp}°</div>
-        <div style={{ fontSize: 14, opacity: 0.95 }}>{cur.condition} · feels {cur.feelsLike}°</div>
+        <div style={{ fontSize: 14, opacity: 0.95 }}>{cur.condition} · {tc({en:`feels ${cur.feelsLike}°`,hi:`अनुभव ${cur.feelsLike}°`,bn:`অনুভূত ${cur.feelsLike}°`})}</div>
         <div style={{ display: "flex", gap: 16, marginTop: 14, fontSize: 12.5, opacity: 0.95, flexWrap: "wrap" }}>
-          <span><Icon name="Droplets" size={13} style={{ verticalAlign: -2 }} /> {cur.humidity}% humidity</span>
-          <span><Icon name="Wind" size={13} style={{ verticalAlign: -2 }} /> {cur.windSpeed} km/h</span>
+          <span><Icon name="Droplets" size={13} style={{ verticalAlign: -2 }} /> {tc({en:`${cur.humidity}% humidity`,hi:`${cur.humidity}% आर्द्रता`,bn:`${cur.humidity}% আর্দ্রতা`})}</span>
+          <span><Icon name="Wind" size={13} style={{ verticalAlign: -2 }} /> {tc({en:`${cur.windSpeed} km/h`,hi:`${cur.windSpeed} किमी/घंटा`,bn:`${cur.windSpeed} কিমি/ঘণ্টা`})}</span>
           {cur.pressure && <span><Icon name="Gauge" size={13} style={{ verticalAlign: -2 }} /> {cur.pressure} hPa</span>}
         </div>
       </div>

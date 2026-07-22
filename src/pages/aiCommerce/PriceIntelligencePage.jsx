@@ -14,7 +14,7 @@ import { rupee } from "../../utils/format.js";
 const POPULAR = ["paddy", "wheat", "potato", "mustard", "maize", "jute"];
 
 export default function PriceIntelligencePage() {
-  const { pop } = useApp();
+  const { pop, tc } = useApp();
   const [q, setQ] = useState("");
   const [cropId, setCropId] = useState("paddy");
   const [forecast, setForecast] = useState(null);
@@ -31,14 +31,19 @@ export default function PriceIntelligencePage() {
 
   const dirIcon = { up: "TrendingUp", down: "TrendingDown", flat: "Minus" };
   const dirColor = { up: T.primary, down: T.red, flat: T.inkSoft };
+  const dirLabel = {
+    up: tc({ en: "Rising", hi: "बढ़ रहा है", bn: "বাড়ছে" }),
+    down: tc({ en: "Falling", hi: "घट रहा है", bn: "কমছে" }),
+    flat: tc({ en: "Stable", hi: "स्थिर", bn: "স্থিতিশীল" }),
+  };
 
   return (
     <>
-      <AppBar title="Price Intelligence" onBack={pop} />
+      <AppBar title={tc({ en: "Price Intelligence", hi: "मूल्य सूचना", bn: "মূল্য বিশ্লেষণ" })} onBack={pop} />
       <div style={{ padding: "4px 16px 32px", display: "flex", flexDirection: "column", gap: 14,
         animation: "ag-fade .25s var(--ag-ease)" }}>
 
-        <SearchBar value={q} onChange={setQ} placeholder="Search a crop…" />
+        <SearchBar value={q} onChange={setQ} placeholder={tc({ en: "Search a crop…", hi: "फ़सल खोजें…", bn: "ফসল খুঁজুন…" })} />
         {matches.length > 0 && (
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             {matches.map((c) => (
@@ -74,7 +79,7 @@ export default function PriceIntelligencePage() {
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 5, background: T.surface2, borderRadius: 999, padding: "4px 10px" }}>
                 <Icon name={dirIcon[forecast.direction]} size={15} color={dirColor[forecast.direction]} />
-                <span style={{ fontSize: 12, fontWeight: 700, color: dirColor[forecast.direction], textTransform: "capitalize" }}>{forecast.direction}</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: dirColor[forecast.direction], textTransform: "capitalize" }}>{dirLabel[forecast.direction]}</span>
               </div>
             </div>
 
@@ -92,13 +97,23 @@ export default function PriceIntelligencePage() {
           <Card pad={15} style={{ background: T.primarySoft, border: "none" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
               <Icon name="Sparkles" size={16} color={T.primary} />
-              <span style={{ fontSize: 13, fontWeight: 700, color: T.primary }}>Suggested selling price</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: T.primary }}>{tc({ en: "Suggested selling price", hi: "अनुशंसित बिक्री मूल्य", bn: "প্রস্তাবিত বিক্রয় মূল্য" })}</span>
             </div>
             <div style={{ fontSize: 24, fontWeight: 800, color: T.ink, fontFamily: T.display }}>
               {rupee(sell.suggested)}<span style={{ fontSize: 13, color: T.inkSoft, fontWeight: 400 }}>/{sell.unit}</span>
             </div>
             <div style={{ fontSize: 11.5, color: T.inkSoft, marginTop: 4 }}>
-              {sell.hasMsp ? `Floor (MSP) ${rupee(sell.floor)} · never sell below this.` : `Band floor ${rupee(sell.floor)} · market-driven crop (no MSP).`}
+              {sell.hasMsp
+                ? tc({
+                    en: `Floor (MSP) ${rupee(sell.floor)} · never sell below this.`,
+                    hi: `न्यूनतम मूल्य (एमएसपी) ${rupee(sell.floor)} · इससे कम पर कभी न बेचें।`,
+                    bn: `সর্বনিম্ন মূল্য (এমএসপি) ${rupee(sell.floor)} · এর নিচে কখনও বিক্রি করবেন না।`,
+                  })
+                : tc({
+                    en: `Band floor ${rupee(sell.floor)} · market-driven crop (no MSP).`,
+                    hi: `न्यूनतम सीमा ${rupee(sell.floor)} · यह फ़सल बाज़ार आधारित है (एमएसपी नहीं)।`,
+                    bn: `সর্বনিম্ন সীমা ${rupee(sell.floor)} · এই ফসল বাজার-চালিত (এমএসপি নেই)।`,
+                  })}
             </div>
           </Card>
         )}

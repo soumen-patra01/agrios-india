@@ -8,7 +8,7 @@ import { PAYMENT_METHODS } from "../../services/marketplace/constantsMp.js";
 import { rupee } from "../../utils/format.js";
 
 export default function CheckoutPage() {
-  const { pop, push, toast, user } = useApp();
+  const { pop, push, toast, tc, user } = useApp();
   const [lines, setLines] = useState([]);
   const [address, setAddress] = useState(() => mpOrderService.getAddress() || {
     name: user?.name || "", phone: user?.phone || "", village: "", district: "", state: "", pin: "",
@@ -30,7 +30,7 @@ export default function CheckoutPage() {
     mpOrderService.saveAddress(address);
     const created = await mpOrderService.createFromCart(valid, { paymentMethod: payment, address });
     await cartService.clearActive();
-    toast(`${created.length} order${created.length > 1 ? "s" : ""} placed`, "success");
+    toast(tc({en:`${created.length} order${created.length > 1 ? "s" : ""} placed`,hi:`${created.length} ऑर्डर दिए गए`,bn:`${created.length}টি অর্ডার দেওয়া হয়েছে`}), "success");
     pop(); pop();                        // drop checkout + cart from the stack
     push({ kind: "mpOrders" });
   };
@@ -39,34 +39,33 @@ export default function CheckoutPage() {
 
   return (
     <>
-      <AppBar title="Checkout" onBack={pop} />
+      <AppBar title={tc({en:"Checkout",hi:"चेकआउट",bn:"চেকআউট"})} onBack={pop} />
       <div style={{ padding: "4px 16px 32px", display: "flex", flexDirection: "column", gap: 12,
         animation: "ag-fade .25s var(--ag-ease)" }}>
 
-        <SectionHeader title="Delivery address" />
+        <SectionHeader title={tc({en:"Delivery address",hi:"डिलीवरी पता",bn:"ডেলিভারি ঠিকানা"})} />
         <Card pad={14}>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            <Input label="Full name" value={address.name} onChange={set("name")} placeholder="Your name" />
-            <Input label="Phone" type="tel" inputMode="numeric" value={address.phone} onChange={set("phone")} placeholder="10-digit mobile" maxLength={10} />
-            <Input label="Village / Town" value={address.village} onChange={set("village")} placeholder="Village or town" />
+            <Input label={tc({en:"Full name",hi:"पूरा नाम",bn:"পুরো নাম"})} value={address.name} onChange={set("name")} placeholder={tc({en:"Your name",hi:"आपका नाम",bn:"আপনার নাম"})} />
+            <Input label={tc({en:"Phone",hi:"फ़ोन",bn:"ফোন"})} type="tel" inputMode="numeric" value={address.phone} onChange={set("phone")} placeholder={tc({en:"10-digit mobile",hi:"10 अंकों का मोबाइल",bn:"10 সংখ্যার মোবাইল"})} maxLength={10} />
+            <Input label={tc({en:"Village / Town",hi:"गाँव / शहर",bn:"গ্রাম / শহর"})} value={address.village} onChange={set("village")} placeholder={tc({en:"Village or town",hi:"गाँव या शहर",bn:"গ্রাম বা শহর"})} />
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-              <Input label="District" value={address.district} onChange={set("district")} placeholder="District" />
-              <Input label="PIN code" inputMode="numeric" value={address.pin} onChange={set("pin")} placeholder="6 digits" maxLength={6} />
+              <Input label={tc({en:"District",hi:"जिला",bn:"জেলা"})} value={address.district} onChange={set("district")} placeholder={tc({en:"District",hi:"जिला",bn:"জেলা"})} />
+              <Input label={tc({en:"PIN code",hi:"पिन कोड",bn:"পিন কোড"})} inputMode="numeric" value={address.pin} onChange={set("pin")} placeholder={tc({en:"6 digits",hi:"6 अंक",bn:"6 সংখ্যা"})} maxLength={6} />
             </div>
           </div>
         </Card>
 
-        <SectionHeader title="Payment" />
+        <SectionHeader title={tc({en:"Payment",hi:"भुगतान",bn:"পেমেন্ট"})} />
         <Card pad={14}>
-          <Dropdown label="Payment method" value={payment} onChange={setPayment}
+          <Dropdown label={tc({en:"Payment method",hi:"भुगतान विधि",bn:"পেমেন্ট পদ্ধতি"})} value={payment} onChange={setPayment}
             options={PAYMENT_METHODS.map((m) => ({ value: m.id, label: m.label }))} />
           <div style={{ fontSize: 11.5, color: T.inkSoft, marginTop: 10, lineHeight: 1.5 }}>
-            Online payment collection arrives with the shared backend phase — for now
-            payment is settled directly with the seller on delivery and recorded here.
+            {tc({en:"Online payment collection arrives with the shared backend phase — for now payment is settled directly with the seller on delivery and recorded here.",hi:"ऑनलाइन भुगतान साझा बैकएंड चरण के साथ आएगा — अभी भुगतान डिलीवरी पर विक्रेता के साथ सीधे तय किया जाता है।",bn:"অনলাইন পেমেন্ট শেয়ার্ড ব্যাকএন্ড পর্বের সাথে আসবে — এখন পেমেন্ট ডেলিভারিতে বিক্রেতার সাথে সরাসরি নিষ্পত্তি করা হয়।"})}
           </div>
         </Card>
 
-        <SectionHeader title="Order summary" />
+        <SectionHeader title={tc({en:"Order summary",hi:"ऑर्डर सारांश",bn:"অর্ডার সারাংশ"})} />
         {Object.entries(bySeller).map(([sellerName, group]) => (
           <Card key={sellerName} pad={14}>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: T.primary, marginBottom: 8 }}>{sellerName}</div>
@@ -81,19 +80,19 @@ export default function CheckoutPage() {
 
         <Card pad={14}>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 16, fontWeight: 800 }}>
-            <span>Total</span><span>{rupee(totals.total)}</span>
+            <span>{tc({en:"Total",hi:"कुल",bn:"মোট"})}</span><span>{rupee(totals.total)}</span>
           </div>
           <div style={{ fontSize: 11.5, color: T.inkSoft, marginTop: 4 }}>
-            {valid.length} item{valid.length !== 1 ? "s" : ""} · one order per seller
+            {tc({en:`${valid.length} item${valid.length !== 1 ? "s" : ""} · one order per seller`,hi:`${valid.length} आइटम · प्रति विक्रेता एक ऑर्डर`,bn:`${valid.length}টি আইটেম · প্রতি বিক্রেতা একটি অর্ডার`})}
           </div>
         </Card>
 
         <Button full size="lg" disabled={!addressOk || valid.length === 0 || placing} onClick={placeOrder}>
-          {placing ? "Placing order…" : `Place Order · ${rupee(totals.total)}`}
+          {placing ? tc({en:"Placing order…",hi:"ऑर्डर दिया जा रहा है…",bn:"অর্ডার দেওয়া হচ্ছে…"}) : `${tc({en:"Place Order",hi:"ऑर्डर दें",bn:"অর্ডার দিন"})} · ${rupee(totals.total)}`}
         </Button>
         {!addressOk && (
           <div style={{ fontSize: 12, color: T.inkFaint, textAlign: "center" }}>
-            Fill name, phone and village to place the order.
+            {tc({en:"Fill name, phone and village to place the order.",hi:"ऑर्डर देने के लिए नाम, फ़ोन और गाँव भरें।",bn:"অর্ডার দিতে নাম, ফোন এবং গ্রাম পূরণ করুন।"})}
           </div>
         )}
       </div>

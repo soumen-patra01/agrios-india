@@ -37,7 +37,7 @@ function WaterfallChart({ data }) {
 }
 
 export default function CashFlowPage() {
-  const { pop } = useApp();
+  const { pop, tc } = useApp();
   const [year, setYear]   = useState(new Date().getFullYear());
   const [flow, setFlow]   = useState([]);
   const [peaks, setPeaks] = useState({});
@@ -59,7 +59,7 @@ export default function CashFlowPage() {
 
   return (
     <>
-      <AppBar title="Cash Flow" onBack={pop} />
+      <AppBar title={tc({en: "Cash Flow", hi: "नकदी प्रवाह", bn: "নগদ প্রবাহ"})} onBack={pop} />
       <div style={{ padding: "8px 16px 32px", display: "flex", flexDirection: "column", gap: 14,
         animation: "ag-fade .25s var(--ag-ease)" }}>
 
@@ -77,7 +77,7 @@ export default function CashFlowPage() {
 
         {/* Running balance chart */}
         <Card pad={14}>
-          <div style={{ fontSize: 12, color: T.inkSoft, marginBottom: 10 }}>Running Cash Balance — {year}</div>
+          <div style={{ fontSize: 12, color: T.inkSoft, marginBottom: 10 }}>{tc({en: `Running Cash Balance — ${year}`, hi: `चालू नकद शेष — ${year}`, bn: `চলমান নগদ ব্যালেন্স — ${year}`})}</div>
           <WaterfallChart data={flow} />
         </Card>
 
@@ -86,10 +86,10 @@ export default function CashFlowPage() {
           <div style={{ background: T.redSoft, borderRadius: T.rLg, padding: "12px 14px",
             borderLeft: `4px solid ${T.red}` }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: T.red, marginBottom: 4 }}>
-              ⚠ Cash-negative months
+              {tc({en: "⚠ Cash-negative months", hi: "⚠ नकदी-ऋणात्मक महीने", bn: "⚠ নগদ-ঋণাত্মক মাসগুলি"})}
             </div>
             <div style={{ fontSize: 12, color: T.inkSoft }}>
-              {negativeMths.map((m) => m.label).join(", ")} — plan credit or reduce expenses in advance.
+              {negativeMths.map((m) => m.label).join(", ")} — {tc({en: "plan credit or reduce expenses in advance.", hi: "पहले से ऋण की योजना बनाएं या खर्च कम करें।", bn: "আগে থেকে ঋণের পরিকল্পনা করুন বা খরচ কমান।"})}
             </div>
           </div>
         )}
@@ -98,12 +98,12 @@ export default function CashFlowPage() {
         {peaks.peakIncome && (
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
             <Card pad={12} style={{ borderTop: `3px solid ${T.primary}` }}>
-              <div style={{ fontSize: 11, color: T.inkSoft }}>Peak Income Month</div>
+              <div style={{ fontSize: 11, color: T.inkSoft }}>{tc({en: "Peak Income Month", hi: "अधिकतम आय माह", bn: "সর্বোচ্চ আয়ের মাস"})}</div>
               <div style={{ fontWeight: 700, fontSize: 14, color: T.ink, marginTop: 4 }}>{peaks.peakIncome.label}</div>
               <div style={{ fontSize: 13, color: T.primary }}>{rupee(peaks.peakIncome.income)}</div>
             </Card>
             <Card pad={12} style={{ borderTop: `3px solid ${T.red}` }}>
-              <div style={{ fontSize: 11, color: T.inkSoft }}>Peak Expense Month</div>
+              <div style={{ fontSize: 11, color: T.inkSoft }}>{tc({en: "Peak Expense Month", hi: "अधिकतम व्यय माह", bn: "সর্বোচ্চ ব্যয়ের মাস"})}</div>
               <div style={{ fontWeight: 700, fontSize: 14, color: T.ink, marginTop: 4 }}>{peaks.peakExpense.label}</div>
               <div style={{ fontSize: 13, color: T.red }}>{rupee(peaks.peakExpense.expense)}</div>
             </Card>
@@ -111,10 +111,10 @@ export default function CashFlowPage() {
         )}
 
         {/* Monthly detail table */}
-        <SectionHeader title="Monthly Breakdown" />
+        <SectionHeader title={tc({en: "Monthly Breakdown", hi: "मासिक विवरण", bn: "মাসিক বিবরণ"})} />
         {activeFlow.length === 0 ? (
           <div style={{ textAlign: "center", padding: "30px 0", color: T.inkFaint, fontSize: 13 }}>
-            No transactions for {year}. Add entries in Farm Ledger to see cash flow.
+            {tc({en: `No transactions for ${year}. Add entries in Farm Ledger to see cash flow.`, hi: `${year} के लिए कोई लेनदेन नहीं। नकदी प्रवाह देखने के लिए फार्म लेजर में प्रविष्टि करें।`, bn: `${year}-এর জন্য কোনো লেনদেন নেই। নগদ প্রবাহ দেখতে ফার্ম লেজারে এন্ট্রি করুন।`})}
           </div>
         ) : (
           flow.map((m) => (
@@ -126,17 +126,17 @@ export default function CashFlowPage() {
                     {m.label}
                     {m.closing < 0 && (
                       <span style={{ marginLeft: 6, fontSize: 10, color: T.red, background: T.redSoft,
-                        borderRadius: 5, padding: "1px 5px", fontWeight: 700 }}>NEGATIVE</span>
+                        borderRadius: 5, padding: "1px 5px", fontWeight: 700 }}>{tc({en: "NEGATIVE", hi: "ऋणात्मक", bn: "ঋণাত্মক"})}</span>
                     )}
                   </div>
                   <div style={{ fontSize: 11, color: T.inkSoft, marginTop: 3 }}>
-                    Opening: {rupee(m.opening)} &nbsp;|&nbsp;
+                    {tc({en: "Opening", hi: "शुरुआती", bn: "শুরুর"})}: {rupee(m.opening)} &nbsp;|&nbsp;
                     <span style={{ color: T.primary }}>+{rupee(m.income)}</span> &nbsp;
                     <span style={{ color: T.red }}>−{rupee(m.expense)}</span>
                   </div>
                 </div>
                 <div style={{ textAlign: "right" }}>
-                  <div style={{ fontSize: 11, color: T.inkSoft }}>Closing</div>
+                  <div style={{ fontSize: 11, color: T.inkSoft }}>{tc({en: "Closing", hi: "समापन", bn: "সমাপনী"})}</div>
                   <div style={{ fontSize: 14, fontWeight: 700, color: m.closing >= 0 ? T.primary : T.red }}>
                     {rupee(m.closing)}
                   </div>

@@ -9,10 +9,15 @@ import { domainRegistry } from "../services/diagnostics/domainRegistry.js";
 import { orchestrator } from "../services/diagnostics/orchestrator.js";
 import { consentService } from "../services/diagnostics/consentService.js";
 
-const STEPS = ["Species", "Photo", "Symptoms", "Analyze"];
+const STEPS_I18N = [
+  {en:"Species", hi:"प्रजाति", bn:"প্রজাতি"},
+  {en:"Photo", hi:"फोटो", bn:"ছবি"},
+  {en:"Symptoms", hi:"लक्षण", bn:"লক্ষণ"},
+  {en:"Analyze", hi:"विश्लेषण", bn:"বিশ্লেষণ"},
+];
 
 export default function DiagnosticFlow({ domainId }) {
-  const { pop, push, toast, lang } = useApp();
+  const { pop, push, toast, lang, tc } = useApp();
   const domain = domainRegistry.get(domainId);
 
   const [step,           setStep]           = useState(0); // 0-3
@@ -56,7 +61,7 @@ export default function DiagnosticFlow({ domainId }) {
   };
 
   const next = () => {
-    if (step < STEPS.length - 2) { setStep((s) => s + 1); return; }
+    if (step < STEPS_I18N.length - 2) { setStep((s) => s + 1); return; }
     runAnalysis();
   };
 
@@ -75,7 +80,7 @@ export default function DiagnosticFlow({ domainId }) {
       });
       push({ kind: "diagnosticResult", props: { record } });
     } catch (err) {
-      toast("Diagnosis failed — please try again", "error");
+      toast(tc({en:"Diagnosis failed — please try again", hi:"निदान विफल — पुनः प्रयास करें", bn:"রোগ নির্ণয় ব্যর্থ — আবার চেষ্টা করুন"}), "error");
       setStep(2);
     } finally {
       setAnalyzing(false);
@@ -95,11 +100,11 @@ export default function DiagnosticFlow({ domainId }) {
       <div style={{ padding: "16px 16px 100px", animation: "ag-fade .22s var(--ag-ease)" }}>
 
         {/* Step indicator */}
-        <StepBar steps={STEPS} current={step} />
+        <StepBar steps={STEPS_I18N.map(s => tc(s))} current={step} />
 
         {/* ── Step 0: Species ──────────────────────────────────────────────── */}
         {step === 0 && (
-          <StepSection title="Select Species / Crop" subtitle="Choose what you want to diagnose">
+          <StepSection title={tc({en:"Select Species / Crop", hi:"प्रजाति / फसल चुनें", bn:"প্রজাতি / ফসল নির্বাচন করুন"})} subtitle={tc({en:"Choose what you want to diagnose", hi:"निदान करने के लिए चुनें", bn:"রোগ নির্ণয়ের জন্য নির্বাচন করুন"})}>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {domain.species.map((sp) => (
                 <button key={sp} onClick={() => setSpecies(species === sp ? "" : sp)}
@@ -116,14 +121,14 @@ export default function DiagnosticFlow({ domainId }) {
               ))}
             </div>
             <p style={{ fontSize: 12, color: T.inkFaint, marginTop: 12 }}>
-              Optional — skip if unsure
+              {tc({en:"Optional — skip if unsure", hi:"वैकल्पिक — अनिश्चित हों तो छोड़ दें", bn:"ঐচ্ছিক — নিশ্চিত না হলে এড়িয়ে যান"})}
             </p>
           </StepSection>
         )}
 
         {/* ── Step 1: Photo ────────────────────────────────────────────────── */}
         {step === 1 && (
-          <StepSection title="Attach a Photo" subtitle="A clear photo significantly improves accuracy">
+          <StepSection title={tc({en:"Attach a Photo", hi:"फोटो जोड़ें", bn:"ছবি সংযুক্ত করুন"})} subtitle={tc({en:"A clear photo significantly improves accuracy", hi:"स्पष्ट फोटो सटीकता बहुत बढ़ाती है", bn:"স্পষ্ট ছবি নির্ভুলতা অনেক বাড়ায়"})}>
             {imagePreview ? (
               <div style={{ position: "relative" }}>
                 <img src={imagePreview} alt="Captured" style={{ width: "100%", borderRadius: T.rLg, maxHeight: 260, objectFit: "cover" }} />
@@ -137,7 +142,7 @@ export default function DiagnosticFlow({ domainId }) {
                     background: "rgba(0,0,0,.6)", border: "none", borderRadius: 12,
                     padding: "7px 12px", cursor: "pointer", color: "#fff",
                     display: "flex", gap: 6, alignItems: "center", fontSize: 12, fontFamily: T.body }}>
-                  <Icon name="Camera" size={14} /> Retake
+                  <Icon name="Camera" size={14} /> {tc({en:"Retake", hi:"फिर से लें", bn:"আবার তুলুন"})}
                 </button>
               </div>
             ) : (
@@ -150,28 +155,28 @@ export default function DiagnosticFlow({ domainId }) {
                   <Icon name="ImagePlus" size={26} style={{ color: "var(--ag-primary)" }} />
                 </div>
                 <div style={{ fontFamily: T.body }}>
-                  <div style={{ fontSize: 15, fontWeight: 600, color: T.ink }}>Take or choose a photo</div>
-                  <div style={{ fontSize: 12.5, color: T.inkSoft, marginTop: 4 }}>Camera or gallery — JPEG, PNG, WEBP</div>
+                  <div style={{ fontSize: 15, fontWeight: 600, color: T.ink }}>{tc({en:"Take or choose a photo", hi:"फोटो लें या चुनें", bn:"ছবি তুলুন বা বাছুন"})}</div>
+                  <div style={{ fontSize: 12.5, color: T.inkSoft, marginTop: 4 }}>{tc({en:"Camera or gallery — JPEG, PNG, WEBP", hi:"कैमरा या गैलरी — JPEG, PNG, WEBP", bn:"ক্যামেরা বা গ্যালারি — JPEG, PNG, WEBP"})}</div>
                 </div>
               </button>
             )}
             <p style={{ fontSize: 12, color: T.inkFaint, marginTop: 10 }}>
-              Skip to proceed without a photo (text-based diagnosis only)
+              {tc({en:"Skip to proceed without a photo (text-based diagnosis only)", hi:"फोटो के बिना आगे बढ़ें (केवल टेक्स्ट निदान)", bn:"ছবি ছাড়া এগিয়ে যান (শুধু টেক্সট রোগ নির্ণয়)"})}
             </p>
           </StepSection>
         )}
 
         {/* ── Step 2: Symptoms ─────────────────────────────────────────────── */}
         {step === 2 && (
-          <StepSection title="Describe Symptoms" subtitle="Select what you observe">
+          <StepSection title={tc({en:"Describe Symptoms", hi:"लक्षण बताएँ", bn:"লক্ষণ বর্ণনা করুন"})} subtitle={tc({en:"Select what you observe", hi:"जो आप देखते हैं वह चुनें", bn:"আপনি যা দেখছেন তা নির্বাচন করুন"})}>
             <SymptomChecklist symptoms={domain.symptoms} answers={answers} onChange={setAnswers} />
 
             <div style={{ marginTop: 20 }}>
               <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: T.inkSoft, marginBottom: 6 }}>
-                Any other details?
+                {tc({en:"Any other details?", hi:"कोई अन्य विवरण?", bn:"অন্য কোনো বিবরণ?"})}
               </label>
               <textarea value={notes} onChange={(e) => setNotes(e.target.value)}
-                placeholder="E.g. started after rain, only in one corner, animals from new batch…"
+                placeholder={tc({en:"E.g. started after rain, only in one corner, animals from new batch…", hi:"जैसे बारिश के बाद शुरू हुआ, केवल एक कोने में, नए बैच के जानवर…", bn:"যেমন বৃষ্টির পরে শুরু হয়েছে, শুধু এক কোণায়, নতুন ব্যাচের পশু…"})}
                 rows={3}
                 style={{ width: "100%", padding: "10px 12px", borderRadius: T.rMd,
                   border: `1px solid ${T.line}`, background: T.surface, color: T.ink,
@@ -189,11 +194,11 @@ export default function DiagnosticFlow({ domainId }) {
               <Icon name="Microscope" size={34} style={{ color: "var(--ag-primary)" }} />
             </div>
             <div style={{ fontFamily: T.display, fontSize: 20, fontWeight: 700, color: T.ink, marginBottom: 8 }}>
-              Analyzing…
+              {tc({en:"Analyzing…", hi:"विश्लेषण हो रहा है…", bn:"বিশ্লেষণ হচ্ছে…"})}
             </div>
             <div style={{ fontSize: 13.5, color: T.inkSoft, lineHeight: 1.6 }}>
-              AI is reviewing your image and symptoms.<br />
-              Gathering weather, farm, and knowledge context.
+              {tc({en:"AI is reviewing your image and symptoms.", hi:"AI आपकी छवि और लक्षणों की समीक्षा कर रहा है।", bn:"AI আপনার ছবি ও লক্ষণ পর্যালোচনা করছে।"})}<br />
+              {tc({en:"Gathering weather, farm, and knowledge context.", hi:"मौसम, खेत और ज्ञान संदर्भ एकत्र कर रहा है।", bn:"আবহাওয়া, খামার ও জ্ঞান প্রসঙ্গ সংগ্রহ করছে।"})}
             </div>
           </div>
         )}
@@ -212,11 +217,11 @@ export default function DiagnosticFlow({ domainId }) {
                 style={{ flex: "0 0 auto", background: T.surface, border: `1px solid ${T.line}`,
                   borderRadius: T.rLg, padding: "12px 20px", cursor: "pointer",
                   fontFamily: T.body, fontSize: 14.5, color: T.ink }}>
-                Back
+                {tc({en:"Back", hi:"पीछे", bn:"পিছনে"})}
               </button>
             )}
             <Button full onClick={next}>
-              {step === STEPS.length - 2 ? "Start Diagnosis" : "Continue"}
+              {step === STEPS_I18N.length - 2 ? tc({en:"Start Diagnosis", hi:"निदान शुरू करें", bn:"রোগ নির্ণয় শুরু করুন"}) : tc({en:"Continue", hi:"आगे बढ़ें", bn:"এগিয়ে যান"})}
             </Button>
           </div>
         </div>

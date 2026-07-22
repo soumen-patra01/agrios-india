@@ -27,7 +27,7 @@ function BarChart({ data, maxVal, color, bg }) {
 }
 
 export default function PLReport() {
-  const { pop } = useApp();
+  const { pop, tc } = useApp();
   const [year, setYear]     = useState(new Date().getFullYear());
   const [view, setView]     = useState("monthly"); // monthly | enterprise
   const [monthly, setMonthly]   = useState([]);
@@ -53,7 +53,7 @@ export default function PLReport() {
 
   return (
     <>
-      <AppBar title="P&L Report" onBack={pop} />
+      <AppBar title={tc({en: "P&L Report", hi: "लाभ-हानि रिपोर्ट", bn: "লাভ-ক্ষতি রিপোর্ট"})} onBack={pop} />
       <div style={{ padding: "8px 16px 32px", display: "flex", flexDirection: "column", gap: 14,
         animation: "ag-fade .25s var(--ag-ease)" }}>
 
@@ -72,18 +72,18 @@ export default function PLReport() {
         {/* Year totals */}
         <div style={{ background: `linear-gradient(135deg, ${T.primary}, ${T.primaryDark})`,
           borderRadius: T.rLg, padding: "18px 18px", color: "#fff" }}>
-          <div style={{ fontSize: 12, opacity: .8, marginBottom: 8 }}>Year {year} Summary</div>
+          <div style={{ fontSize: 12, opacity: .8, marginBottom: 8 }}>{tc({en: `Year ${year} Summary`, hi: `वर्ष ${year} सारांश`, bn: `${year} সালের সারসংক্ষেপ`})}</div>
           <div style={{ display: "flex", gap: 24 }}>
             <div>
-              <div style={{ fontSize: 11, opacity: .7 }}>Income</div>
+              <div style={{ fontSize: 11, opacity: .7 }}>{tc({en: "Income", hi: "आय", bn: "আয়"})}</div>
               <div style={{ fontFamily: T.display, fontSize: 20, fontWeight: 700 }}>{rupee(total.income)}</div>
             </div>
             <div>
-              <div style={{ fontSize: 11, opacity: .7 }}>Expense</div>
+              <div style={{ fontSize: 11, opacity: .7 }}>{tc({en: "Expense", hi: "व्यय", bn: "খরচ"})}</div>
               <div style={{ fontFamily: T.display, fontSize: 20, fontWeight: 700 }}>{rupee(total.expense)}</div>
             </div>
             <div>
-              <div style={{ fontSize: 11, opacity: .7 }}>Net Profit</div>
+              <div style={{ fontSize: 11, opacity: .7 }}>{tc({en: "Net Profit", hi: "शुद्ध लाभ", bn: "নিট লাভ"})}</div>
               <div style={{ fontFamily: T.display, fontSize: 22, fontWeight: 800 }}>
                 {total.net >= 0 ? "+" : ""}{rupee(total.net)}
               </div>
@@ -95,7 +95,7 @@ export default function PLReport() {
         <div style={{ display: "flex", gap: 8 }}>
           {["monthly", "enterprise"].map((v) => (
             <Chip key={v} active={view === v} onClick={() => setView(v)}>
-              {v === "monthly" ? "Month-wise" : "By Enterprise"}
+              {v === "monthly" ? tc({en: "Month-wise", hi: "माह-वार", bn: "মাস-ভিত্তিক"}) : tc({en: "By Enterprise", hi: "उद्यम अनुसार", bn: "এন্টারপ্রাইজ অনুসারে"})}
             </Chip>
           ))}
         </div>
@@ -104,12 +104,12 @@ export default function PLReport() {
         {view === "monthly" && (
           <>
             <Card pad={14}>
-              <SectionHeader title="Monthly Income" />
+              <SectionHeader title={tc({en: "Monthly Income", hi: "मासिक आय", bn: "মাসিক আয়"})} />
               <BarChart data={monthly.map((m) => ({ month: m.month, value: m.income }))}
                 maxVal={maxIncome} color={T.primary} bg={T.primarySoft} />
             </Card>
             <Card pad={14}>
-              <SectionHeader title="Monthly Expense" />
+              <SectionHeader title={tc({en: "Monthly Expense", hi: "मासिक व्यय", bn: "মাসিক খরচ"})} />
               <BarChart data={monthly.map((m) => ({ month: m.month, value: m.expense }))}
                 maxVal={maxExpense} color={T.red} bg={T.redSoft} />
             </Card>
@@ -129,7 +129,7 @@ export default function PLReport() {
             ))}
             {monthly.every((m) => m.income === 0 && m.expense === 0) && (
               <div style={{ textAlign: "center", padding: "30px 0", color: T.inkFaint, fontSize: 13 }}>
-                No transactions for {year}. Add entries in Farm Ledger.
+                {tc({en: `No transactions for ${year}. Add entries in Farm Ledger.`, hi: `${year} के लिए कोई लेनदेन नहीं। फार्म लेजर में प्रविष्टि करें।`, bn: `${year}-এর জন্য কোনো লেনদেন নেই। ফার্ম লেজারে এন্ট্রি করুন।`})}
               </div>
             )}
           </>
@@ -139,7 +139,7 @@ export default function PLReport() {
         {view === "enterprise" && (
           byEnt.length === 0 ? (
             <div style={{ textAlign: "center", padding: "30px 0", color: T.inkFaint, fontSize: 13 }}>
-              No transactions for {year}. Add entries in Farm Ledger with an enterprise selected.
+              {tc({en: `No transactions for ${year}. Add entries in Farm Ledger with an enterprise selected.`, hi: `${year} के लिए कोई लेनदेन नहीं। उद्यम चुनकर फार्म लेजर में प्रविष्टि करें।`, bn: `${year}-এর জন্য কোনো লেনদেন নেই। এন্টারপ্রাইজ নির্বাচন করে ফার্ম লেজারে এন্ট্রি করুন।`})}
             </div>
           ) : (
             byEnt.map((e) => (

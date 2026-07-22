@@ -15,7 +15,7 @@ import { categoryMeta } from "../../services/marketplace/constantsMp.js";
 import { rupee } from "../../utils/format.js";
 
 export default function ProductDetail({ id }) {
-  const { pop, push, toast } = useApp();
+  const { pop, push, toast, tc } = useApp();
   const [p, setP] = useState(null);
   const [seller, setSeller] = useState(null);
   const [reviews, setReviews] = useState([]);
@@ -34,7 +34,7 @@ export default function ProductDetail({ id }) {
     });
   }, [id]);
 
-  if (!p) return <><AppBar title="Product" onBack={pop} /><div style={{ padding: 40, textAlign: "center", color: T.inkFaint, fontSize: 13 }}>Product not found.</div></>;
+  if (!p) return <><AppBar title={tc({ en: "Product", hi: "उत्पाद", bn: "পণ্য" })} onBack={pop} /><div style={{ padding: 40, textAlign: "center", color: T.inkFaint, fontSize: 13 }}>{tc({ en: "Product not found.", hi: "उत्पाद नहीं मिला।", bn: "পণ্য পাওয়া যায়নি।" })}</div></>;
 
   const meta = categoryMeta(p.category);
   const c = accent(meta.accent);
@@ -45,7 +45,7 @@ export default function ProductDetail({ id }) {
 
   const addToCart = async (goToCart = false) => {
     await cartService.addToCart(p.id, qty);
-    toast(`Added ${qty} × ${p.name}`, "success");
+    toast(tc({ en: `Added ${qty} × ${p.name}`, hi: `${qty} × ${p.name} जोड़ा गया`, bn: `${qty} × ${p.name} যোগ করা হয়েছে` }), "success");
     if (goToCart) push({ kind: "mpCart" });
   };
 
@@ -60,7 +60,7 @@ export default function ProductDetail({ id }) {
   return (
     <>
       <AppBar title={meta.label} onBack={pop} action={
-        <button onClick={async () => { const on = await wishlistService.toggle("product", p.id); setWished(on); toast(on ? "Added to wishlist" : "Removed", "info"); }}
+        <button onClick={async () => { const on = await wishlistService.toggle("product", p.id); setWished(on); toast(on ? tc({ en: "Added to wishlist", hi: "विशलिस्ट में जोड़ा गया", bn: "উইশলিস্টে যোগ করা হয়েছে" }) : tc({ en: "Removed", hi: "हटाया गया", bn: "সরানো হয়েছে" }), "info"); }}
           aria-label="wishlist" style={{ background: T.surface, border: `1px solid ${T.line}`, borderRadius: 12, padding: 8, cursor: "pointer", display: "flex" }}>
           <Icon name="Heart" size={19} color={wished ? T.red : T.ink} style={{ fill: wished ? T.red : "none" }} />
         </button>
@@ -72,7 +72,7 @@ export default function ProductDetail({ id }) {
         {/* hero */}
         <div style={{ background: c.bg, borderRadius: T.rLg, height: 150, display: "grid", placeItems: "center", position: "relative" }}>
           <Icon name={meta.icon} size={64} color={c.fg} strokeWidth={1.4} />
-          {p.featured && <span style={{ position: "absolute", top: 12, left: 12, background: T.yellow, color: "#3b2f00", fontSize: 10, fontWeight: 800, padding: "4px 8px", borderRadius: 7 }}>FEATURED</span>}
+          {p.featured && <span style={{ position: "absolute", top: 12, left: 12, background: T.yellow, color: "#3b2f00", fontSize: 10, fontWeight: 800, padding: "4px 8px", borderRadius: 7 }}>{tc({ en: "FEATURED", hi: "विशेष", bn: "বৈশিষ্ট্যযুক্ত" })}</span>}
         </div>
 
         {/* title + price */}
@@ -87,17 +87,17 @@ export default function ProductDetail({ id }) {
             {hasDiscount && <span style={{ fontSize: 14, color: T.inkFaint, textDecoration: "line-through" }}>{rupee(p.price)}</span>}
             <span style={{ fontSize: 12.5, color: T.inkSoft }}>/{p.unit}</span>
             {out
-              ? <Pill fg={T.red} bg={T.redSoft}>OUT OF STOCK</Pill>
+              ? <Pill fg={T.red} bg={T.redSoft}>{tc({ en: "OUT OF STOCK", hi: "स्टॉक में नहीं", bn: "স্টক নেই" })}</Pill>
               : available <= (p.lowStockAt || 0)
-                ? <Pill fg={T.orange} bg={T.orangeSoft}>ONLY {available} LEFT</Pill>
-                : <Pill fg={T.primary} bg={T.primarySoft}>IN STOCK</Pill>}
+                ? <Pill fg={T.orange} bg={T.orangeSoft}>{tc({ en: `ONLY ${available} LEFT`, hi: `केवल ${available} बचा`, bn: `মাত্র ${available} বাকি` })}</Pill>
+                : <Pill fg={T.primary} bg={T.primarySoft}>{tc({ en: "IN STOCK", hi: "स्टॉक में है", bn: "স্টকে আছে" })}</Pill>}
           </div>
         </div>
 
         {/* bulk pricing */}
         {(p.bulkPrices || []).length > 0 && (
           <Card pad={13}>
-            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>Bulk pricing</div>
+            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>{tc({ en: "Bulk pricing", hi: "थोक मूल्य", bn: "পাইকারি দাম" })}</div>
             {p.bulkPrices.map((b, i) => (
               <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, color: T.inkSoft, padding: "3px 0" }}>
                 <span>{b.minQty}+ {p.unit}</span><b style={{ color: T.ink }}>{rupee(b.price)}/{p.unit}</b>
@@ -128,7 +128,7 @@ export default function ProductDetail({ id }) {
         {p.description && <div style={{ fontSize: 13.5, color: T.inkSoft, lineHeight: 1.6 }}>{p.description}</div>}
         {p.specs && Object.keys(p.specs).length > 0 && (
           <Card pad={13}>
-            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>Specifications</div>
+            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>{tc({ en: "Specifications", hi: "विशेषताएं", bn: "বৈশিষ্ট্য" })}</div>
             {Object.entries(p.specs).map(([k, v]) => (
               <div key={k} style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, padding: "3px 0" }}>
                 <span style={{ color: T.inkSoft }}>{k}</span><span style={{ color: T.ink, fontWeight: 600 }}>{v}</span>
@@ -141,32 +141,32 @@ export default function ProductDetail({ id }) {
         {!out && (
           <>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <span style={{ fontSize: 13, fontWeight: 600, color: T.inkSoft }}>Quantity</span>
+              <span style={{ fontSize: 13, fontWeight: 600, color: T.inkSoft }}>{tc({ en: "Quantity", hi: "मात्रा", bn: "পরিমাণ" })}</span>
               {stepBtn(-1)}
               <span style={{ fontSize: 16, fontWeight: 800, minWidth: 28, textAlign: "center" }}>{qty}</span>
               {stepBtn(1)}
               <span style={{ marginLeft: "auto", fontSize: 13.5, fontWeight: 700 }}>{rupee(price * qty)}</span>
             </div>
             <div style={{ display: "flex", gap: 10 }}>
-              <Button variant="soft" full icon="ShoppingCart" onClick={() => addToCart(false)}>Add to Cart</Button>
-              <Button full onClick={() => addToCart(true)}>Buy Now</Button>
+              <Button variant="soft" full icon="ShoppingCart" onClick={() => addToCart(false)}>{tc({ en: "Add to Cart", hi: "कार्ट में डालें", bn: "কার্টে যোগ করুন" })}</Button>
+              <Button full onClick={() => addToCart(true)}>{tc({ en: "Buy Now", hi: "अभी खरीदें", bn: "এখনই কিনুন" })}</Button>
             </div>
           </>
         )}
 
         {/* reviews */}
         <Divider my={4} />
-        <SectionHeader title={`Reviews (${stats.count})`} />
+        <SectionHeader title={tc({ en: `Reviews (${stats.count})`, hi: `समीक्षाएं (${stats.count})`, bn: `রিভিউ (${stats.count})` })} />
         {reviews.length === 0 ? (
           <div style={{ fontSize: 12.5, color: T.inkFaint, textAlign: "center", padding: "8px 0 16px" }}>
-            No reviews yet — reviews unlock after a delivered order.
+            {tc({ en: "No reviews yet — reviews unlock after a delivered order.", hi: "अभी तक कोई समीक्षा नहीं — डिलीवर हुए ऑर्डर के बाद समीक्षा उपलब्ध होगी।", bn: "এখনও কোনো রিভিউ নেই — ডেলিভারি হওয়া অর্ডারের পর রিভিউ আনলক হবে।" })}
           </div>
         ) : reviews.map((r) => (
           <Card key={r.id} pad={13}>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <RatingStars value={r.rating} size={12} />
               <span style={{ fontSize: 12, fontWeight: 700 }}>{r.author}</span>
-              {r.verified && <Pill fg={T.primary} bg={T.primarySoft}>VERIFIED</Pill>}
+              {r.verified && <Pill fg={T.primary} bg={T.primarySoft}>{tc({ en: "VERIFIED", hi: "सत्यापित", bn: "যাচাইকৃত" })}</Pill>}
             </div>
             {r.text && <div style={{ fontSize: 12.5, color: T.inkSoft, marginTop: 6, lineHeight: 1.5 }}>{r.text}</div>}
           </Card>

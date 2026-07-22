@@ -31,7 +31,7 @@ function Sparkline({ data, color, height = 36 }) {
 }
 
 export default function BusinessDashboard() {
-  const { pop, push } = useApp();
+  const { pop, push, tc } = useApp();
   const [year, setYear]   = useState(new Date().getFullYear());
   const [kpi, setKpi]     = useState(null);
   const [byEnt, setByEnt] = useState([]);
@@ -52,7 +52,7 @@ export default function BusinessDashboard() {
 
   return (
     <>
-      <AppBar title="Business Dashboard" onBack={pop} />
+      <AppBar title={tc({en: "Business Dashboard", hi: "व्यापार डैशबोर्ड", bn: "ব্যবসা ড্যাশবোর্ড"})} onBack={pop} />
       <div style={{ padding: `8px ${H_PAD}px 32px`, display: "flex", flexDirection: "column", gap: 14,
         animation: "ag-fade .25s var(--ag-ease)" }}>
 
@@ -73,10 +73,10 @@ export default function BusinessDashboard() {
           <>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
               {[
-                { label: "Total Revenue", value: compact(kpi.totalRevenue), icon: "TrendingUp", color: T.primary, bg: T.primarySoft },
-                { label: "Total Cost",    value: compact(kpi.totalCost),    icon: "TrendingDown", color: T.red,     bg: T.redSoft    },
-                { label: "Net Profit",    value: compact(kpi.netProfit),    icon: "Wallet",       color: profitColor, bg: kpi.netProfit >= 0 ? T.primarySoft : T.redSoft },
-                { label: "Profit Margin", value: `${kpi.profitMargin}%`,   icon: "Percent",      color: T.blue,    bg: T.blueSoft   },
+                { label: tc({en: "Total Revenue", hi: "कुल राजस्व", bn: "মোট রাজস্ব"}), value: compact(kpi.totalRevenue), icon: "TrendingUp", color: T.primary, bg: T.primarySoft },
+                { label: tc({en: "Total Cost", hi: "कुल लागत", bn: "মোট খরচ"}),    value: compact(kpi.totalCost),    icon: "TrendingDown", color: T.red,     bg: T.redSoft    },
+                { label: tc({en: "Net Profit", hi: "शुद्ध लाभ", bn: "নিট লাভ"}),    icon: "Wallet",       value: compact(kpi.netProfit), color: profitColor, bg: kpi.netProfit >= 0 ? T.primarySoft : T.redSoft },
+                { label: tc({en: "Profit Margin", hi: "लाभ मार्जिन", bn: "লাভের মার্জিন"}), value: `${kpi.profitMargin}%`,   icon: "Percent",      color: T.blue,    bg: T.blueSoft   },
               ].map((c) => (
                 <div key={c.label} style={{ background: c.bg, borderRadius: T.rLg, padding: "14px 14px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
@@ -94,14 +94,14 @@ export default function BusinessDashboard() {
             <Card pad={14}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
-                  <div style={{ fontSize: 11, color: T.inkSoft }}>Return on Investment</div>
+                  <div style={{ fontSize: 11, color: T.inkSoft }}>{tc({en: "Return on Investment", hi: "निवेश पर प्रतिफल", bn: "বিনিয়োগের রিটার্ন"})}</div>
                   <div style={{ fontSize: 22, fontWeight: 700, color: kpi.roi >= 0 ? T.primary : T.red, fontFamily: T.display }}>
                     {kpi.roi}%
                   </div>
                 </div>
                 {kpi.revenueGrowth !== null && (
                   <div style={{ textAlign: "right" }}>
-                    <div style={{ fontSize: 11, color: T.inkSoft }}>Month-on-Month Revenue</div>
+                    <div style={{ fontSize: 11, color: T.inkSoft }}>{tc({en: "Month-on-Month Revenue", hi: "माह-दर-माह राजस्व", bn: "মাসে মাসে রাজস্ব"})}</div>
                     <div style={{ fontSize: 18, fontWeight: 700, fontFamily: T.display,
                       color: kpi.revenueGrowth >= 0 ? T.primary : T.red }}>
                       {kpi.revenueGrowth >= 0 ? "+" : ""}{kpi.revenueGrowth}%
@@ -114,10 +114,10 @@ export default function BusinessDashboard() {
             {/* Best enterprise */}
             {kpi.bestEnterprise && (
               <Card pad={14} style={{ borderLeft: `4px solid ${T.primary}` }}>
-                <div style={{ fontSize: 11, color: T.inkSoft, marginBottom: 4 }}>🏆 Best Performing Enterprise</div>
+                <div style={{ fontSize: 11, color: T.inkSoft, marginBottom: 4 }}>{tc({en: "🏆 Best Performing Enterprise", hi: "🏆 सर्वश्रेष्ठ प्रदर्शन करने वाला उद्यम", bn: "🏆 সেরা পারফর্মিং এন্টারপ্রাইজ"})}</div>
                 <div style={{ fontWeight: 700, fontSize: 15, color: T.ink }}>{kpi.bestEnterprise.label}</div>
                 <div style={{ fontSize: 13, color: T.primary, marginTop: 2 }}>
-                  Net profit: {rupee(kpi.bestEnterprise.net)}
+                  {tc({en: "Net profit", hi: "शुद्ध लाभ", bn: "নিট লাভ"})}: {rupee(kpi.bestEnterprise.net)}
                 </div>
               </Card>
             )}
@@ -125,10 +125,10 @@ export default function BusinessDashboard() {
         )}
 
         {/* Enterprise breakdown */}
-        <SectionHeader title="By Enterprise" />
+        <SectionHeader title={tc({en: "By Enterprise", hi: "उद्यम अनुसार", bn: "এন্টারপ্রাইজ অনুসারে"})} />
         {byEnt.length === 0 ? (
           <div style={{ textAlign: "center", padding: "30px 0", color: T.inkFaint, fontSize: 13 }}>
-            No transactions recorded for {year}.<br />Add entries in Farm Ledger to see your P&L.
+            {tc({en: `No transactions recorded for ${year}.`, hi: `${year} के लिए कोई लेनदेन दर्ज नहीं।`, bn: `${year}-এর জন্য কোনো লেনদেন নেই।`})}<br />{tc({en: "Add entries in Farm Ledger to see your P&L.", hi: "अपना लाभ-हानि देखने के लिए फार्म लेजर में प्रविष्टि करें।", bn: "আপনার লাভ-ক্ষতি দেখতে ফার্ম লেজারে এন্ট্রি করুন।"})}
           </div>
         ) : (
           byEnt.map((e) => {
@@ -156,11 +156,11 @@ export default function BusinessDashboard() {
         )}
 
         {/* Quick links */}
-        <SectionHeader title="Reports" />
+        <SectionHeader title={tc({en: "Reports", hi: "रिपोर्ट", bn: "রিপোর্ট"})} />
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
           {[
-            { label: "P&L Report",    icon: "FileText", kind: "plReport",    color: T.primary, bg: T.primarySoft },
-            { label: "Cash Flow",     icon: "ArrowLeftRight", kind: "cashFlow", color: T.blue, bg: T.blueSoft },
+            { label: tc({en: "P&L Report", hi: "लाभ-हानि रिपोर्ट", bn: "লাভ-ক্ষতি রিপোর্ট"}),    icon: "FileText", kind: "plReport",    color: T.primary, bg: T.primarySoft },
+            { label: tc({en: "Cash Flow", hi: "नकदी प्रवाह", bn: "নগদ প্রবাহ"}),     icon: "ArrowLeftRight", kind: "cashFlow", color: T.blue, bg: T.blueSoft },
           ].map((r) => (
             <Card key={r.label} onClick={() => push({ kind: r.kind })} pad={14}
               style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, background: r.bg, border: "none" }}>

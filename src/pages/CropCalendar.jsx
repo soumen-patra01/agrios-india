@@ -16,7 +16,7 @@ const CROP_OPTIONS = [
 const TODAY_STR = new Date().toISOString().slice(0, 10);
 
 export default function CropCalendar() {
-  const { pop, toast } = useApp();
+  const { pop, toast, tc } = useApp();
   const [filter, setFilter]   = useState("Upcoming");
   const [tick, setTick]       = useState(0);
   const [addOpen, setAddOpen] = useState(false);
@@ -56,25 +56,25 @@ export default function CropCalendar() {
     setForm({ cropId: "", sowingDate: "", areaAcres: "", fieldName: "" });
     setAddOpen(false);
     refresh();
-    toast("Crop registered", "success");
+    toast(tc({en:"Crop registered", hi:"फसल दर्ज हुई", bn:"ফসল নিবন্ধিত হয়েছে"}), "success");
   };
 
   const handleDelete = () => {
     cropCalendarService.remove(deleteId);
     setDeleteId(null);
     refresh();
-    toast("Crop removed", "success");
+    toast(tc({en:"Crop removed", hi:"फसल हटाई गई", bn:"ফসল সরানো হয়েছে"}), "success");
   };
 
   return (
     <>
-      <AppBar title="Crop Calendar" onBack={pop} action={
+      <AppBar title={tc({en:"Crop Calendar", hi:"फसल कैलेंडर", bn:"ফসল ক্যালেন্ডার"})} onBack={pop} action={
         <button onClick={() => setAddOpen(true)}
           style={{ background: T.primary, border: "none", borderRadius: 12,
             padding: "8px 14px", cursor: "pointer", color: "#fff",
             display: "flex", alignItems: "center", gap: 6,
             fontFamily: T.body, fontSize: 13, fontWeight: 600 }}>
-          <Icon name="Plus" size={15} color="#fff" /> Add crop
+          <Icon name="Plus" size={15} color="#fff" /> {tc({en:"Add crop", hi:"फसल जोड़ें", bn:"ফসল যোগ করুন"})}
         </button>
       } />
 
@@ -91,13 +91,13 @@ export default function CropCalendar() {
             </div>
             <div>
               <div style={{ fontFamily: T.display, fontSize: 19, fontWeight: 700, color: T.ink }}>
-                No crops yet
+                {tc({en:"No crops yet", hi:"अभी कोई फसल नहीं", bn:"এখনও কোনো ফসল নেই"})}
               </div>
               <div style={{ fontSize: 13.5, color: T.inkSoft, marginTop: 5, lineHeight: 1.55 }}>
-                Register a crop to get a personalised<br />task schedule with real due dates.
+                {tc({en:"Register a crop to get a personalised task schedule with real due dates.", hi:"व्यक्तिगत कार्य सूची पाने के लिए फसल दर्ज करें।", bn:"ব্যক্তিগত কাজের তালিকা পেতে ফসল নিবন্ধন করুন।"})}
               </div>
             </div>
-            <Button onClick={() => setAddOpen(true)}>Register first crop</Button>
+            <Button onClick={() => setAddOpen(true)}>{tc({en:"Register first crop", hi:"पहली फसल दर्ज करें", bn:"প্রথম ফসল নিবন্ধন করুন"})}</Button>
           </div>
         )}
 
@@ -105,14 +105,14 @@ export default function CropCalendar() {
           <>
             {/* Summary tiles */}
             <div style={{ display: "flex", gap: 10 }}>
-              <SummaryTile icon="CalendarDays" label="Crops"     value={instances.length} bg={T.primarySoft} color={T.primary} />
-              <SummaryTile icon="Timer"        label="This week" value={weekCount}         bg={T.orangeSoft}  color={T.orange}  />
-              <SummaryTile icon="AlertCircle"  label="Overdue"   value={overdueCount}      bg={T.redSoft}     color={T.red}     />
+              <SummaryTile icon="CalendarDays" label={tc({en:"Crops", hi:"फसलें", bn:"ফসল"})}     value={instances.length} bg={T.primarySoft} color={T.primary} />
+              <SummaryTile icon="Timer"        label={tc({en:"This week", hi:"इस सप्ताह", bn:"এই সপ্তাহ"})} value={weekCount}         bg={T.orangeSoft}  color={T.orange}  />
+              <SummaryTile icon="AlertCircle"  label={tc({en:"Overdue", hi:"विलंबित", bn:"বিলম্বিত"})}   value={overdueCount}      bg={T.redSoft}     color={T.red}     />
             </div>
 
             {/* Registered crop cards */}
             <div>
-              <SectionHeader title="Registered crops" />
+              <SectionHeader title={tc({en:"Registered crops", hi:"दर्ज फसलें", bn:"নিবন্ধিত ফসল"})} />
               <div style={{ display: "flex", gap: 12, overflowX: "auto",
                 paddingBottom: 4, marginLeft: -16, paddingLeft: 16, marginRight: -16, paddingRight: 16 }}>
                 {instances.map((inst) => <CropCard key={inst.id} inst={inst} onDelete={() => setDeleteId(inst.id)} />)}
@@ -121,17 +121,19 @@ export default function CropCalendar() {
 
             {/* Task list */}
             <div>
-              <SectionHeader title="Tasks" />
+              <SectionHeader title={tc({en:"Tasks", hi:"कार्य", bn:"কাজ"})} />
               <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
                 {FILTERS.map((f) => (
-                  <Chip key={f} label={f} active={filter === f} onClick={() => setFilter(f)} />
+                  <Chip key={f} active={filter === f} onClick={() => setFilter(f)}>
+                    {tc({Upcoming:{en:"Upcoming",hi:"आगामी",bn:"আসন্ন"}, Overdue:{en:"Overdue",hi:"विलंबित",bn:"বিলম্বিত"}, Done:{en:"Done",hi:"पूर्ण",bn:"সম্পন্ন"}}[f])}
+                  </Chip>
                 ))}
               </div>
 
               {tasks.length === 0 ? (
                 <div style={{ textAlign: "center", padding: "36px 0",
                   color: T.inkFaint, fontSize: 14 }}>
-                  No {filter.toLowerCase()} tasks
+                  {tc({Upcoming:{en:"No upcoming tasks",hi:"कोई आगामी कार्य नहीं",bn:"কোনো আসন্ন কাজ নেই"}, Overdue:{en:"No overdue tasks",hi:"कोई विलंबित कार्य नहीं",bn:"কোনো বিলম্বিত কাজ নেই"}, Done:{en:"No done tasks",hi:"कोई पूर्ण कार्य नहीं",bn:"কোনো সম্পন্ন কাজ নেই"}}[filter])}
                 </div>
               ) : (
                 <Card pad={6}>
@@ -147,34 +149,34 @@ export default function CropCalendar() {
       </div>
 
       {/* Add crop sheet */}
-      <BottomSheet open={addOpen} onClose={() => setAddOpen(false)} title="Register crop">
+      <BottomSheet open={addOpen} onClose={() => setAddOpen(false)} title={tc({en:"Register crop", hi:"फसल दर्ज करें", bn:"ফসল নিবন্ধন করুন"})}>
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           <Dropdown
-            label="Crop *"
+            label={tc({en:"Crop *", hi:"फसल *", bn:"ফসল *"})}
             value={form.cropId}
             onChange={(v) => setForm((f) => ({ ...f, cropId: v }))}
             options={CROP_OPTIONS}
           />
           <Input
-            label="Sowing / planting date *"
+            label={tc({en:"Sowing / planting date *", hi:"बुवाई / रोपण तिथि *", bn:"বপন / রোপণ তারিখ *"})}
             type="date"
             value={form.sowingDate}
             onChange={(v) => setForm((f) => ({ ...f, sowingDate: v }))}
           />
           <Input
-            label="Area (acres)"
+            label={tc({en:"Area (acres)", hi:"क्षेत्रफल (एकड़)", bn:"ক্ষেত্রফল (একর)"})}
             type="number"
             value={form.areaAcres}
             onChange={(v) => setForm((f) => ({ ...f, areaAcres: v }))}
-            placeholder="e.g. 2.5"
+            placeholder={tc({en:"e.g. 2.5", hi:"जैसे 2.5", bn:"যেমন 2.5"})}
           />
           <Input
-            label="Field name (optional)"
+            label={tc({en:"Field name (optional)", hi:"खेत का नाम (वैकल्पिक)", bn:"জমির নাম (ঐচ্ছিক)"})}
             value={form.fieldName}
             onChange={(v) => setForm((f) => ({ ...f, fieldName: v }))}
-            placeholder="e.g. North field"
+            placeholder={tc({en:"e.g. North field", hi:"जैसे उत्तर खेत", bn:"যেমন উত্তর জমি"})}
           />
-          <Button full disabled={!canSubmit} onClick={handleAdd}>Save crop</Button>
+          <Button full disabled={!canSubmit} onClick={handleAdd}>{tc({en:"Save crop", hi:"फसल सहेजें", bn:"ফসল সংরক্ষণ করুন"})}</Button>
         </div>
       </BottomSheet>
 
@@ -182,12 +184,12 @@ export default function CropCalendar() {
       <Dialog
         open={!!deleteId}
         onClose={() => setDeleteId(null)}
-        title="Remove crop?"
-        body="This will remove the crop and all its task history."
+        title={tc({en:"Remove crop?", hi:"फसल हटाएं?", bn:"ফসল সরাবেন?"})}
+        body={tc({en:"This will remove the crop and all its task history.", hi:"इससे फसल और उसका सारा कार्य इतिहास हट जाएगा।", bn:"এটি ফসল এবং তার সমস্ত কাজের ইতিহাস সরিয়ে দেবে।"})}
         icon="Trash2"
         danger
-        confirmLabel="Remove"
-        cancelLabel="Cancel"
+        confirmLabel={tc({en:"Remove", hi:"हटाएं", bn:"সরান"})}
+        cancelLabel={tc({en:"Cancel", hi:"रद्द करें", bn:"বাতিল"})}
         onConfirm={handleDelete}
       />
     </>
@@ -195,6 +197,7 @@ export default function CropCalendar() {
 }
 
 function CropCard({ inst, onDelete }) {
+  const { tc } = useApp();
   const def      = cropCalendarService.cropDef(inst.cropId);
   const sowDays  = Math.floor((Date.now() - new Date(inst.sowingDate)) / 86400000);
   const daysLeft = def ? def.days - sowDays : null;
@@ -213,7 +216,7 @@ function CropCard({ inst, onDelete }) {
       {inst.fieldName && (
         <div style={{ fontSize: 11.5, color: T.inkSoft }}>{inst.fieldName}</div>
       )}
-      <div style={{ fontSize: 11.5, color: T.inkSoft, marginTop: 2 }}>Sown {inst.sowingDate}</div>
+      <div style={{ fontSize: 11.5, color: T.inkSoft, marginTop: 2 }}>{tc({en:`Sown ${inst.sowingDate}`, hi:`बुवाई ${inst.sowingDate}`, bn:`বপন ${inst.sowingDate}`})}</div>
       {inst.areaAcres > 0 && (
         <div style={{ fontSize: 11.5, color: T.inkSoft }}>{inst.areaAcres} ac</div>
       )}
@@ -222,7 +225,7 @@ function CropCard({ inst, onDelete }) {
           borderRadius: 7, display: "inline-block",
           background: daysLeft > 0 ? T.primarySoft : T.redSoft,
           color: daysLeft > 0 ? T.primary : T.red }}>
-          {daysLeft > 0 ? `${daysLeft}d to harvest` : "Harvest due"}
+          {daysLeft > 0 ? tc({en:`${daysLeft}d to harvest`, hi:`कटाई में ${daysLeft} दिन`, bn:`ফসল কাটতে ${daysLeft} দিন`}) : tc({en:"Harvest due", hi:"कटाई का समय", bn:"ফসল কাটার সময়"})}
         </div>
       )}
     </div>
@@ -230,14 +233,15 @@ function CropCard({ inst, onDelete }) {
 }
 
 function TaskRow({ task, i, onToggle }) {
+  const { tc } = useApp();
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const diff  = Math.floor((new Date(task.dueDate) - today) / 86400000);
 
   let dateLabel;
-  if (task.done)    dateLabel = "Done";
-  else if (diff < 0) dateLabel = `${Math.abs(diff)}d overdue`;
-  else if (diff === 0) dateLabel = "Today";
-  else if (diff === 1) dateLabel = "Tomorrow";
+  if (task.done)    dateLabel = tc({en:"Done", hi:"पूर्ण", bn:"সম্পন্ন"});
+  else if (diff < 0) dateLabel = tc({en:`${Math.abs(diff)}d overdue`, hi:`${Math.abs(diff)} दिन विलंबित`, bn:`${Math.abs(diff)} দিন বিলম্বিত`});
+  else if (diff === 0) dateLabel = tc({en:"Today", hi:"आज", bn:"আজ"});
+  else if (diff === 1) dateLabel = tc({en:"Tomorrow", hi:"कल", bn:"আগামীকাল"});
   else dateLabel = task.dueDate;
 
   const dateColor = task.done ? T.inkFaint

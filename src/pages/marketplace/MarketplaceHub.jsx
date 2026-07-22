@@ -14,13 +14,13 @@ import { seedMp } from "../../services/marketplace/seedMp.js";
 import { PRODUCT_CATEGORIES } from "../../services/marketplace/constantsMp.js";
 
 const QUICK_LINKS = [
-  { kind: "mpOrders",   label: "My Orders", icon: "ClipboardList", a: "blue"    },
-  { kind: "mpWishlist", label: "Wishlist",  icon: "Heart",         a: "red"     },
-  { kind: "mpSeller",   label: "Sell",      icon: "Store",         a: "primary" },
+  { kind: "mpOrders",   label: {en:"My Orders",hi:"मेरे ऑर्डर",bn:"আমার অর্ডার"}, icon: "ClipboardList", a: "blue"    },
+  { kind: "mpWishlist", label: {en:"Wishlist",hi:"इच्छा सूची",bn:"ইচ্ছা তালিকা"},  icon: "Heart",         a: "red"     },
+  { kind: "mpSeller",   label: {en:"Sell",hi:"बेचें",bn:"বিক্রি"},      icon: "Store",         a: "primary" },
 ];
 
 export default function MarketplaceHub({ category = "all" } = {}) {
-  const { pop, push, toast } = useApp();
+  const { pop, push, toast, tc } = useApp();
   const [q, setQ] = useState("");
   const [cat, setCat] = useState(category);
   const [list, setList] = useState(null);           // null = loading
@@ -48,7 +48,7 @@ export default function MarketplaceHub({ category = "all" } = {}) {
 
   const toggleWish = async (p) => {
     const on = await wishlistService.toggle("product", p.id);
-    toast(on ? "Added to wishlist" : "Removed from wishlist", "info");
+    toast(on ? tc({en:"Added to wishlist",hi:"इच्छा सूची में जोड़ा गया",bn:"ইচ্ছা তালিকায় যোগ করা হয়েছে"}) : tc({en:"Removed from wishlist",hi:"इच्छा सूची से हटाया गया",bn:"ইচ্ছা তালিকা থেকে সরানো হয়েছে"}), "info");
     refresh();
   };
 
@@ -56,7 +56,7 @@ export default function MarketplaceHub({ category = "all" } = {}) {
     setSeeding(true);
     const r = await seedMp.load();
     setSeeding(false);
-    toast(`${r.products} products from ${r.sellers} sellers loaded`, "success");
+    toast(tc({en:`${r.products} products from ${r.sellers} sellers loaded`,hi:`${r.sellers} विक्रेताओं के ${r.products} उत्पाद लोड हुए`,bn:`${r.sellers} বিক্রেতার ${r.products}টি পণ্য লোড হয়েছে`}), "success");
     refresh();
   };
 
@@ -65,8 +65,8 @@ export default function MarketplaceHub({ category = "all" } = {}) {
 
   return (
     <>
-      <AppBar title="Marketplace" onBack={pop} action={
-        <button onClick={() => push({ kind: "mpCart" })} aria-label="Cart"
+      <AppBar title={tc({en:"Marketplace",hi:"बाज़ार",bn:"বাজার"})} onBack={pop} action={
+        <button onClick={() => push({ kind: "mpCart" })} aria-label={tc({en:"Cart",hi:"कार्ट",bn:"কার্ট"})}
           style={{ position: "relative", background: T.surface, border: `1px solid ${T.line}`,
             borderRadius: 12, padding: 8, cursor: "pointer", color: T.ink, display: "flex" }}>
           <Icon name="ShoppingCart" size={19} />
@@ -87,30 +87,30 @@ export default function MarketplaceHub({ category = "all" } = {}) {
             <Card key={l.kind} onClick={() => push({ kind: l.kind })} pad={11}
               style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <IconTile name={l.icon} a={l.a} size={32} iconSize={16} />
-              <span style={{ fontSize: 12, fontWeight: 700, color: T.ink }}>{l.label}</span>
+              <span style={{ fontSize: 12, fontWeight: 700, color: T.ink }}>{tc(l.label)}</span>
             </Card>
           ))}
         </div>
 
-        <SearchBar value={q} onChange={setQ} placeholder="Search seeds, feed, equipment…" />
+        <SearchBar value={q} onChange={setQ} placeholder={tc({en:"Search seeds, feed, equipment…",hi:"बीज, चारा, उपकरण खोजें…",bn:"বীজ, খাদ্য, সরঞ্জাম খুঁজুন…"})} />
 
         <div style={{ display: "flex", gap: 8, overflowX: "auto", margin: "-4px 0", paddingBottom: 4 }}>
-          <Chip active={cat === "all"} onClick={() => setCat("all")}>All</Chip>
+          <Chip active={cat === "all"} onClick={() => setCat("all")}>{tc({en:"All",hi:"सभी",bn:"সব"})}</Chip>
           {PRODUCT_CATEGORIES.map((c) => (
             <Chip key={c.id} active={cat === c.id} onClick={() => setCat(c.id)} icon={c.icon}>{c.label}</Chip>
           ))}
         </div>
 
         {list === null ? null : empty ? (
-          <EmptyState icon="ShoppingBag" title="The marketplace is empty"
-            body="Load demo sellers and products to explore, or open Sell to list your own produce. Real multi-device buying and selling arrives with the shared backend phase."
-            action={seeding ? "Loading…" : "Load demo data"} onAction={seeding ? undefined : loadDemo} />
+          <EmptyState icon="ShoppingBag" title={tc({en:"The marketplace is empty",hi:"बाज़ार खाली है",bn:"বাজার খালি"})}
+            body={tc({en:"Load demo sellers and products to explore, or open Sell to list your own produce. Real multi-device buying and selling arrives with the shared backend phase.",hi:"एक्सप्लोर करने के लिए डेमो विक्रेता और उत्पाद लोड करें, या अपनी उपज बेचने के लिए बेचें खोलें।",bn:"অন্বেষণ করতে ডেমো বিক্রেতা ও পণ্য লোড করুন, অথবা আপনার ফসল তালিকাভুক্ত করতে বিক্রি খুলুন।"})}
+            action={seeding ? tc({en:"Loading…",hi:"लोड हो रहा है…",bn:"লোড হচ্ছে…"}) : tc({en:"Load demo data",hi:"डेमो डेटा लोड करें",bn:"ডেমো ডেটা লোড করুন"})} onAction={seeding ? undefined : loadDemo} />
         ) : (
           <>
             {/* stores strip */}
             {sellers.length > 0 && cat === "all" && !q && (
               <div>
-                <SectionHeader title="Stores" />
+                <SectionHeader title={tc({en:"Stores",hi:"स्टोर",bn:"স্টোর"})} />
                 <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 4 }}>
                   {sellers.map((s) => (
                     <Card key={s.id} onClick={() => push({ kind: "mpStore", props: { sellerId: s.id } })}
@@ -133,7 +133,7 @@ export default function MarketplaceHub({ category = "all" } = {}) {
             {/* featured strip */}
             {featured.length > 0 && !q && (
               <div>
-                <SectionHeader title="Featured" />
+                <SectionHeader title={tc({en:"Featured",hi:"विशेष",bn:"বিশেষ"})} />
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                   {featured.slice(0, 2).map((p) => (
                     <ProductCard key={p.id} product={p} wished={wishedIds.has(p.id)}
@@ -146,10 +146,10 @@ export default function MarketplaceHub({ category = "all" } = {}) {
 
             {/* all products */}
             <div>
-              <SectionHeader title={cat === "all" ? "All Products" : (PRODUCT_CATEGORIES.find((c) => c.id === cat)?.label || "Products")} />
+              <SectionHeader title={cat === "all" ? tc({en:"All Products",hi:"सभी उत्पाद",bn:"সব পণ্য"}) : (PRODUCT_CATEGORIES.find((c) => c.id === cat)?.label || tc({en:"Products",hi:"उत्पाद",bn:"পণ্য"}))} />
               {list.length === 0 ? (
-                <EmptyState icon="SearchX" title="Nothing found"
-                  body={q ? `No products match "${q}".` : "No products in this category yet."} />
+                <EmptyState icon="SearchX" title={tc({en:"Nothing found",hi:"कुछ नहीं मिला",bn:"কিছু পাওয়া যায়নি"})}
+                  body={q ? tc({en:`No products match "${q}".`,hi:`"${q}" से मेल खाने वाला कोई उत्पाद नहीं।`,bn:`"${q}" এর সাথে মেলে এমন কোনো পণ্য নেই।`}) : tc({en:"No products in this category yet.",hi:"इस श्रेणी में अभी कोई उत्पाद नहीं है।",bn:"এই বিভাগে এখনও কোনো পণ্য নেই।"})} />
               ) : (
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                   {list.map((p) => (
@@ -161,9 +161,9 @@ export default function MarketplaceHub({ category = "all" } = {}) {
               )}
             </div>
 
-            <Button variant="soft" full icon="Trash2" onClick={async () => { await seedMp.clear(); refresh(); toast("Demo data cleared", "info"); }}
+            <Button variant="soft" full icon="Trash2" onClick={async () => { await seedMp.clear(); refresh(); toast(tc({en:"Demo data cleared",hi:"डेमो डेटा हटाया गया",bn:"ডেমো ডেটা মুছে ফেলা হয়েছে"}), "info"); }}
               style={{ display: (list || []).some((p) => p.demo) ? "inline-flex" : "none" }}>
-              Clear demo data
+              {tc({en:"Clear demo data",hi:"डेमो डेटा हटाएं",bn:"ডেমো ডেটা মুছুন"})}
             </Button>
           </>
         )}

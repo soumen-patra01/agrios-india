@@ -13,7 +13,7 @@ import { complianceChecker } from "../../services/mlops/governance/complianceChe
 const STAGE_FILTERS = ["all", ...Object.values(MODEL_STAGES)];
 
 export default function ModelRegistryPage() {
-  const { pop, push } = useApp();
+  const { pop, push, tc } = useApp();
   const [models, setModels] = useState([]);
   const [loading, setLoading] = useState(true);
   const [stageFilter, setStageFilter] = useState("all");
@@ -49,10 +49,10 @@ export default function ModelRegistryPage() {
 
   return (
     <>
-      <AppBar title="Model Registry" onBack={pop} />
+      <AppBar title={tc({en:"Model Registry", hi:"मॉडल रजिस्ट्री", bn:"মডেল রেজিস্ট্রি"})} onBack={pop} />
       <div style={{ padding: "12px 16px 32px", animation: "ag-fade .22s var(--ag-ease)" }}>
 
-        <ApprovalBanner count={pendingPromotions} label="promotion requests pending"
+        <ApprovalBanner count={pendingPromotions} label={tc({en:"promotion requests pending", hi:"प्रमोशन अनुरोध लंबित", bn:"প্রোমোশন অনুরোধ মুলতুবি"})}
           onAction={() => push({ kind: "trainingDashboard" })} />
 
         {/* Stage filter */}
@@ -75,7 +75,7 @@ export default function ModelRegistryPage() {
             <Icon name="RefreshCw" size={24} style={{ animation: "ag-blink 1.2s infinite" }} />
           </div>
         ) : filtered.length === 0 ? (
-          <EmptyState icon="Layers" title="No models" body="No models match the current filter." />
+          <EmptyState icon="Layers" title={tc({en:"No models", hi:"कोई मॉडल नहीं", bn:"কোনো মডেল নেই"})} body={tc({en:"No models match the current filter.", hi:"वर्तमान फ़िल्टर से कोई मॉडल मेल नहीं खाता।", bn:"বর্তমান ফিল্টারের সাথে কোনো মডেল মেলে না।"})} />
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {filtered.map((model) => {
@@ -108,10 +108,10 @@ export default function ModelRegistryPage() {
                     <Icon name={compliance.compliant ? "ShieldCheck" : "ShieldAlert"} size={13}
                       color={compliance.compliant ? "var(--ag-primary)" : "var(--ag-orange)"} />
                     <span style={{ fontSize: 11, color: compliance.compliant ? "var(--ag-primary)" : "var(--ag-orange)" }}>
-                      Compliance {compliance.score}%
+                      {tc({en:"Compliance", hi:"अनुपालन", bn:"কমপ্লায়েন্স"})} {compliance.score}%
                     </span>
                     {compliance.warnings.length > 0 && (
-                      <span style={{ fontSize: 11, color: T.inkFaint }}>· {compliance.warnings.length} warning{compliance.warnings.length !== 1 ? "s" : ""}</span>
+                      <span style={{ fontSize: 11, color: T.inkFaint }}>· {compliance.warnings.length} {compliance.warnings.length !== 1 ? tc({en:"warnings", hi:"चेतावनियाँ", bn:"সতর্কতা"}) : tc({en:"warning", hi:"चेतावनी", bn:"সতর্কতা"})}</span>
                     )}
                   </div>
 
@@ -122,7 +122,7 @@ export default function ModelRegistryPage() {
                       style={{ fontSize: 12, fontWeight: 600, color: "var(--ag-primary)",
                         background: "var(--ag-primary-soft)", border: "none", borderRadius: T.rMd,
                         padding: "6px 14px", cursor: "pointer", fontFamily: T.body }}>
-                      {promotingId === model.id ? "Requesting…" : "Request Promotion →"}
+                      {promotingId === model.id ? tc({en:"Requesting…", hi:"अनुरोध किया जा रहा है…", bn:"অনুরোধ করা হচ্ছে…"}) : tc({en:"Request Promotion →", hi:"प्रमोशन का अनुरोध करें →", bn:"প্রোমোশনের অনুরোধ করুন →"})}
                     </button>
                   )}
                 </div>

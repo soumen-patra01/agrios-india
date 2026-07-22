@@ -11,7 +11,7 @@ import { reviewService } from "../../services/marketplace/reviewService.js";
 import { wishlistService } from "../../services/marketplace/wishlistService.js";
 
 export default function StoreView({ sellerId }) {
-  const { pop, push, toast } = useApp();
+  const { pop, push, toast, tc } = useApp();
   const [seller, setSeller] = useState(null);
   const [products, setProducts] = useState([]);
   const [stats, setStats] = useState({ avg: 0, count: 0 });
@@ -24,11 +24,11 @@ export default function StoreView({ sellerId }) {
     wishlistService.has("seller", sellerId).then(setFav);
   }, [sellerId]);
 
-  if (!seller) return <><AppBar title="Store" onBack={pop} /></>;
+  if (!seller) return <><AppBar title={tc({ en: "Store", hi: "दुकान", bn: "দোকান" })} onBack={pop} /></>;
 
   return (
     <>
-      <AppBar title="Store" onBack={pop} />
+      <AppBar title={tc({ en: "Store", hi: "दुकान", bn: "দোকান" })} onBack={pop} />
       <div style={{ padding: "4px 16px 32px", display: "flex", flexDirection: "column", gap: 16,
         animation: "ag-fade .25s var(--ag-ease)" }}>
 
@@ -56,15 +56,15 @@ export default function StoreView({ sellerId }) {
         </div>
 
         <Button variant={fav ? "soft" : "outline"} full icon="Heart"
-          onClick={async () => { const on = await wishlistService.toggle("seller", sellerId); setFav(on); toast(on ? "Store added to favourites" : "Removed from favourites", "info"); }}>
-          {fav ? "Favourite store ✓" : "Add to favourites"}
+          onClick={async () => { const on = await wishlistService.toggle("seller", sellerId); setFav(on); toast(on ? tc({ en: "Store added to favourites", hi: "दुकान पसंदीदा में जोड़ी गई", bn: "দোকান পছন্দে যোগ করা হয়েছে" }) : tc({ en: "Removed from favourites", hi: "पसंदीदा से हटाया गया", bn: "পছন্দ থেকে সরানো হয়েছে" }), "info"); }}>
+          {fav ? tc({ en: "Favourite store ✓", hi: "पसंदीदा दुकान ✓", bn: "প্রিয় দোকান ✓" }) : tc({ en: "Add to favourites", hi: "पसंदीदा में जोड़ें", bn: "পছন্দে যোগ করুন" })}
         </Button>
 
         {seller.description && <div style={{ fontSize: 13, color: T.inkSoft, lineHeight: 1.6 }}>{seller.description}</div>}
 
-        <SectionHeader title={`Products (${products.length})`} />
+        <SectionHeader title={tc({ en: `Products (${products.length})`, hi: `उत्पाद (${products.length})`, bn: `পণ্য (${products.length})` })} />
         {products.length === 0 ? (
-          <EmptyState icon="Package" title="No live products" body="This store hasn't published any listings yet." />
+          <EmptyState icon="Package" title={tc({ en: "No live products", hi: "कोई लाइव उत्पाद नहीं", bn: "কোনো লাইভ পণ্য নেই" })} body={tc({ en: "This store hasn't published any listings yet.", hi: "इस दुकान ने अभी तक कोई सूची प्रकाशित नहीं की है।", bn: "এই দোকান এখনো কোনো তালিকা প্রকাশ করেনি।" })} />
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             {products.map((p) => (

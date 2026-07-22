@@ -25,7 +25,7 @@ function Bar({ label, value, level, sub }) {
 }
 
 export default function ForecastPage() {
-  const { pop } = useApp();
+  const { pop, tc } = useApp();
   const [tab, setTab] = useState("demand");
   const [demand, setDemand] = useState(null);
   const [supply, setSupply] = useState(null);
@@ -39,25 +39,29 @@ export default function ForecastPage() {
 
   return (
     <>
-      <AppBar title="Demand & Supply" onBack={pop} />
+      <AppBar title={tc({ en: "Demand & Supply", hi: "मांग और आपूर्ति", bn: "চাহিদা ও জোগান" })} onBack={pop} />
       <div style={{ padding: "4px 16px 32px", display: "flex", flexDirection: "column", gap: 14,
         animation: "ag-fade .25s var(--ag-ease)" }}>
 
         <div style={{ display: "flex", gap: 8 }}>
-          <Chip active={tab === "demand"} onClick={() => setTab("demand")}>Demand</Chip>
-          <Chip active={tab === "supply"} onClick={() => setTab("supply")}>Supply</Chip>
+          <Chip active={tab === "demand"} onClick={() => setTab("demand")}>{tc({ en: "Demand", hi: "मांग", bn: "চাহিদা" })}</Chip>
+          <Chip active={tab === "supply"} onClick={() => setTab("supply")}>{tc({ en: "Supply", hi: "आपूर्ति", bn: "জোগান" })}</Chip>
         </div>
 
         {tab === "demand" && (
           demand === null ? null : demand.every((d) => d.unitsOrdered === 0) ? (
-            <EmptyState icon="Activity" title="No demand signal yet" body="Load AI commerce demo data from the hub first." />
+            <EmptyState icon="Activity"
+              title={tc({ en: "No demand signal yet", hi: "अभी तक कोई मांग संकेत नहीं", bn: "এখনও কোনো চাহিদার সংকেত নেই" })}
+              body={tc({ en: "Load AI commerce demo data from the hub first.", hi: "पहले हब से AI कॉमर्स डेमो डेटा लोड करें।", bn: "প্রথমে হাব থেকে AI কমার্স ডেমো ডেটা লোড করুন।" })} />
           ) : (
             <Card pad={15}>
-              <SectionHeader title="Demand index by category" />
+              <SectionHeader title={tc({ en: "Demand index by category", hi: "श्रेणी अनुसार मांग सूचकांक", bn: "শ্রেণি অনুযায়ী চাহিদা সূচক" })} />
               <div style={{ marginTop: 10 }}>
                 {demand.map((d) => (
                   <Bar key={d.category} label={d.label} value={d.demandIndex} level={d.level}
-                    sub={d.festival ? `${d.unitsOrdered} units · festival lift: ${d.festival}` : `${d.unitsOrdered} units ordered`} />
+                    sub={d.festival
+                      ? tc({ en: `${d.unitsOrdered} units · festival lift: ${d.festival}`, hi: `${d.unitsOrdered} यूनिट · त्योहारी बढ़त: ${d.festival}`, bn: `${d.unitsOrdered} ইউনিট · উৎসবের চাহিদা বৃদ্ধি: ${d.festival}` })
+                      : tc({ en: `${d.unitsOrdered} units ordered`, hi: `${d.unitsOrdered} यूनिट का ऑर्डर`, bn: `${d.unitsOrdered} ইউনিট অর্ডার করা হয়েছে` })} />
                 ))}
               </div>
             </Card>
@@ -70,20 +74,28 @@ export default function ForecastPage() {
               <Card pad={15} style={{ background: T.blueSoft, border: "none" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <Icon name="Warehouse" size={17} color={T.blue} />
-                  <span style={{ fontSize: 13, fontWeight: 700, color: T.ink }}>Storage capacity — {storage.position}</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: T.ink }}>{tc({ en: "Storage capacity —", hi: "भंडारण क्षमता —", bn: "সংরক্ষণ ক্ষমতা —" })} {storage.position}</span>
                 </div>
                 <div style={{ fontSize: 12, color: T.inkSoft, marginTop: 6 }}>
-                  {storage.freeTonnes}t free of {storage.capacityTonnes}t across {storage.facilities} facilities · {storage.utilisation}% used
+                  {tc({
+                    en: `${storage.freeTonnes}t free of ${storage.capacityTonnes}t across ${storage.facilities} facilities · ${storage.utilisation}% used`,
+                    hi: `${storage.facilities} सुविधाओं में ${storage.capacityTonnes}t में से ${storage.freeTonnes}t खाली · ${storage.utilisation}% उपयोग में`,
+                    bn: `${storage.facilities}টি সুবিধায় ${storage.capacityTonnes}t-এর মধ্যে ${storage.freeTonnes}t খালি · ${storage.utilisation}% ব্যবহৃত`,
+                  })}
                 </div>
               </Card>
             )}
             {supply === null ? null : (
               <Card pad={15}>
-                <SectionHeader title="Supply position by category" />
+                <SectionHeader title={tc({ en: "Supply position by category", hi: "श्रेणी अनुसार आपूर्ति स्थिति", bn: "শ্রেণি অনুযায়ী জোগানের অবস্থা" })} />
                 <div style={{ marginTop: 10 }}>
                   {supply.map((s) => (
                     <Bar key={s.category} label={s.label} value={s.supplyIndex} level={s.position}
-                      sub={`${s.availableUnits} available · ${s.orderedUnits} ordered`} />
+                      sub={tc({
+                        en: `${s.availableUnits} available · ${s.orderedUnits} ordered`,
+                        hi: `${s.availableUnits} उपलब्ध · ${s.orderedUnits} ऑर्डर किए गए`,
+                        bn: `${s.availableUnits} উপলব্ধ · ${s.orderedUnits} অর্ডার করা হয়েছে`,
+                      })} />
                   ))}
                 </div>
               </Card>

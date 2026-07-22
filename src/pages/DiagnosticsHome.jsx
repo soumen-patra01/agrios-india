@@ -17,7 +17,7 @@ const ACCENT_COLORS = {
 };
 
 export default function DiagnosticsHome() {
-  const { pop, push } = useApp();
+  const { pop, push, tc } = useApp();
   const domains = domainRegistry.getAll();
   const [recent,  setRecent]  = useState([]);
   const [consent, setConsent] = useState(false);
@@ -39,7 +39,7 @@ export default function DiagnosticsHome() {
 
   return (
     <>
-      <AppBar title="AI Diagnostics" onBack={pop}
+      <AppBar title={tc({en:"AI Diagnostics", hi:"AI निदान", bn:"AI রোগ নির্ণয়"})} onBack={pop}
         action={
           <button onClick={() => push({ kind: "diagnosticHistory" })}
             style={{ background: T.surface, border: `1px solid ${T.line}`, borderRadius: 12,
@@ -57,10 +57,10 @@ export default function DiagnosticsHome() {
             <Icon name="Microscope" size={30} style={{ color: "var(--ag-primary)" }} />
           </div>
           <div style={{ fontFamily: T.display, fontSize: 20, fontWeight: 700, color: T.ink }}>
-            Select Diagnostic Domain
+            {tc({en:"Select Diagnostic Domain", hi:"निदान श्रेणी चुनें", bn:"রোগ নির্ণয়ের বিভাগ নির্বাচন করুন"})}
           </div>
           <div style={{ fontSize: 13, color: T.inkSoft, marginTop: 4, lineHeight: 1.5 }}>
-            AI-powered diagnosis for crops, livestock, fish, and bees
+            {tc({en:"AI-powered diagnosis for crops, livestock, fish, and bees", hi:"फसलों, पशुओं, मछली और मधुमक्खियों के लिए AI निदान", bn:"ফসল, পশু, মাছ এবং মৌমাছির জন্য AI রোগ নির্ণয়"})}
           </div>
         </div>
 
@@ -91,12 +91,12 @@ export default function DiagnosticsHome() {
           <>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
               <span style={{ fontFamily: T.display, fontSize: 15, fontWeight: 700, color: T.ink }}>
-                Recent Diagnoses
+                {tc({en:"Recent Diagnoses", hi:"हाल के निदान", bn:"সাম্প্রতিক রোগ নির্ণয়"})}
               </span>
               <button onClick={() => push({ kind: "diagnosticHistory" })}
                 style={{ background: "none", border: "none", cursor: "pointer",
                   color: "var(--ag-primary)", fontSize: 12.5, fontFamily: T.body, fontWeight: 600 }}>
-                See all
+                {tc({en:"See all", hi:"सभी देखें", bn:"সব দেখুন"})}
               </button>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -113,8 +113,7 @@ export default function DiagnosticsHome() {
           <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
             <Icon name="Info" size={14} style={{ color: T.inkFaint, flexShrink: 0, marginTop: 1 }} />
             <p style={{ fontSize: 11.5, color: T.inkFaint, margin: 0, lineHeight: 1.5 }}>
-              AgriOS AI Diagnostics provides AI-assisted guidance only — not a confirmed diagnosis.
-              Always consult a qualified agricultural expert or veterinarian before acting on AI recommendations.
+              {tc({en:"AgriOS AI Diagnostics provides AI-assisted guidance only — not a confirmed diagnosis. Always consult a qualified agricultural expert or veterinarian before acting on AI recommendations.", hi:"AgriOS AI निदान केवल AI-सहायता मार्गदर्शन प्रदान करता है — यह कोई पक्का निदान नहीं है। AI सिफारिशों पर कार्य करने से पहले हमेशा किसी योग्य कृषि विशेषज्ञ या पशु चिकित्सक से परामर्श करें।", bn:"AgriOS AI রোগ নির্ণয় শুধুমাত্র AI-সহায়তা নির্দেশিকা প্রদান করে — এটি নিশ্চিত রোগ নির্ণয় নয়। AI সুপারিশের উপর কাজ করার আগে সর্বদা একজন যোগ্য কৃষি বিশেষজ্ঞ বা পশু চিকিৎসকের সাথে পরামর্শ করুন।"})}
             </p>
           </div>
         </div>

@@ -8,7 +8,7 @@ import { nearbyService, NEARBY_CATEGORIES, getCategory } from "../services/nearb
 import { mapsService } from "../services/maps/mapsService.js";
 
 export default function NearbyServices() {
-  const { pop, push } = useApp();
+  const { pop, push, tc } = useApp();
   const [loc] = useState(() => locationService.getActive());
   const [cat, setCat] = useState(NEARBY_CATEGORIES[0].id);
   const [state, setState] = useState({ status: "idle", items: [] });
@@ -31,16 +31,16 @@ export default function NearbyServices() {
 
   return (
     <>
-      <AppBar title="Nearby services" onBack={pop} />
+      <AppBar title={tc({ en: "Nearby services", hi: "नज़दीकी सेवाएँ", bn: "কাছাকাছি সেবা" })} onBack={pop} />
       <Screen gap={14}>
         {!loc ? (
-          <EmptyState icon="MapPin" title="Set your location first"
-            body="We need your farm location to find services near you."
-            action="Set location" onAction={() => push({ kind: "farmLocations" })} />
+          <EmptyState icon="MapPin" title={tc({ en: "Set your location first", hi: "पहले अपना स्थान सेट करें", bn: "প্রথমে আপনার অবস্থান সেট করুন" })}
+            body={tc({ en: "We need your farm location to find services near you.", hi: "आपके पास सेवाएँ खोजने के लिए हमें आपके खेत का स्थान चाहिए।", bn: "আপনার কাছাকাছি সেবা খুঁজতে আপনার খামারের অবস্থান দরকার।" })}
+            action={tc({ en: "Set location", hi: "स्थान सेट करें", bn: "অবস্থান সেট করুন" })} onAction={() => push({ kind: "farmLocations" })} />
         ) : (
           <>
             <div style={{ display: "flex", alignItems: "center", gap: 6, color: T.inkSoft, fontSize: 12.5, padding: "0 2px" }}>
-              <Icon name="MapPin" size={14} style={{ color: T.primary }} /> Around {loc.name}
+              <Icon name="MapPin" size={14} style={{ color: T.primary }} /> {tc({ en: `Around ${loc.name}`, hi: `${loc.name} के आसपास`, bn: `${loc.name}-এর আশেপাশে` })}
             </div>
 
             {/* category chips */}
@@ -54,11 +54,11 @@ export default function NearbyServices() {
               <div style={{ display: "grid", placeItems: "center", padding: "40px 0" }}><Spinner size={26} /></div>
             )}
             {status === "error" && (
-              <ErrorState title="Couldn't load services" body="Check your connection and try again." onRetry={() => load(cat)} />
+              <ErrorState title={tc({ en: "Couldn't load services", hi: "सेवाएँ लोड नहीं हुईं", bn: "সেবা লোড হয়নি" })} body={tc({ en: "Check your connection and try again.", hi: "इंटरनेट जाँचें और पुनः प्रयास करें।", bn: "ইন্টারনেট দেখে আবার চেষ্টা করুন।" })} onRetry={() => load(cat)} />
             )}
             {status === "ready" && items.length === 0 && (
-              <EmptyState icon="SearchX" title={`No ${category.label.toLowerCase()} found nearby`}
-                body="Nothing within 15 km on the map. Try another category." />
+              <EmptyState icon="SearchX" title={tc({ en: `No ${category.label.toLowerCase()} found nearby`, hi: `पास में कोई ${category.label.toLowerCase()} नहीं मिला`, bn: `কাছাকাছি কোনো ${category.label.toLowerCase()} পাওয়া যায়নি` })}
+                body={tc({ en: "Nothing within 15 km on the map. Try another category.", hi: "15 किमी के भीतर कुछ नहीं मिला। दूसरी श्रेणी आज़माएँ।", bn: "১৫ কিমি-র মধ্যে কিছু পাওয়া যায়নি। অন্য বিভাগ চেষ্টা করুন।" })} />
             )}
 
             {status === "ready" && items.map((p) => (
@@ -67,7 +67,7 @@ export default function NearbyServices() {
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 14, fontWeight: 700, color: T.ink, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</div>
                   <div style={{ fontSize: 12, color: T.inkSoft, marginTop: 2 }}>
-                    {p.distanceKm} km away{p.address ? ` · ${p.address}` : ""}
+                    {tc({ en: `${p.distanceKm} km away`, hi: `${p.distanceKm} किमी दूर`, bn: `${p.distanceKm} কিমি দূরে` })}{p.address ? ` · ${p.address}` : ""}
                   </div>
                 </div>
                 <a href={mapsService.directionsUrl({ lat: p.lat, lon: p.lon })} target="_blank" rel="noreferrer"
@@ -80,7 +80,7 @@ export default function NearbyServices() {
 
             {status === "ready" && items.length > 0 && (
               <div style={{ fontSize: 11.5, color: T.inkFaint, textAlign: "center", lineHeight: 1.5 }}>
-                Places from OpenStreetMap · distances are straight-line
+                {tc({ en: "Places from OpenStreetMap · distances are straight-line", hi: "OpenStreetMap से स्थान · सीधी-रेखा दूरी", bn: "OpenStreetMap থেকে স্থান · সরলরেখা দূরত্ব" })}
               </div>
             )}
           </>

@@ -12,7 +12,7 @@ import { rupee } from "../../utils/format.js";
 import { accent } from "../../components/primitives.jsx";
 
 export default function ProviderProfile({ providerId }) {
-  const { pop, push } = useApp();
+  const { pop, push, tc } = useApp();
   const [prov, setProv] = useState(null);
   const [services, setServices] = useState([]);
   const [reviews, setReviews] = useState([]);
@@ -32,7 +32,7 @@ export default function ProviderProfile({ providerId }) {
 
   return (
     <>
-      <AppBar title="Provider" onBack={pop} />
+      <AppBar title={tc({en:"Provider",hi:"प्रदाता",bn:"প্রদানকারী"})} onBack={pop} />
       <div style={{ animation: "ag-fade .25s var(--ag-ease)" }}>
 
         {/* header */}
@@ -50,7 +50,7 @@ export default function ProviderProfile({ providerId }) {
             <RatingStars value={prov.rating || 0} count={prov.reviewCount ?? 0} size={13} />
           </div>
           <div style={{ fontSize: 11, color: T.inkFaint, marginTop: 4 }}>
-            {prov.completedBookings || 0} bookings · {prov.village}, {prov.district}
+            {prov.completedBookings || 0} {tc({en:"bookings",hi:"बुकिंग",bn:"বুকিং"})} · {prov.village}, {prov.district}
           </div>
         </div>
 
@@ -78,13 +78,13 @@ export default function ProviderProfile({ providerId }) {
 
           {/* tabs */}
           <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
-            <Chip active={tab === "services"} onClick={() => setTab("services")}>Services ({services.length})</Chip>
-            <Chip active={tab === "reviews"} onClick={() => setTab("reviews")}>Reviews ({stats.count})</Chip>
+            <Chip active={tab === "services"} onClick={() => setTab("services")}>{tc({en:"Services",hi:"सेवाएं",bn:"পরিষেবা"})} ({services.length})</Chip>
+            <Chip active={tab === "reviews"} onClick={() => setTab("reviews")}>{tc({en:"Reviews",hi:"समीक्षाएं",bn:"পর্যালোচনা"})} ({stats.count})</Chip>
           </div>
 
           {tab === "services" && (
             services.length === 0 ? (
-              <EmptyState icon="Handshake" title="No services listed" />
+              <EmptyState icon="Handshake" title={tc({en:"No services listed",hi:"कोई सेवा सूचीबद्ध नहीं है",bn:"কোনো পরিষেবা তালিকাভুক্ত নেই"})} />
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {services.map((svc) => {
@@ -96,9 +96,9 @@ export default function ProviderProfile({ providerId }) {
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ fontSize: 13, fontWeight: 700, color: T.ink }}>{svc.title}</div>
                           <div style={{ fontSize: 13, fontWeight: 800, color: T.ink, marginTop: 4 }}>
-                            {svc.price > 0 ? rupee(svc.price) : "Free"}
+                            {svc.price > 0 ? rupee(svc.price) : tc({en:"Free",hi:"मुफ्त",bn:"বিনামূল্যে"})}
                             <span style={{ fontSize: 10.5, color: T.inkFaint, fontWeight: 500, marginLeft: 4 }}>
-                              {svc.duration > 0 ? `${svc.duration} min` : ""}
+                              {svc.duration > 0 ? `${svc.duration} ${tc({en:"min",hi:"मिनट",bn:"মিনিট"})}` : ""}
                             </span>
                           </div>
                         </div>
@@ -113,7 +113,7 @@ export default function ProviderProfile({ providerId }) {
 
           {tab === "reviews" && (
             reviews.length === 0 ? (
-              <EmptyState icon="Star" title="No reviews yet" />
+              <EmptyState icon="Star" title={tc({en:"No reviews yet",hi:"अभी तक कोई समीक्षा नहीं",bn:"এখনো কোনো পর্যালোচনা নেই"})} />
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {stats.count > 0 && (
@@ -126,7 +126,7 @@ export default function ProviderProfile({ providerId }) {
                   <Card key={r.id} pad={12}>
                     <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
                       <RatingStars value={r.rating} size={12} />
-                      {r.verified && <span style={{ fontSize: 10, color: T.primary, fontWeight: 700 }}>Verified</span>}
+                      {r.verified && <span style={{ fontSize: 10, color: T.primary, fontWeight: 700 }}>{tc({en:"Verified",hi:"सत्यापित",bn:"যাচাইকৃত"})}</span>}
                     </div>
                     <div style={{ fontSize: 12.5, color: T.ink }}>{r.text}</div>
                     <div style={{ fontSize: 11, color: T.inkFaint, marginTop: 4 }}>— {r.author}</div>

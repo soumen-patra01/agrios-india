@@ -16,14 +16,14 @@ import { rupee } from "../../utils/format.js";
 import { accent } from "../../components/primitives.jsx";
 
 const FILTERS = [
-  { id: "all",       label: "All" },
-  { id: "upcoming",  label: "Upcoming" },
-  { id: "completed", label: "Completed" },
-  { id: "cancelled", label: "Cancelled" },
+  { id: "all",       label: {en:"All", hi:"सभी", bn:"সব"} },
+  { id: "upcoming",  label: {en:"Upcoming", hi:"आगामी", bn:"আসন্ন"} },
+  { id: "completed", label: {en:"Completed", hi:"पूर्ण", bn:"সম্পন্ন"} },
+  { id: "cancelled", label: {en:"Cancelled", hi:"रद्द", bn:"বাতিল"} },
 ];
 
 export default function MyBookingsPage() {
-  const { pop, push, toast } = useApp();
+  const { pop, push, toast, tc } = useApp();
   const [bookings, setBookings] = useState(null);
   const [filter, setFilter] = useState("all");
   const [detail, setDetail] = useState(null);
@@ -50,7 +50,7 @@ export default function MyBookingsPage() {
 
   const handleCancel = async (b) => {
     await bookingService.cancel(b.id);
-    toast("Booking cancelled", "info");
+    toast(tc({en:"Booking cancelled", hi:"बुकिंग रद्द की गई", bn:"বুকিং বাতিল হয়েছে"}), "info");
     setCancelConfirm(null); setDetail(null); refresh();
   };
 
@@ -68,21 +68,21 @@ export default function MyBookingsPage() {
   };
 
   const confirmReschedule = async () => {
-    if (!rescheduleDate || !rescheduleStart) { toast("Pick date and time", "error"); return; }
+    if (!rescheduleDate || !rescheduleStart) { toast(tc({en:"Pick date and time", hi:"दिनांक और समय चुनें", bn:"তারিখ ও সময় নির্বাচন করুন"}), "error"); return; }
     try {
       await bookingService.reschedule(reschedule.id, rescheduleDate.toISOString().slice(0, 10), rescheduleStart, rescheduleEnd);
-      toast("Booking rescheduled", "success");
+      toast(tc({en:"Booking rescheduled", hi:"बुकिंग पुनर्निर्धारित की गई", bn:"বুকিং পুনঃনির্ধারণ হয়েছে"}), "success");
       setReschedule(null); refresh();
     } catch (e) { toast(e.message, "error"); }
   };
 
   const submitReview = async () => {
-    if (!reviewRating) { toast("Select a rating", "error"); return; }
+    if (!reviewRating) { toast(tc({en:"Select a rating", hi:"रेटिंग चुनें", bn:"একটি রেটিং নির্বাচন করুন"}), "error"); return; }
     await svcReviewService.add({
       serviceId: reviewSheet.serviceId, providerId: reviewSheet.providerId,
       rating: reviewRating, text: reviewText,
     });
-    toast("Review submitted", "success");
+    toast(tc({en:"Review submitted", hi:"समीक्षा सबमिट की गई", bn:"রিভিউ জমা হয়েছে"}), "success");
     setReviewSheet(null); setReviewRating(0); setReviewText(""); refresh();
   };
 
@@ -91,19 +91,19 @@ export default function MyBookingsPage() {
 
   return (
     <>
-      <AppBar title="My Bookings" onBack={pop} />
+      <AppBar title={tc({en:"My Bookings", hi:"मेरी बुकिंग", bn:"আমার বুকিং"})} onBack={pop} />
       <div style={{ padding: "4px 16px 32px", display: "flex", flexDirection: "column", gap: 14,
         animation: "ag-fade .25s var(--ag-ease)" }}>
 
         <div style={{ display: "flex", gap: 8, overflowX: "auto" }}>
           {FILTERS.map((f) => (
-            <Chip key={f.id} active={filter === f.id} onClick={() => setFilter(f.id)}>{f.label}</Chip>
+            <Chip key={f.id} active={filter === f.id} onClick={() => setFilter(f.id)}>{tc(f.label)}</Chip>
           ))}
         </div>
 
         {bookings === null ? null : filtered.length === 0 ? (
-          <EmptyState icon="CalendarClock" title="No bookings"
-            body={filter === "all" ? "Browse the Service Marketplace to book your first service." : `No ${filter} bookings.`} />
+          <EmptyState icon="CalendarClock" title={tc({en:"No bookings", hi:"कोई बुकिंग नहीं", bn:"কোনো বুকিং নেই"})}
+            body={filter === "all" ? tc({en:"Browse the Service Marketplace to book your first service.", hi:"अपनी पहली सेवा बुक करने के लिए सेवा बाज़ार ब्राउज़ करें।", bn:"আপনার প্রথম পরিষেবা বুক করতে সার্ভিস মার্কেটপ্লেস ব্রাউজ করুন।"}) : `${tc({en:"No", hi:"कोई", bn:"কোনো"})} ${tc(FILTERS.find(x=>x.id===filter)?.label || {en:filter,hi:filter,bn:filter})} ${tc({en:"bookings.", hi:"बुकिंग नहीं।", bn:"বুকিং নেই।"})}`} />
         ) : (
           filtered.map((b) => {
             const st = BOOKING_STATUS[b.status] || { label: b.status, a: "yellow" };
@@ -128,7 +128,7 @@ export default function MyBookingsPage() {
       </div>
 
       {/* detail sheet */}
-      <BottomSheet open={!!detail} onClose={() => setDetail(null)} title="Booking Details">
+      <BottomSheet open={!!detail} onClose={() => setDetail(null)} title={tc({en:"Booking Details", hi:"बुकिंग विवरण", bn:"বুকিং বিবরণ"})}>
         {detail && (() => {
           const st = BOOKING_STATUS[detail.status] || { label: detail.status, a: "yellow" };
           return (
@@ -141,13 +141,13 @@ export default function MyBookingsPage() {
                 <span><Icon name="Clock" size={13} /> {detail.startTime}–{detail.endTime}</span>
               </div>
               <div style={{ fontSize: 14, fontWeight: 800, color: T.ink }}>{rupee(detail.price)}</div>
-              {detail.notes && <div style={{ fontSize: 12, color: T.inkSoft }}>Notes: {detail.notes}</div>}
-              {detail.location && <div style={{ fontSize: 12, color: T.inkSoft }}>Location: {detail.location}</div>}
+              {detail.notes && <div style={{ fontSize: 12, color: T.inkSoft }}>{tc({en:"Notes:", hi:"टिप्पणियाँ:", bn:"নোট:"})} {detail.notes}</div>}
+              {detail.location && <div style={{ fontSize: 12, color: T.inkSoft }}>{tc({en:"Location:", hi:"स्थान:", bn:"অবস্থান:"})} {detail.location}</div>}
 
               {/* timeline */}
               {detail.timeline?.length > 0 && (
                 <div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: T.ink, marginBottom: 6 }}>Timeline</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: T.ink, marginBottom: 6 }}>{tc({en:"Timeline", hi:"समयरेखा", bn:"টাইমলাইন"})}</div>
                   {detail.timeline.map((t, i) => (
                     <div key={i} style={{ display: "flex", gap: 8, fontSize: 11.5, color: T.inkSoft, marginBottom: 4 }}>
                       <span style={{ fontWeight: 700, textTransform: "capitalize" }}>{t.status}</span>
@@ -159,15 +159,15 @@ export default function MyBookingsPage() {
 
               <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
                 {bookingService.canReschedule(detail) && (
-                  <Button variant="soft" full icon="CalendarClock" onClick={() => openReschedule(detail)}>Reschedule</Button>
+                  <Button variant="soft" full icon="CalendarClock" onClick={() => openReschedule(detail)}>{tc({en:"Reschedule", hi:"पुनर्निर्धारित करें", bn:"পুনঃনির্ধারণ করুন"})}</Button>
                 )}
                 {bookingService.canCancel(detail) && (
                   <Button variant="soft" full icon="X" style={{ color: T.red }}
-                    onClick={() => setCancelConfirm(detail)}>Cancel</Button>
+                    onClick={() => setCancelConfirm(detail)}>{tc({en:"Cancel", hi:"रद्द करें", bn:"বাতিল করুন"})}</Button>
                 )}
                 {detail.status === "completed" && (
                   <Button variant="soft" full icon="Star"
-                    onClick={() => { setReviewSheet(detail); setDetail(null); }}>Review</Button>
+                    onClick={() => { setReviewSheet(detail); setDetail(null); }}>{tc({en:"Review", hi:"समीक्षा करें", bn:"রিভিউ করুন"})}</Button>
                 )}
               </div>
             </div>
@@ -177,18 +177,18 @@ export default function MyBookingsPage() {
 
       {/* cancel confirm */}
       <Dialog open={!!cancelConfirm} onClose={() => setCancelConfirm(null)}
-        title="Cancel Booking?" icon="X" danger
-        body={`Cancel ${cancelConfirm?.serviceName} on ${cancelConfirm?.date}?`}
-        confirmLabel="Yes, Cancel" onConfirm={() => handleCancel(cancelConfirm)} />
+        title={tc({en:"Cancel Booking?", hi:"बुकिंग रद्द करें?", bn:"বুকিং বাতিল করবেন?"})} icon="X" danger
+        body={`${tc({en:"Cancel", hi:"रद्द करें", bn:"বাতিল করুন"})} ${cancelConfirm?.serviceName} ${tc({en:"on", hi:"तारीख", bn:"তারিখে"})} ${cancelConfirm?.date}?`}
+        confirmLabel={tc({en:"Yes, Cancel", hi:"हाँ, रद्द करें", bn:"হ্যাঁ, বাতিল করুন"})} onConfirm={() => handleCancel(cancelConfirm)} />
 
       {/* reschedule sheet */}
-      <BottomSheet open={!!reschedule} onClose={() => setReschedule(null)} title="Reschedule Booking">
+      <BottomSheet open={!!reschedule} onClose={() => setReschedule(null)} title={tc({en:"Reschedule Booking", hi:"बुकिंग पुनर्निर्धारित करें", bn:"বুকিং পুনঃনির্ধারণ করুন"})}>
         {reschedule && (
           <div style={{ display: "flex", flexDirection: "column", gap: 14, padding: "0 4px" }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: T.ink }}>{reschedule.serviceName}</div>
-            <div style={{ fontSize: 12, color: T.inkSoft }}>Current: {reschedule.date} at {reschedule.startTime}</div>
+            <div style={{ fontSize: 12, color: T.inkSoft }}>{tc({en:"Current:", hi:"वर्तमान:", bn:"বর্তমান:"})} {reschedule.date} {tc({en:"at", hi:"समय", bn:"সময়"})} {reschedule.startTime}</div>
 
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: T.ink }}>New Date</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: T.ink }}>{tc({en:"New Date", hi:"नई तारीख", bn:"নতুন তারিখ"})}</div>
             <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 4 }}>
               {nextDays.map((d) => {
                 const active = rescheduleDate && d.toDateString() === rescheduleDate.toDateString();
@@ -206,27 +206,27 @@ export default function MyBookingsPage() {
 
             {rescheduleDate && (
               <>
-                <div style={{ fontSize: 12.5, fontWeight: 700, color: T.ink }}>New Time</div>
+                <div style={{ fontSize: 12.5, fontWeight: 700, color: T.ink }}>{tc({en:"New Time", hi:"नया समय", bn:"নতুন সময়"})}</div>
                 <TimeSlotPicker slots={rescheduleSlots} selected={rescheduleStart}
                   onSelect={(s, e) => { setRescheduleStart(s); setRescheduleEnd(e); }} />
               </>
             )}
 
             <Button full icon="CalendarClock" disabled={!rescheduleDate || !rescheduleStart}
-              onClick={confirmReschedule}>Confirm Reschedule</Button>
+              onClick={confirmReschedule}>{tc({en:"Confirm Reschedule", hi:"पुनर्निर्धारण की पुष्टि करें", bn:"পুনঃনির্ধারণ নিশ্চিত করুন"})}</Button>
           </div>
         )}
       </BottomSheet>
 
       {/* review sheet */}
-      <BottomSheet open={!!reviewSheet} onClose={() => setReviewSheet(null)} title="Write a Review">
+      <BottomSheet open={!!reviewSheet} onClose={() => setReviewSheet(null)} title={tc({en:"Write a Review", hi:"समीक्षा लिखें", bn:"রিভিউ লিখুন"})}>
         {reviewSheet && (
           <div style={{ display: "flex", flexDirection: "column", gap: 14, padding: "0 4px" }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: T.ink }}>{reviewSheet.serviceName}</div>
             <RatingStars value={reviewRating} size={24} onChange={setReviewRating} />
-            <Input label="Your review (optional)" value={reviewText}
-              onChange={(v) => setReviewText(v)} placeholder="How was the service?" />
-            <Button full icon="Send" onClick={submitReview}>Submit Review</Button>
+            <Input label={tc({en:"Your review (optional)", hi:"आपकी समीक्षा (वैकल्पिक)", bn:"আপনার রিভিউ (ঐচ্ছিক)"})} value={reviewText}
+              onChange={(v) => setReviewText(v)} placeholder={tc({en:"How was the service?", hi:"सेवा कैसी थी?", bn:"পরিষেবাটি কেমন ছিল?"})} />
+            <Button full icon="Send" onClick={submitReview}>{tc({en:"Submit Review", hi:"समीक्षा सबमिट करें", bn:"রিভিউ জমা দিন"})}</Button>
           </div>
         )}
       </BottomSheet>

@@ -11,7 +11,7 @@ import {
 } from "../services/firebase/auth.js";
 
 export default function Login() {
-  const { login, t } = useApp();
+  const { login, t, tc } = useApp();
   const [step, setStep] = useState("main");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -33,8 +33,8 @@ export default function Login() {
     } catch (err) {
       if (err?.code !== "auth/popup-closed-by-user") {
         setError(err?.code === "auth/account-exists-with-different-credential"
-          ? "Account exists with a different sign-in method"
-          : "Sign-in failed — please try again");
+          ? tc({ en: "Account exists with a different sign-in method", hi: "खाता पहले से अलग तरीके से जुड़ा है", bn: "অ্যাকাউন্ট অন্য সাইন-ইন পদ্ধতিতে আছে" })
+          : tc({ en: "Sign-in failed — please try again", hi: "साइन-इन विफल — कृपया पुनः प्रयास करें", bn: "সাইন-ইন ব্যর্থ — আবার চেষ্টা করুন" }));
       }
     } finally { setSocialLoading(null); }
   };
@@ -48,10 +48,10 @@ export default function Login() {
       login({ email, uid: fbUser.uid, name: fbUser.displayName || "", joined: Date.now() });
     } catch (err) {
       setError(
-        err?.code === "auth/invalid-email" ? "Invalid email address"
-        : err?.code === "auth/wrong-password" || err?.code === "auth/invalid-credential" ? "Incorrect email or password"
-        : err?.code === "auth/weak-password" ? "Password must be at least 6 characters"
-        : `Login failed — ${err?.code || "please try again"}`
+        err?.code === "auth/invalid-email" ? tc({ en: "Invalid email address", hi: "अमान्य ईमेल पता", bn: "অবৈধ ইমেইল ঠিকানা" })
+        : err?.code === "auth/wrong-password" || err?.code === "auth/invalid-credential" ? tc({ en: "Incorrect email or password", hi: "गलत ईमेल या पासवर्ड", bn: "ভুল ইমেইল বা পাসওয়ার্ড" })
+        : err?.code === "auth/weak-password" ? tc({ en: "Password must be at least 6 characters", hi: "पासवर्ड कम से कम 6 अक्षर का होना चाहिए", bn: "পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে" })
+        : tc({ en: `Login failed — ${err?.code || "please try again"}`, hi: `लॉगिन विफल — ${err?.code || "कृपया पुनः प्रयास करें"}`, bn: `লগইন ব্যর্থ — ${err?.code || "আবার চেষ্টা করুন"}` })
       );
     } finally { setLoading(false); }
   };
@@ -78,38 +78,38 @@ export default function Login() {
           <>
             <h1 style={{ fontSize: 26, fontWeight: 700, margin: "0 0 10px", color: "#1a1a1a",
               textAlign: "center", fontFamily: "inherit" }}>
-              Log in or sign up
+              {tc({ en: "Log in or sign up", hi: "लॉग इन या साइन अप करें", bn: "লগ ইন বা সাইন আপ করুন" })}
             </h1>
             <p style={{ fontSize: 14, color: "#6b6b6b", margin: "0 0 28px", textAlign: "center", lineHeight: 1.5 }}>
-              Smart farming tools, market prices, AI advice, and more.
+              {tc({ en: "Smart farming tools, market prices, AI advice, and more.", hi: "स्मार्ट खेती उपकरण, बाज़ार भाव, AI सलाह, और भी बहुत कुछ।", bn: "স্মার্ট কৃষি সরঞ্জাম, বাজার দর, AI পরামর্শ, এবং আরও অনেক কিছু।" })}
             </p>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               <button onClick={() => handleSocial("google", signInWithGoogle)} disabled={disabled}
                 style={{ ...btnStyle, opacity: disabled && socialLoading !== "google" ? 0.5 : 1 }}>
                 <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-                {socialLoading === "google" ? "Signing in…" : "Continue with Google"}
+                {socialLoading === "google" ? tc({ en: "Signing in…", hi: "साइन इन हो रहा है…", bn: "সাইন ইন হচ্ছে…" }) : tc({ en: "Continue with Google", hi: "Google से जारी रखें", bn: "Google দিয়ে চালিয়ে যান" })}
               </button>
 
               <button onClick={() => handleSocial("apple", signInWithApple)} disabled={disabled}
                 style={{ ...btnStyle, opacity: disabled && socialLoading !== "apple" ? 0.5 : 1 }}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="#1a1a1a"><path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.51-3.23 0-1.44.64-2.2.45-3.06-.4C3.79 16.17 4.36 9.53 8.7 9.28c1.23.06 2.08.72 2.8.75.99-.2 1.94-.78 3-.66 1.28.15 2.24.69 2.87 1.7-2.63 1.58-2.01 5.05.36 6.02-.5 1.32-.93 2.61-1.68 3.19zM12.03 9.22c-.13-2.62 2.08-4.88 4.47-5.08.32 2.95-2.67 5.16-4.47 5.08z"/></svg>
-                {socialLoading === "apple" ? "Signing in…" : "Continue with Apple"}
+                {socialLoading === "apple" ? tc({ en: "Signing in…", hi: "साइन इन हो रहा है…", bn: "সাইন ইন হচ্ছে…" }) : tc({ en: "Continue with Apple", hi: "Apple से जारी रखें", bn: "Apple দিয়ে চালিয়ে যান" })}
               </button>
 
               <button onClick={() => setStep("phone")} disabled={disabled} style={btnStyle}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                Continue with phone
+                {tc({ en: "Continue with phone", hi: "फ़ोन से जारी रखें", bn: "ফোন দিয়ে চালিয়ে যান" })}
               </button>
 
               <div style={{ display: "flex", alignItems: "center", gap: 14, margin: "6px 0" }}>
                 <div style={{ flex: 1, height: 1, background: "#e5e5e5" }} />
-                <span style={{ fontSize: 12, color: "#999", fontWeight: 400 }}>OR</span>
+                <span style={{ fontSize: 12, color: "#999", fontWeight: 400 }}>{tc({ en: "OR", hi: "या", bn: "অথবা" })}</span>
                 <div style={{ flex: 1, height: 1, background: "#e5e5e5" }} />
               </div>
 
               <input value={email} onChange={(e) => { setEmail(e.target.value.trim()); setError(""); }}
-                placeholder="Email address" type="email"
+                placeholder={tc({ en: "Email address", hi: "ईमेल पता", bn: "ইমেইল ঠিকানা" })} type="email"
                 style={{ width: "100%", padding: "13px 16px", borderRadius: 12, fontSize: 15,
                   border: "1px solid #e5e5e5", background: "#f5f5f5", color: "#1a1a1a",
                   fontFamily: "inherit", outline: "none", boxSizing: "border-box" }}
@@ -121,19 +121,19 @@ export default function Login() {
                   background: "#1a1a1a", color: "#fff", fontSize: 15, fontWeight: 600,
                   fontFamily: "inherit", cursor: "pointer",
                   opacity: email.includes("@") ? 1 : 0.35 }}>
-                Continue
+                {t("continue")}
               </button>
 
               <div style={{ display: "flex", gap: 10 }}>
                 <button onClick={() => handleSocial("facebook", signInWithGoogle)} disabled={disabled}
                   style={{ ...btnStyle, flex: 1, justifyContent: "center", padding: "12px 0" }}>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                  Facebook
+                  {tc({ en: "Facebook", hi: "Facebook", bn: "Facebook" })}
                 </button>
                 <button onClick={() => handleSocial("twitter", signInWithGoogle)} disabled={disabled}
                   style={{ ...btnStyle, flex: 1, justifyContent: "center", padding: "12px 0" }}>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="#1a1a1a"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                  X
+                  {tc({ en: "X", hi: "X", bn: "X" })}
                 </button>
               </div>
             </div>
@@ -146,11 +146,11 @@ export default function Login() {
               style={{ position: "absolute", top: 16, left: 16, background: "none", border: "none",
                 cursor: "pointer", fontSize: 20, color: "#999", padding: 4 }}>←</button>
             <h1 style={{ fontSize: 26, fontWeight: 700, margin: "0 0 28px", color: "#1a1a1a",
-              textAlign: "center", fontFamily: "inherit" }}>Email login</h1>
+              textAlign: "center", fontFamily: "inherit" }}>{tc({ en: "Email login", hi: "ईमेल लॉगिन", bn: "ইমেইল লগইন" })}</h1>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <input value={email} onChange={(e) => { setEmail(e.target.value.trim()); setError(""); }}
-                placeholder="Email address" type="email" autoFocus
+                placeholder={tc({ en: "Email address", hi: "ईमेल पता", bn: "ইমেইল ঠিকানা" })} type="email" autoFocus
                 style={{ width: "100%", padding: "13px 16px", borderRadius: 12, fontSize: 15,
                   border: "1px solid #e5e5e5", background: "#f5f5f5", color: "#1a1a1a",
                   fontFamily: "inherit", outline: "none", boxSizing: "border-box" }}
@@ -158,7 +158,7 @@ export default function Login() {
                 onBlur={(e) => e.target.style.borderColor = "#e5e5e5"} />
 
               <input value={password} onChange={(e) => { setPassword(e.target.value); setError(""); }}
-                placeholder="Password (min 6 characters)" type="password"
+                placeholder={tc({ en: "Password (min 6 characters)", hi: "पासवर्ड (कम से कम 6 अक्षर)", bn: "পাসওয়ার্ড (কমপক্ষে ৬ অক্ষর)" })} type="password"
                 style={{ width: "100%", padding: "13px 16px", borderRadius: 12, fontSize: 15,
                   border: "1px solid #e5e5e5", background: "#f5f5f5", color: "#1a1a1a",
                   fontFamily: "inherit", outline: "none", boxSizing: "border-box" }}
@@ -171,7 +171,7 @@ export default function Login() {
                   background: "#1a1a1a", color: "#fff", fontSize: 15, fontWeight: 600,
                   fontFamily: "inherit", cursor: "pointer",
                   opacity: email.includes("@") && password.length >= 6 && !loading ? 1 : 0.35 }}>
-                {loading ? "Signing in…" : "Continue"}
+                {loading ? tc({ en: "Signing in…", hi: "साइन इन हो रहा है…", bn: "সাইন ইন হচ্ছে…" }) : t("continue")}
               </button>
             </div>
           </>
@@ -183,7 +183,7 @@ export default function Login() {
               style={{ position: "absolute", top: 16, left: 16, background: "none", border: "none",
                 cursor: "pointer", fontSize: 20, color: "#999", padding: 4 }}>←</button>
             <h1 style={{ fontSize: 26, fontWeight: 700, margin: "0 0 28px", color: "#1a1a1a",
-              textAlign: "center", fontFamily: "inherit" }}>Phone login</h1>
+              textAlign: "center", fontFamily: "inherit" }}>{tc({ en: "Phone login", hi: "फ़ोन लॉगिन", bn: "ফোন লগইন" })}</h1>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <div style={{ display: "flex", gap: 8 }}>
@@ -191,7 +191,7 @@ export default function Login() {
                   background: "#f5f5f5", color: "#6b6b6b", fontSize: 15, fontFamily: "inherit", flexShrink: 0 }}>
                   +91
                 </div>
-                <input placeholder="Mobile number" autoFocus
+                <input placeholder={tc({ en: "Mobile number", hi: "मोबाइल नंबर", bn: "মোবাইল নম্বর" })} autoFocus
                   style={{ flex: 1, padding: "13px 16px", borderRadius: 12, fontSize: 15,
                     border: "1px solid #e5e5e5", background: "#f5f5f5", color: "#1a1a1a",
                     fontFamily: "inherit", outline: "none", boxSizing: "border-box" }}
@@ -201,7 +201,7 @@ export default function Login() {
 
               <div style={{ padding: "10px 14px", borderRadius: 10, background: "#fff8ed",
                 fontSize: 13, color: "#b25e00", textAlign: "center" }}>
-                Phone login requires Firebase Blaze plan — use Google or Email instead
+                {tc({ en: "Phone login requires Firebase Blaze plan — use Google or Email instead", hi: "फ़ोन लॉगिन के लिए Firebase Blaze प्लान चाहिए — Google या ईमेल से लॉगिन करें", bn: "ফোন লগইনের জন্য Firebase Blaze প্ল্যান দরকার — Google বা ইমেইল ব্যবহার করুন" })}
               </div>
             </div>
           </>
