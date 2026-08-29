@@ -1,5 +1,11 @@
 import { enqueue } from "./syncQueue.js";
 
+/* Cheap env check — mirrors config.js's `fbEnabled` without importing it, so a
+   build with no Firebase project never drags the SDK in (same trick as
+   pages/Profile.jsx). Read once at module load; the env cannot change at
+   runtime. */
+const fbEnabled = !!import.meta.env.VITE_FB_API_KEY;
+
 /* firestoreRepo pulls in the Firestore SDK (~600kB). Load it lazily so reads —
    which never touch the cloud — keep Firestore off the initial render path. */
 async function cloudRepo(storeName) {
@@ -21,6 +27,10 @@ export function wrapWithSync(storeName, local, options = {}) {
   };
 
   function pushToCloud(op) {
+    // No Firebase project configured: every firestoreRepo method short-circuits
+    // on this same flag, so importing it would cost ~600kB (and, in tests, a
+    // ~1.2s module evaluation that blocks the event loop) to do nothing.
+    if (!fbEnabled) return;
     cloudRepo(storeName).then(op).catch(() => {});
   }
 
