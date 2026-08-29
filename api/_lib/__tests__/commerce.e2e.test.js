@@ -51,7 +51,9 @@ beforeAll(async () => {
   server = new PGLiteSocketServer({ db: pglite, port: 0, host: "127.0.0.1" });
   await server.start();
   held.sql = postgres(`postgres://postgres@${server.getServerConn()}/postgres`, { prepare: false, ssl: false, max: 1 });
-}, 30000);
+  // Same irreducible PGlite WASM init as the integration suite (~6s idle, far
+  // more under full-suite parallelism), plus the socket server and client.
+}, 60000);
 
 afterAll(async () => {
   await held.sql?.end();
