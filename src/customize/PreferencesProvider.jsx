@@ -34,15 +34,24 @@ export function PreferencesProvider({ children }) {
   }, [prefs.accessibility.reduceMotion]);
 
   // Cloud sync: pull on sign-in (new-device restore), push on change (debounced).
+  // prefsSync drags in the Firestore SDK, and neither direction is reachable
+  // until somebody is actually signed in — so it is loaded from inside the auth
+  // callback, never at mount. Eagerly pairing it with loadAuth() here used to
+  // put ~460kB of Firestore on the first-paint path of every signed-out session.
+  const signedIn = useRef(false);
   useEffect(() => {
     let unsub = () => {};
     let cancelled = false;
-    Promise.all([loadAuth(), loadPrefsSync()]).then(([{ onAuthChange }, { loadPrefsCloud }]) => {
+    loadAuth().then(({ onAuthChange }) => {
       if (cancelled) return;
       unsub = onAuthChange(async (user) => {
+        signedIn.current = !!user;
         if (!user) return;
-        const cloud = await loadPrefsCloud();
-        if (cloud) preferences.replace(cloud);
+        try {
+          const { loadPrefsCloud } = await loadPrefsSync();
+          const cloud = await loadPrefsCloud();
+          if (cloud) preferences.replace(cloud);
+        } catch { /* offline / chunk fetch failed — local prefs stay the source */ }
       });
     }).catch(() => {});
     return () => { cancelled = true; unsub(); };
@@ -54,6 +63,10 @@ export function PreferencesProvider({ children }) {
     // "off" = local only: don't push preferences to the cloud.
     if (prefs.offline.mode === "off") return;
     saveTimer.current = setTimeout(() => {
+      // Signed out, savePrefsCloud() no-ops on its own null ref — skip the
+      // import entirely so the SDK is never fetched for a session that has
+      // nowhere to push to.
+      if (!signedIn.current) return;
       loadPrefsSync().then(({ savePrefsCloud }) => savePrefsCloud(preferences.all())).catch(() => {});
     }, 800);
     return () => clearTimeout(saveTimer.current);
